@@ -19,7 +19,6 @@ struct ARLandmarkView: UIViewControllerRepresentable {
     }
 
     func updateUIViewController(_ vc: ARLandmarkViewController, context: Context) {
-        // Called whenever landmarks, location, or heading changes
         vc.update(landmarks: landmarks, userLocation: userLocation, heading: heading) { landmark in
             selectedLandmark = landmark
         }
@@ -31,21 +30,16 @@ struct ARLandmarkView: UIViewControllerRepresentable {
 
 class ARLandmarkViewController: UIViewController, ARSessionDelegate {
 
-    // ARView is RealityKit's main rendering view (built on top of ARKit)
     private var arView: ARView!
+    private var labelViews: [String: LandmarkLabelView] = [:]
 
-    // We keep track of label views so we can update/remove them
-    private var labelViews: [String: LandmarkLabelView] = [:]  // keyed by landmark ID
-
-    // Current state passed in from SwiftUI
     private var landmarks: [Landmark] = []
     private var userLocation: CLLocation?
     private var heading: CLHeading?
     private var onSelect: ((Landmark) -> Void)?
 
-    // How often to update label positions (every N frames)
     private var frameCount = 0
-    private let updateInterval = 30  // update every 30 frames (~0.5 seconds at 60fps)
+    private let updateInterval = 30
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -64,9 +58,8 @@ class ARLandmarkViewController: UIViewController, ARSessionDelegate {
         arView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         view.addSubview(arView)
 
-        // World tracking: uses camera + IMU to track device position/orientation
         let config = ARWorldTrackingConfiguration()
-        config.worldAlignment = .gravityAndHeading  // CRITICAL: aligns AR world with compass north
+        config.worldAlignment = .gravityAndHeading
         arView.session.run(config)
         arView.session.delegate = self
     }
@@ -81,6 +74,14 @@ class ARLandmarkViewController: UIViewController, ARSessionDelegate {
         self.userLocation = userLocation
         self.heading = heading
         self.onSelect = onSelect
+
+        // Remove labels for landmarks that are no longer in the list
+        let currentIDs = Set(landmarks.map { $0.id })
+        for id in labelViews.keys where !currentIDs.contains(id) {
+            labelViews[id]?.removeFromSuperview()
+            labelViews.removeValue(forKey: id)
+        }
+
         refreshLabels()
     }
 
@@ -93,7 +94,6 @@ class ARLandmarkViewController: UIViewController, ARSessionDelegate {
     }
 
     // MARK: - Label Placement
-    // This is the core of the app: converting GPS coordinates to AR screen positions.
 
     private func refreshLabels() {
         guard let userLocation = userLocation,
@@ -108,68 +108,47 @@ class ARLandmarkViewController: UIViewController, ARSessionDelegate {
         )
 
         for landmark in landmarks {
-            // Convert the landmark's GPS position to an AR world-space position
             guard let worldPosition = worldPosition(for: landmark, relativeTo: userLocation) else { continue }
 
-            // Project 3D world position to 2D screen coordinates
             guard let screenPoint = project(worldPosition,
                                             camera: cameraTransform,
                                             projection: projectionMatrix,
                                             viewSize: arView.bounds.size) else {
-                // Landmark is behind the camera — hide its label
                 labelViews[landmark.id]?.isHidden = true
                 continue
             }
 
-            // Show or create the label at the screen position
             showLabel(for: landmark, at: screenPoint)
         }
     }
 
-    /// Converts a GPS coordinate to a 3D position in ARKit world space.
-    /// ARKit uses meters; we use the bearing and distance to place a point
-    /// in the correct compass direction at a fixed "display distance" from camera.
     private func worldPosition(for landmark: Landmark, relativeTo userLocation: CLLocation) -> SIMD3<Float>? {
         let bearing = landmark.bearing
         let bearingRad = Float(bearing.toRadians())
+        let displayDistance: Float = 80
 
-        // We place the label at a fixed distance regardless of actual distance
-        // (so distant mountains still have visible labels)
-        let displayDistance: Float = 80  // meters in AR world space
-
-        // Convert polar (bearing + distance) to Cartesian (x, z)
-        // In ARKit with gravityAndHeading: X = East, Z = South, Y = Up
         let x = displayDistance * sin(bearingRad)
-        let z = -displayDistance * cos(bearingRad)  // negative = forward (north)
-        let y: Float = 0  // same height as camera (eye level)
+        let z = -displayDistance * cos(bearingRad)
+        let y: Float = 0
 
         return SIMD3<Float>(x, y, z)
     }
 
-    /// Projects a 3D world-space point to 2D screen coordinates.
-    /// Returns nil if the point is behind the camera.
     private func project(_ worldPoint: SIMD3<Float>,
                          camera: float4x4,
                          projection: float4x4,
                          viewSize: CGSize) -> CGPoint? {
-
-        // Transform world point into camera (view) space
         let worldPoint4 = SIMD4<Float>(worldPoint.x, worldPoint.y, worldPoint.z, 1)
         let viewSpace = camera.inverse * worldPoint4
 
-        // If z > 0 the point is behind the camera (ARKit uses right-handed coords)
         guard viewSpace.z < 0 else { return nil }
 
-        // Apply projection matrix to get clip space
         let clipSpace = projection * viewSpace
         guard clipSpace.w != 0 else { return nil }
 
-        // Perspective divide → NDC (-1 to 1)
         let ndc = SIMD2<Float>(clipSpace.x / clipSpace.w, clipSpace.y / clipSpace.w)
-
-        // Convert NDC to screen pixels
         let screenX = CGFloat((ndc.x + 1) / 2) * viewSize.width
-        let screenY = CGFloat((1 - ndc.y) / 2) * viewSize.height  // flip Y axis
+        let screenY = CGFloat((1 - ndc.y) / 2) * viewSize.height
 
         return CGPoint(x: screenX, y: screenY)
     }
@@ -177,18 +156,17 @@ class ARLandmarkViewController: UIViewController, ARSessionDelegate {
     // MARK: - Label UI
 
     private func showLabel(for landmark: Landmark, at point: CGPoint) {
-        // Clamp to screen edges so labels don't fly off screen
         let padding: CGFloat = 80
         let clampedX = max(padding, min(arView.bounds.width - padding, point.x))
         let clampedY = max(padding, min(arView.bounds.height - padding, point.y))
         let clampedPoint = CGPoint(x: clampedX, y: clampedY)
 
         if let existingLabel = labelViews[landmark.id] {
-            // Update position of existing label
             existingLabel.isHidden = false
             existingLabel.center = clampedPoint
+            // LAR-8: Update scale whenever position refreshes
+            existingLabel.applyDistanceScale(landmark.distance)
         } else {
-            // Create a new label view
             let label = LandmarkLabelView(landmark: landmark)
             label.center = clampedPoint
             label.onTap = { [weak self] in
@@ -202,11 +180,16 @@ class ARLandmarkViewController: UIViewController, ARSessionDelegate {
 
 // MARK: - LandmarkLabelView
 // The floating label that appears in AR for each nearby landmark.
+// LAR-7: No background bubble — text-only with shadow for legibility.
+// LAR-8: Scaled relative to distance from user.
+// LAR-9: Distance displayed prominently below landmark name.
 
 class LandmarkLabelView: UIView {
 
     var onTap: (() -> Void)?
     private let landmark: Landmark
+    private let nameLabel = UILabel()
+    private let distanceLabel = UILabel()
 
     init(landmark: Landmark) {
         self.landmark = landmark
@@ -217,64 +200,90 @@ class LandmarkLabelView: UIView {
     required init?(coder: NSCoder) { fatalError() }
 
     private func setup() {
-        // Semi-transparent dark pill background
-        backgroundColor = UIColor.black.withAlphaComponent(0.65)
-        layer.cornerRadius = 12
-        layer.borderColor = UIColor.white.withAlphaComponent(0.3).cgColor
-        layer.borderWidth = 1
+        // LAR-7: No background or border — transparent view, text only
+        backgroundColor = .clear
 
-        // Stack: name label on top, distance below
-        let nameLabel = UILabel()
+        // Name label
         nameLabel.text = landmark.title
         nameLabel.textColor = .white
-        nameLabel.font = UIFont.boldSystemFont(ofSize: 14)
+        nameLabel.font = UIFont.boldSystemFont(ofSize: 15)
         nameLabel.numberOfLines = 2
         nameLabel.textAlignment = .center
+        nameLabel.applyShadow()
 
-        let distanceLabel = UILabel()
-        let distanceText = formatDistance(landmark.distance)
-        distanceLabel.text = "📍 \(distanceText)"
-        distanceLabel.textColor = UIColor.white.withAlphaComponent(0.8)
-        distanceLabel.font = UIFont.systemFont(ofSize: 11)
+        // LAR-9: Distance label — formatted and shown below name
+        distanceLabel.text = formattedDistance(landmark.distance)
+        distanceLabel.textColor = UIColor.white.withAlphaComponent(0.9)
+        distanceLabel.font = UIFont.systemFont(ofSize: 12, weight: .medium)
         distanceLabel.textAlignment = .center
+        distanceLabel.applyShadow()
 
         let stack = UIStackView(arrangedSubviews: [nameLabel, distanceLabel])
         stack.axis = .vertical
-        stack.spacing = 2
+        stack.spacing = 3
+        stack.alignment = .center
         stack.translatesAutoresizingMaskIntoConstraints = false
         addSubview(stack)
 
+        let targetWidth: CGFloat = 160
+        nameLabel.preferredMaxLayoutWidth = targetWidth
+
         NSLayoutConstraint.activate([
-            stack.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 10),
-            stack.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -10),
-            stack.topAnchor.constraint(equalTo: topAnchor, constant: 8),
-            stack.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -8),
+            stack.centerXAnchor.constraint(equalTo: centerXAnchor),
+            stack.centerYAnchor.constraint(equalTo: centerYAnchor),
+            stack.widthAnchor.constraint(lessThanOrEqualToConstant: targetWidth),
         ])
 
-        // Size the view to fit its content
-        let targetWidth: CGFloat = 150
-        nameLabel.preferredMaxLayoutWidth = targetWidth - 20
         let size = stack.systemLayoutSizeFitting(
             CGSize(width: targetWidth, height: UIView.layoutFittingCompressedSize.height)
         )
-        frame = CGRect(origin: .zero, size: CGSize(width: targetWidth, height: size.height + 16))
+        frame = CGRect(origin: .zero, size: CGSize(width: targetWidth, height: size.height + 8))
 
-        // Tap to see detail
+        // LAR-8: Apply initial distance-based scale
+        applyDistanceScale(landmark.distance)
+
         let tap = UITapGestureRecognizer(target: self, action: #selector(tapped))
         addGestureRecognizer(tap)
         isUserInteractionEnabled = true
+    }
+
+    // LAR-8: Scale the label so closer landmarks appear larger
+    func applyDistanceScale(_ distanceMeters: CLLocationDistance) {
+        let scale: CGFloat
+        switch distanceMeters {
+        case ..<300:        scale = 1.4
+        case 300..<800:     scale = 1.2
+        case 800..<2000:    scale = 1.0
+        case 2000..<5000:   scale = 0.85
+        default:            scale = 0.70
+        }
+        transform = CGAffineTransform(scaleX: scale, y: scale)
     }
 
     @objc private func tapped() {
         onTap?()
     }
 
-    private func formatDistance(_ meters: CLLocationDistance) -> String {
-        if meters < 1000 {
-            return "\(Int(meters))m"
+    // LAR-9: Human-readable distance string
+    private func formattedDistance(_ meters: CLLocationDistance) -> String {
+        if meters < 100 {
+            return "< 100 m away"
+        } else if meters < 1000 {
+            return "\(Int((meters / 100).rounded() * 100)) m away"
         } else {
-            let km = meters / 1000
-            return String(format: "%.1f km", km)
+            return String(format: "%.1f km away", meters / 1000)
         }
+    }
+}
+
+// MARK: - UILabel Shadow Helper
+
+private extension UILabel {
+    func applyShadow() {
+        layer.shadowColor = UIColor.black.cgColor
+        layer.shadowOffset = CGSize(width: 0, height: 1)
+        layer.shadowOpacity = 0.9
+        layer.shadowRadius = 3
+        layer.masksToBounds = false
     }
 }

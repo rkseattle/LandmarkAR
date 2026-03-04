@@ -1,6 +1,37 @@
 import CoreLocation
 import Foundation
 
+// MARK: - LandmarkCategory (LAR-5)
+// Keyword-based classification used for the category filter in Settings.
+
+enum LandmarkCategory: String {
+    case historical, natural, cultural, other
+
+    static func classify(title: String, summary: String) -> LandmarkCategory {
+        let text = (title + " " + summary).lowercased()
+
+        let historicalKeywords = ["museum", "historic", "monument", "memorial", "war", "battle",
+                                  "fort", "castle", "ruin", "colonial", "ancient", "heritage",
+                                  "cemetery", "landmark", "church", "cathedral", "temple",
+                                  "mosque", "synagogue", "basilica", "shrine", "chapel",
+                                  "mission", "palace", "mansion", "historic district"]
+        let naturalKeywords    = ["park", "mountain", "lake", "river", "forest", "canyon",
+                                  "waterfall", "nature", "wildlife", "reserve", "beach",
+                                  "glacier", "valley", "volcano", "creek", "bay", "island",
+                                  "peak", "hill", "ridge", "trail", "wilderness", "garden",
+                                  "botanical", "preserve"]
+        let culturalKeywords   = ["art", "theater", "theatre", "gallery", "library", "university",
+                                  "college", "stadium", "arena", "market", "bridge", "plaza",
+                                  "center", "centre", "district", "neighborhood", "street",
+                                  "avenue", "hall", "opera", "concert", "sculpture"]
+
+        if historicalKeywords.contains(where: { text.contains($0) }) { return .historical }
+        if naturalKeywords.contains(where:    { text.contains($0) }) { return .natural }
+        if culturalKeywords.contains(where:   { text.contains($0) }) { return .cultural }
+        return .other
+    }
+}
+
 // MARK: - Landmark Model
 // Represents a single point of interest (natural landmark, historic site, etc.)
 
@@ -10,6 +41,7 @@ struct Landmark: Identifiable {
     let summary: String      // Short description from Wikipedia
     let coordinate: CLLocationCoordinate2D  // Lat/long of the landmark
     let wikipediaURL: URL?   // Link to full Wikipedia article
+    let category: LandmarkCategory  // Used for category filtering (LAR-5)
 
     // Calculated at runtime — filled in after we know the user's location
     var distance: CLLocationDistance = 0   // Meters from user

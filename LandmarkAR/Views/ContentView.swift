@@ -10,18 +10,30 @@ import CoreLocation
 
 struct ContentView: View {
 
-    // These objects live for the lifetime of the app
     @StateObject private var locationManager = LocationManager()
+    @StateObject private var settings = AppSettings()
 
-    // App state
     @State private var landmarks: [Landmark] = []
     @State private var selectedLandmark: Landmark?
     @State private var isLoading = false
     @State private var errorMessage: String?
-    @State private var lastFetchLocation: CLLocation?  // avoid re-fetching if user hasn't moved
+    @State private var lastFetchLocation: CLLocation?
+    @State private var showSettings = false
 
     private let wikipediaService = WikipediaService()
-    private let refetchDistanceThreshold: CLLocationDistance = 200  // re-fetch after moving 200m
+    private let refetchDistanceThreshold: CLLocationDistance = 200
+
+    // Landmarks filtered by the user's category settings (LAR-5)
+    private var filteredLandmarks: [Landmark] {
+        landmarks.filter { landmark in
+            switch landmark.category {
+            case .historical: return settings.showHistorical
+            case .natural:    return settings.showNatural
+            case .cultural:   return settings.showCultural
+            case .other:      return settings.showOther
+            }
+        }
+    }
 
     var body: some View {
         ZStack {
@@ -37,33 +49,42 @@ struct ContentView: View {
             // MARK: AR is ready — show the camera + labels
             } else {
                 ARLandmarkView(
-                    landmarks: landmarks,
+                    landmarks: filteredLandmarks,
                     userLocation: locationManager.userLocation,
                     heading: locationManager.heading,
                     selectedLandmark: $selectedLandmark
                 )
                 .ignoresSafeArea()
 
-                // Overlay: loading spinner + landmark count
                 overlayUI
             }
         }
-        // Request location permission when app first opens
         .onAppear {
             locationManager.start()
         }
-        // Fetch landmarks whenever user location updates significantly
         .onChange(of: locationManager.userLocation) { _, newLocation in
             guard let newLocation = newLocation else { return }
             fetchLandmarksIfNeeded(at: newLocation)
         }
-        // Show detail sheet when user taps an AR label
+        // Re-fetch when key settings change (LAR-3, LAR-4)
+        .onChange(of: settings.isWikipediaEnabled) { _, _ in
+            guard let location = locationManager.userLocation else { return }
+            Task { await fetchLandmarks(at: location) }
+        }
+        .onChange(of: settings.maxDistanceKm) { _, _ in
+            guard let location = locationManager.userLocation else { return }
+            lastFetchLocation = nil  // force a re-fetch at new radius
+            Task { await fetchLandmarks(at: location) }
+        }
         .sheet(item: $selectedLandmark) { landmark in
             LandmarkDetailSheet(landmark: landmark)
         }
+        .sheet(isPresented: $showSettings) {
+            SettingsView(settings: settings)
+        }
     }
 
-    // MARK: - Overlay UI (on top of AR camera)
+    // MARK: - Overlay UI
 
     private var overlayUI: some View {
         VStack {
@@ -73,15 +94,26 @@ struct ContentView: View {
                     Text("LandmarkAR")
                         .font(.headline)
                         .foregroundColor(.white)
-                    if !landmarks.isEmpty {
-                        Text("\(landmarks.count) landmarks nearby")
+                    if !filteredLandmarks.isEmpty {
+                        Text("\(filteredLandmarks.count) landmarks nearby")
                             .font(.caption)
                             .foregroundColor(.white.opacity(0.8))
                     }
                 }
                 Spacer()
 
-                // Refresh button — re-fetch landmarks manually
+                // Settings button (LAR-2)
+                Button {
+                    showSettings = true
+                } label: {
+                    Image(systemName: "gearshape.fill")
+                        .foregroundColor(.white)
+                        .padding(8)
+                        .background(.ultraThinMaterial)
+                        .clipShape(Circle())
+                }
+
+                // Refresh button
                 Button {
                     if let location = locationManager.userLocation {
                         Task { await fetchLandmarks(at: location) }
@@ -105,7 +137,6 @@ struct ContentView: View {
 
             Spacer()
 
-            // Loading indicator
             if isLoading {
                 HStack(spacing: 8) {
                     ProgressView()
@@ -121,7 +152,6 @@ struct ContentView: View {
                 .padding(.bottom, 20)
             }
 
-            // Error message
             if let error = errorMessage {
                 Text(error)
                     .font(.caption)
@@ -136,11 +166,10 @@ struct ContentView: View {
 
     // MARK: - Landmark Fetching
 
-    /// Only re-fetch if we've moved more than `refetchDistanceThreshold` meters
     private func fetchLandmarksIfNeeded(at location: CLLocation) {
         if let last = lastFetchLocation,
            location.distance(from: last) < refetchDistanceThreshold {
-            return  // haven't moved enough — skip
+            return
         }
         Task { await fetchLandmarks(at: location) }
     }
@@ -152,7 +181,7 @@ struct ContentView: View {
         lastFetchLocation = location
 
         do {
-            let fetched = try await wikipediaService.fetchNearbyLandmarks(near: location)
+            let fetched = try await wikipediaService.fetchNearbyLandmarks(near: location, settings: settings)
             landmarks = fetched
         } catch {
             errorMessage = "Couldn't load landmarks: \(error.localizedDescription)"

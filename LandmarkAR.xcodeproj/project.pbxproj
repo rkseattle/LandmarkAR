@@ -14,6 +14,9 @@
 		A105 /* WikipediaService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A005 /* WikipediaService.swift */; };
 		A106 /* ARLandmarkView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A006 /* ARLandmarkView.swift */; };
 		A107 /* LandmarkDetailSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = A007 /* LandmarkDetailSheet.swift */; };
+		A108 /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = A008S /* AppSettings.swift */; };
+		A109 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A009 /* SettingsView.swift */; };
+		A110 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A010 /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -25,6 +28,9 @@
 		A006 /* ARLandmarkView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARLandmarkView.swift; sourceTree = "<group>"; };
 		A007 /* LandmarkDetailSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LandmarkDetailSheet.swift; sourceTree = "<group>"; };
 		A008 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A008S /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettings.swift; sourceTree = "<group>"; };
+		A009 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		A010 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A999 /* LandmarkAR.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LandmarkAR.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -59,6 +65,7 @@
 			isa = PBXGroup;
 			children = (
 				A003 /* Landmark.swift */,
+				A008S /* AppSettings.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -79,6 +86,14 @@
 			path = Resources;
 			sourceTree = "<group>";
 		};
+		ASSETSGROUP /* Assets */ = {
+			isa = PBXGroup;
+			children = (
+				A010 /* Assets.xcassets */,
+			);
+			name = Assets;
+			sourceTree = "<group>";
+		};
 		SRCGROUP /* LandmarkAR */ = {
 			isa = PBXGroup;
 			children = (
@@ -88,6 +103,7 @@
 				MODELGROUP /* Models */,
 				SVCGROUP /* Services */,
 				RESGROUP /* Resources */,
+				ASSETSGROUP /* Assets */,
 			);
 			path = LandmarkAR;
 			sourceTree = "<group>";
@@ -106,6 +122,7 @@
 			children = (
 				A002 /* ContentView.swift */,
 				A007 /* LandmarkDetailSheet.swift */,
+				A009 /* SettingsView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -168,6 +185,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A110 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -185,6 +203,8 @@
 				A105 /* WikipediaService.swift in Sources */,
 				A106 /* ARLandmarkView.swift in Sources */,
 				A107 /* LandmarkDetailSheet.swift in Sources */,
+				A108 /* AppSettings.swift in Sources */,
+				A109 /* SettingsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
