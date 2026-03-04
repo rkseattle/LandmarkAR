@@ -12,10 +12,13 @@ struct SettingsView: View {
         NavigationStack {
             Form {
 
-                // MARK: Data Sources (LAR-3)
+                // MARK: Data Sources (LAR-3, LAR-11)
                 Section {
                     Toggle(isOn: $settings.isWikipediaEnabled) {
                         Label("Wikipedia", systemImage: "globe")
+                    }
+                    Toggle(isOn: $settings.isOpenStreetMapEnabled) {
+                        Label("OpenStreetMap", systemImage: "map")
                     }
                 } header: {
                     Text("Data Sources")

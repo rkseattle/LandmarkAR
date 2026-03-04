@@ -6,9 +6,12 @@ import Foundation
 
 class AppSettings: ObservableObject {
 
-    // MARK: - Data Sources (LAR-3)
+    // MARK: - Data Sources (LAR-3, LAR-11)
     @Published var isWikipediaEnabled: Bool {
         didSet { UserDefaults.standard.set(isWikipediaEnabled, forKey: Keys.isWikipediaEnabled) }
+    }
+    @Published var isOpenStreetMapEnabled: Bool {
+        didSet { UserDefaults.standard.set(isOpenStreetMapEnabled, forKey: Keys.isOpenStreetMapEnabled) }
     }
 
     // MARK: - Distance Filter (LAR-4)
@@ -35,8 +38,9 @@ class AppSettings: ObservableObject {
 
     init() {
         let ud = UserDefaults.standard
-        isWikipediaEnabled = ud.object(forKey: Keys.isWikipediaEnabled) as? Bool ?? true
-        maxDistanceKm      = ud.object(forKey: Keys.maxDistanceKm)      as? Double ?? 10.0
+        isWikipediaEnabled     = ud.object(forKey: Keys.isWikipediaEnabled)     as? Bool ?? true
+        isOpenStreetMapEnabled = ud.object(forKey: Keys.isOpenStreetMapEnabled) as? Bool ?? true
+        maxDistanceKm          = ud.object(forKey: Keys.maxDistanceKm)          as? Double ?? 10.0
         showHistorical     = ud.object(forKey: Keys.showHistorical)     as? Bool ?? true
         showNatural        = ud.object(forKey: Keys.showNatural)        as? Bool ?? true
         showCultural       = ud.object(forKey: Keys.showCultural)       as? Bool ?? true
@@ -46,8 +50,9 @@ class AppSettings: ObservableObject {
     // MARK: - Private
 
     private enum Keys {
-        static let isWikipediaEnabled = "isWikipediaEnabled"
-        static let maxDistanceKm      = "maxDistanceKm"
+        static let isWikipediaEnabled     = "isWikipediaEnabled"
+        static let isOpenStreetMapEnabled = "isOpenStreetMapEnabled"
+        static let maxDistanceKm          = "maxDistanceKm"
         static let showHistorical     = "showHistorical"
         static let showNatural        = "showNatural"
         static let showCultural       = "showCultural"

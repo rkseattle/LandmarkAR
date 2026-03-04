@@ -21,6 +21,7 @@ struct ContentView: View {
     @State private var showSettings = false
 
     private let wikipediaService = WikipediaService()
+    private let osmService = OpenStreetMapService()
     private let refetchDistanceThreshold: CLLocationDistance = 200
 
     // Landmarks filtered by the user's category settings (LAR-5)
@@ -66,8 +67,12 @@ struct ContentView: View {
             guard let newLocation = newLocation else { return }
             fetchLandmarksIfNeeded(at: newLocation)
         }
-        // Re-fetch when key settings change (LAR-3, LAR-4)
+        // Re-fetch when key settings change (LAR-3, LAR-4, LAR-11)
         .onChange(of: settings.isWikipediaEnabled) { _, _ in
+            guard let location = locationManager.userLocation else { return }
+            Task { await fetchLandmarks(at: location) }
+        }
+        .onChange(of: settings.isOpenStreetMapEnabled) { _, _ in
             guard let location = locationManager.userLocation else { return }
             Task { await fetchLandmarks(at: location) }
         }
@@ -181,8 +186,22 @@ struct ContentView: View {
         lastFetchLocation = location
 
         do {
-            let fetched = try await wikipediaService.fetchNearbyLandmarks(near: location, settings: settings)
-            landmarks = fetched
+            // Fetch from all enabled data sources in parallel (LAR-11)
+            async let wikipediaResults = wikipediaService.fetchNearbyLandmarks(near: location, settings: settings)
+            async let osmResults = osmService.fetchNearbyLandmarks(near: location, settings: settings)
+
+            let (fromWikipedia, fromOSM) = try await (wikipediaResults, osmResults)
+
+            // Merge and deduplicate by title (case-insensitive), preferring Wikipedia entries
+            var seen = Set<String>()
+            var merged: [Landmark] = []
+            for landmark in (fromWikipedia + fromOSM) {
+                let key = landmark.title.lowercased()
+                if seen.insert(key).inserted {
+                    merged.append(landmark)
+                }
+            }
+            landmarks = merged.sorted { $0.distance < $1.distance }
         } catch {
             errorMessage = "Couldn't load landmarks: \(error.localizedDescription)"
         }
