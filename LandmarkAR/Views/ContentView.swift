@@ -195,12 +195,14 @@ struct ContentView: View {
         lastFetchLocation = location
 
         do {
-            // Fetch from all enabled data sources in parallel (LAR-11, LAR-12)
+            // Fetch from all enabled data sources in parallel (LAR-11, LAR-12).
+            // Wikipedia and NPS can throw; OSM is non-throwing and returns [] on failure.
             async let wikipediaResults = wikipediaService.fetchNearbyLandmarks(near: location, settings: settings)
             async let osmResults = osmService.fetchNearbyLandmarks(near: location, settings: settings)
             async let npsResults = npsService.fetchNearbyLandmarks(near: location, settings: settings)
 
-            let (fromWikipedia, fromOSM, fromNPS) = try await (wikipediaResults, osmResults, npsResults)
+            let fromOSM = await osmResults
+            let (fromWikipedia, fromNPS) = try await (wikipediaResults, npsResults)
 
             // Merge and deduplicate by title (case-insensitive), preferring Wikipedia entries
             var seen = Set<String>()

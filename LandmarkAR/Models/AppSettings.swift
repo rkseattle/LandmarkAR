@@ -47,7 +47,7 @@ class AppSettings: ObservableObject {
         isWikipediaEnabled     = ud.object(forKey: Keys.isWikipediaEnabled)     as? Bool ?? true
         isOpenStreetMapEnabled = ud.object(forKey: Keys.isOpenStreetMapEnabled) as? Bool ?? true
         isNPSEnabled           = ud.object(forKey: Keys.isNPSEnabled)           as? Bool ?? false
-        npsApiKey              = ud.string(forKey: Keys.npsApiKey) ?? ""
+        npsApiKey              = ud.string(forKey: Keys.npsApiKey) ?? "H7f7Y1eEtjYH7it8HOI2YOp6aBicGNA5FWeyDhPN"
         maxDistanceKm          = ud.object(forKey: Keys.maxDistanceKm)          as? Double ?? 10.0
         showHistorical         = ud.object(forKey: Keys.showHistorical)         as? Bool ?? true
         showNatural            = ud.object(forKey: Keys.showNatural)            as? Bool ?? true

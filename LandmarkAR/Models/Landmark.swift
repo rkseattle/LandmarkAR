@@ -71,7 +71,7 @@ struct WikipediaGeoResult: Codable {
 // Used when we fetch a short description for each landmark
 
 struct WikipediaSummaryResponse: Codable {
-    let extract: String   // Plain-text summary paragraph
+    let extract: String?  // Plain-text summary; absent on error/missing pages
     let content_urls: WikipediaContentURLs?
 }
 

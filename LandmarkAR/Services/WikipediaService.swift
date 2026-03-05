@@ -25,16 +25,18 @@ class WikipediaService {
                                              radiusMeters: radiusMeters,
                                              maxResults: maxResults)
 
-        // Step 2: For each result, fetch a short summary (run all fetches in parallel)
-        let landmarks = try await withThrowingTaskGroup(of: Landmark?.self) { group in
+        // Step 2: For each result, fetch a short summary (run all fetches in parallel).
+        // Individual article failures are non-fatal — a bad page is skipped rather than
+        // aborting the entire fetch.
+        let landmarks = await withTaskGroup(of: Landmark?.self) { group in
             for result in geoResults {
                 group.addTask {
-                    try await self.buildLandmark(from: result, userLocation: location)
+                    await self.buildLandmark(from: result, userLocation: location)
                 }
             }
 
             var results: [Landmark] = []
-            for try await landmark in group {
+            for await landmark in group {
                 if let landmark = landmark {
                     results.append(landmark)
                 }
@@ -68,35 +70,40 @@ class WikipediaService {
         return response.query.geosearch
     }
 
-    /// Fetches a plain-text summary for one Wikipedia article, then builds a Landmark
-    private func buildLandmark(from result: WikipediaGeoResult, userLocation: CLLocation) async throws -> Landmark? {
+    /// Fetches a plain-text summary for one Wikipedia article, then builds a Landmark.
+    /// Returns nil (rather than throwing) if the page is missing or the response is malformed.
+    private func buildLandmark(from result: WikipediaGeoResult, userLocation: CLLocation) async -> Landmark? {
         let urlString = "https://en.wikipedia.org/api/rest_v1/page/summary/\(result.title.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? "")"
-
         guard let url = URL(string: urlString) else { return nil }
 
-        let (data, _) = try await URLSession.shared.data(from: url)
-        let summary = try JSONDecoder().decode(WikipediaSummaryResponse.self, from: data)
+        do {
+            let (data, _) = try await URLSession.shared.data(from: url)
+            let summary = try JSONDecoder().decode(WikipediaSummaryResponse.self, from: data)
 
-        let landmarkLocation = CLLocation(latitude: result.lat, longitude: result.lon)
-        let landmarkCoord = CLLocationCoordinate2D(latitude: result.lat, longitude: result.lon)
+            let landmarkLocation = CLLocation(latitude: result.lat, longitude: result.lon)
+            let landmarkCoord = CLLocationCoordinate2D(latitude: result.lat, longitude: result.lon)
 
-        let distance = userLocation.distance(from: landmarkLocation)
-        let bearing  = userLocation.coordinate.bearing(to: landmarkCoord)
-        let pageURL  = summary.content_urls?.desktop?.page.flatMap { URL(string: $0) }
+            let distance = userLocation.distance(from: landmarkLocation)
+            let bearing  = userLocation.coordinate.bearing(to: landmarkCoord)
+            let pageURL  = summary.content_urls?.desktop?.page.flatMap { URL(string: $0) }
+            let extract  = summary.extract ?? ""
 
-        // LAR-5: Classify the landmark into a category
-        let category = LandmarkCategory.classify(title: result.title, summary: summary.extract)
+            // LAR-5: Classify the landmark into a category
+            let category = LandmarkCategory.classify(title: result.title, summary: extract)
 
-        return Landmark(
-            id: "\(result.pageid)",
-            title: result.title,
-            summary: summary.extract,
-            coordinate: landmarkCoord,
-            wikipediaURL: pageURL,
-            category: category,
-            distance: distance,
-            bearing: bearing
-        )
+            return Landmark(
+                id: "\(result.pageid)",
+                title: result.title,
+                summary: extract,
+                coordinate: landmarkCoord,
+                wikipediaURL: pageURL,
+                category: category,
+                distance: distance,
+                bearing: bearing
+            )
+        } catch {
+            return nil
+        }
     }
 }
 
