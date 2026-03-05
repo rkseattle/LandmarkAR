@@ -117,10 +117,13 @@ class ARLandmarkViewController: UIViewController, ARSessionDelegate {
         guard let userLocation = userLocation,
               let arFrame = arView.session.currentFrame else { return }
 
-        let cameraTransform = arFrame.camera.transform
         // LAR-20: Use the actual interface orientation so the projection matches
         // the device's current display orientation rather than assuming landscape.
         let orientation = view.window?.windowScene?.interfaceOrientation ?? .portrait
+        // LAR-22: Use viewMatrix(for:) instead of camera.transform.inverse so that the
+        // orientation rotation is included. In landscape the two differ by 90°, which
+        // was causing labels to move WITH the pan direction instead of against it.
+        let viewMatrix = arFrame.camera.viewMatrix(for: orientation)
         let projectionMatrix = arFrame.camera.projectionMatrix(
             for: orientation,
             viewportSize: arView.bounds.size,
@@ -132,7 +135,7 @@ class ARLandmarkViewController: UIViewController, ARSessionDelegate {
             guard let worldPosition = worldPosition(for: landmark, relativeTo: userLocation) else { continue }
 
             guard let screenPoint = project(worldPosition,
-                                            camera: cameraTransform,
+                                            camera: viewMatrix,
                                             projection: projectionMatrix,
                                             viewSize: arView.bounds.size) else {
                 labelViews[landmark.id]?.isHidden = true
@@ -169,7 +172,7 @@ class ARLandmarkViewController: UIViewController, ARSessionDelegate {
                          projection: float4x4,
                          viewSize: CGSize) -> CGPoint? {
         let worldPoint4 = SIMD4<Float>(worldPoint.x, worldPoint.y, worldPoint.z, 1)
-        let viewSpace = camera.inverse * worldPoint4
+        let viewSpace = camera * worldPoint4
 
         guard viewSpace.z < 0 else { return nil }
 
