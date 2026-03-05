@@ -6,6 +6,7 @@ import SwiftUI
 
 struct SettingsView: View {
     @ObservedObject var settings: AppSettings
+    @ObservedObject var errorLogger: ErrorLogger
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
@@ -70,6 +71,17 @@ struct SettingsView: View {
                     Text("Distance")
                 } footer: {
                     Text("Only show landmarks within this radius of your location.")
+                }
+
+                // MARK: Error Log (LAR-16)
+                Section {
+                    NavigationLink {
+                        ErrorLogView(logger: errorLogger)
+                    } label: {
+                        Label("Error Log", systemImage: "exclamationmark.triangle")
+                    }
+                } header: {
+                    Text("Diagnostics")
                 }
 
                 // MARK: Category Filters (LAR-5)

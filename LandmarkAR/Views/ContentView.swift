@@ -12,11 +12,13 @@ struct ContentView: View {
 
     @StateObject private var locationManager = LocationManager()
     @StateObject private var settings = AppSettings()
+    @StateObject private var errorLogger = ErrorLogger()
 
     @State private var landmarks: [Landmark] = []
     @State private var selectedLandmark: Landmark?
     @State private var isLoading = false
     @State private var errorMessage: String?
+    @State private var errorDismissTask: Task<Void, Never>?
     @State private var lastFetchLocation: CLLocation?
     @State private var showSettings = false
 
@@ -94,7 +96,7 @@ struct ContentView: View {
             LandmarkDetailSheet(landmark: landmark)
         }
         .sheet(isPresented: $showSettings) {
-            SettingsView(settings: settings)
+            SettingsView(settings: settings, errorLogger: errorLogger)
         }
     }
 
@@ -174,8 +176,28 @@ struct ContentView: View {
                     .background(Color.red.opacity(0.7))
                     .cornerRadius(8)
                     .padding(.bottom, 20)
+                    .onTapGesture { dismissError() }
             }
         }
+    }
+
+    // MARK: - Error Bubble (LAR-16)
+
+    private func showError(_ message: String) {
+        errorLogger.log(message)
+        errorMessage = message
+        errorDismissTask?.cancel()
+        errorDismissTask = Task {
+            try? await Task.sleep(for: .seconds(20))
+            if !Task.isCancelled {
+                errorMessage = nil
+            }
+        }
+    }
+
+    private func dismissError() {
+        errorDismissTask?.cancel()
+        errorMessage = nil
     }
 
     // MARK: - Landmark Fetching
@@ -215,7 +237,7 @@ struct ContentView: View {
             }
             landmarks = merged.sorted { $0.distance < $1.distance }
         } catch {
-            errorMessage = "Couldn't load landmarks: \(error.localizedDescription)"
+            showError("Couldn't load landmarks: \(error.localizedDescription)")
         }
 
         isLoading = false
