@@ -27,14 +27,18 @@ struct ContentView: View {
     private let npsService = NPSService()
     private let refetchDistanceThreshold: CLLocationDistance = 200
 
-    // Landmarks filtered by the user's category settings (LAR-5)
+    // Landmarks filtered by category toggles and per-category distance (LAR-5, LAR-13)
     private var filteredLandmarks: [Landmark] {
         landmarks.filter { landmark in
             switch landmark.category {
-            case .historical: return settings.showHistorical
-            case .natural:    return settings.showNatural
-            case .cultural:   return settings.showCultural
-            case .other:      return settings.showOther
+            case .historical:
+                return settings.showHistorical && landmark.distance <= settings.maxDistanceKmHistorical * 1000
+            case .natural:
+                return settings.showNatural && landmark.distance <= settings.maxDistanceKmNatural * 1000
+            case .cultural:
+                return settings.showCultural && landmark.distance <= settings.maxDistanceKmCultural * 1000
+            case .other:
+                return settings.showOther && landmark.distance <= settings.maxDistanceKmOther * 1000
             }
         }
     }
@@ -87,9 +91,25 @@ struct ContentView: View {
             guard let location = locationManager.userLocation else { return }
             Task { await fetchLandmarks(at: location) }
         }
-        .onChange(of: settings.maxDistanceKm) { _, _ in
+        // LAR-13: Re-fetch when any per-category distance changes (may expand the radius)
+        .onChange(of: settings.maxDistanceIndexHistorical) { _, _ in
             guard let location = locationManager.userLocation else { return }
-            lastFetchLocation = nil  // force a re-fetch at new radius
+            lastFetchLocation = nil
+            Task { await fetchLandmarks(at: location) }
+        }
+        .onChange(of: settings.maxDistanceIndexNatural) { _, _ in
+            guard let location = locationManager.userLocation else { return }
+            lastFetchLocation = nil
+            Task { await fetchLandmarks(at: location) }
+        }
+        .onChange(of: settings.maxDistanceIndexCultural) { _, _ in
+            guard let location = locationManager.userLocation else { return }
+            lastFetchLocation = nil
+            Task { await fetchLandmarks(at: location) }
+        }
+        .onChange(of: settings.maxDistanceIndexOther) { _, _ in
+            guard let location = locationManager.userLocation else { return }
+            lastFetchLocation = nil
             Task { await fetchLandmarks(at: location) }
         }
         .sheet(item: $selectedLandmark) { landmark in

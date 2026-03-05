@@ -44,33 +44,20 @@ struct SettingsView: View {
                     }
                 }
 
-                // MARK: Distance Filter (LAR-4)
+                // MARK: Distance Filter (LAR-4, LAR-13)
                 Section {
-                    VStack(alignment: .leading, spacing: 8) {
-                        HStack {
-                            Text("Max Distance")
-                            Spacer()
-                            Text("\(Int(settings.maxDistanceKm)) km")
-                                .foregroundStyle(.secondary)
-                                .monospacedDigit()
-                        }
-                        Slider(
-                            value: $settings.maxDistanceKm,
-                            in: 1...50,
-                            step: 1
-                        ) {
-                            Text("Max Distance")
-                        } minimumValueLabel: {
-                            Text("1 km").font(.caption)
-                        } maximumValueLabel: {
-                            Text("50 km").font(.caption)
-                        }
-                    }
-                    .padding(.vertical, 4)
+                    CategoryDistanceRow(label: "Historical", systemImage: "building.columns.fill",
+                                        index: $settings.maxDistanceIndexHistorical)
+                    CategoryDistanceRow(label: "Natural", systemImage: "mountain.2.fill",
+                                        index: $settings.maxDistanceIndexNatural)
+                    CategoryDistanceRow(label: "Cultural", systemImage: "theatermasks.fill",
+                                        index: $settings.maxDistanceIndexCultural)
+                    CategoryDistanceRow(label: "Other", systemImage: "mappin.circle.fill",
+                                        index: $settings.maxDistanceIndexOther)
                 } header: {
-                    Text("Distance")
+                    Text("Distance by Category")
                 } footer: {
-                    Text("Only show landmarks within this radius of your location.")
+                    Text("Set the maximum display distance per landmark category.")
                 }
 
                 // MARK: Error Log (LAR-16)
@@ -112,5 +99,34 @@ struct SettingsView: View {
                 }
             }
         }
+    }
+}
+
+// MARK: - CategoryDistanceRow (LAR-13)
+// A form row with a labelled slider that snaps to discrete distance values.
+
+private struct CategoryDistanceRow: View {
+    let label: String
+    let systemImage: String
+    @Binding var index: Double
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack {
+                Label(label, systemImage: systemImage)
+                Spacer()
+                Text(AppSettings.distanceLabel(forIndex: index))
+                    .foregroundStyle(.secondary)
+                    .monospacedDigit()
+            }
+            Slider(value: $index, in: 0...6, step: 1) {
+                Text(label)
+            } minimumValueLabel: {
+                Text("0.1").font(.caption2)
+            } maximumValueLabel: {
+                Text("100").font(.caption2)
+            }
+        }
+        .padding(.vertical, 2)
     }
 }
