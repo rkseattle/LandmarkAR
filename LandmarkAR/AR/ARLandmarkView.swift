@@ -162,7 +162,18 @@ class ARLandmarkViewController: UIViewController, ARSessionDelegate {
 
         let x = displayDistance * sin(bearingRad)
         let z = -displayDistance * cos(bearingRad)
-        let y: Float = 0
+
+        // LAR-15: Use elevation delta to tilt labels up/down toward actual terrain height.
+        // Scale the real altitude difference by the same display/real-distance ratio so
+        // the vertical angle in AR matches the true angle to the landmark.
+        let y: Float
+        if let landmarkAlt = landmark.altitude {
+            let altitudeDelta = Float(landmarkAlt - userLocation.altitude)
+            let realDistance = Float(max(landmark.distance, 1))
+            y = altitudeDelta * (displayDistance / realDistance)
+        } else {
+            y = 0
+        }
 
         return SIMD3<Float>(x, y, z)
     }

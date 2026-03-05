@@ -21,6 +21,7 @@
 		D40573532F58FCEB00859722 /* OpenStreetMapService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D40573512F58FCEB00859722 /* OpenStreetMapService.swift */; };
 		A116 /* ErrorLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = A016 /* ErrorLog.swift */; };
 		A117 /* ErrorLogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A017 /* ErrorLogView.swift */; };
+		A118 /* ElevationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A018 /* ElevationService.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -40,6 +41,7 @@
 		D40573512F58FCEB00859722 /* OpenStreetMapService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenStreetMapService.swift; sourceTree = "<group>"; };
 		A016 /* ErrorLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorLog.swift; sourceTree = "<group>"; };
 		A017 /* ErrorLogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorLogView.swift; sourceTree = "<group>"; };
+		A018 /* ElevationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ElevationService.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -124,6 +126,7 @@
 				D40573512F58FCEB00859722 /* OpenStreetMapService.swift */,
 				A004 /* LocationManager.swift */,
 				A005 /* WikipediaService.swift */,
+				A018 /* ElevationService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -221,6 +224,7 @@
 				A109 /* SettingsView.swift in Sources */,
 				A116 /* ErrorLog.swift in Sources */,
 				A117 /* ErrorLogView.swift in Sources */,
+				A118 /* ElevationService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

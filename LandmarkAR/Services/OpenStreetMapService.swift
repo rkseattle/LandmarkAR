@@ -53,6 +53,7 @@ class OpenStreetMapService {
             let bearing = location.coordinate.bearing(to: coordinate)
             let description = element.tags["description"] ?? ""
             let category = LandmarkCategory.classify(title: name, summary: description)
+            let altitude = element.tags["ele"].flatMap { Double($0) }  // LAR-15
 
             return Landmark(
                 id: "osm-\(element.id)",
@@ -62,7 +63,8 @@ class OpenStreetMapService {
                 wikipediaURL: nil,
                 category: category,
                 distance: distance,
-                bearing: bearing
+                bearing: bearing,
+                altitude: altitude
             )
         }
 

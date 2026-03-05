@@ -62,6 +62,12 @@ class AppSettings: ObservableObject {
         max(maxDistanceKmHistorical, maxDistanceKmNatural, maxDistanceKmCultural, maxDistanceKmOther)
     }
 
+    // MARK: - Display Limit (LAR-23)
+    /// Maximum number of landmarks shown at once. Options: 5, 10, 25.
+    @Published var maxLandmarkCount: Int {
+        didSet { UserDefaults.standard.set(maxLandmarkCount, forKey: Keys.maxLandmarkCount) }
+    }
+
     // MARK: - Category Filters (LAR-5)
     @Published var showHistorical: Bool {
         didSet { UserDefaults.standard.set(showHistorical, forKey: Keys.showHistorical) }
@@ -89,6 +95,7 @@ class AppSettings: ObservableObject {
         maxDistanceIndexNatural    = ud.object(forKey: Keys.maxDistanceIndexNatural)    as? Double ?? 4
         maxDistanceIndexCultural   = ud.object(forKey: Keys.maxDistanceIndexCultural)   as? Double ?? 4
         maxDistanceIndexOther      = ud.object(forKey: Keys.maxDistanceIndexOther)      as? Double ?? 4
+        maxLandmarkCount       = ud.object(forKey: Keys.maxLandmarkCount)       as? Int    ?? 10
         showHistorical         = ud.object(forKey: Keys.showHistorical)         as? Bool ?? true
         showNatural            = ud.object(forKey: Keys.showNatural)            as? Bool ?? true
         showCultural           = ud.object(forKey: Keys.showCultural)           as? Bool ?? true
@@ -106,6 +113,7 @@ class AppSettings: ObservableObject {
         static let maxDistanceIndexNatural     = "maxDistanceIndexNatural"
         static let maxDistanceIndexCultural    = "maxDistanceIndexCultural"
         static let maxDistanceIndexOther       = "maxDistanceIndexOther"
+        static let maxLandmarkCount            = "maxLandmarkCount"
         static let showHistorical              = "showHistorical"
         static let showNatural                 = "showNatural"
         static let showCultural                = "showCultural"

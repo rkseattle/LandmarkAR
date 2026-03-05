@@ -25,11 +25,13 @@ struct ContentView: View {
     private let wikipediaService = WikipediaService()
     private let osmService = OpenStreetMapService()
     private let npsService = NPSService()
+    private let elevationService = ElevationService()
     private let refetchDistanceThreshold: CLLocationDistance = 200
+    private let deduplicationProximityMeters: CLLocationDistance = 75
 
-    // Landmarks filtered by category toggles and per-category distance (LAR-5, LAR-13)
+    // Landmarks filtered by category toggles, per-category distance, and display limit (LAR-5, LAR-13, LAR-23)
     private var filteredLandmarks: [Landmark] {
-        landmarks.filter { landmark in
+        let filtered = landmarks.filter { landmark in
             switch landmark.category {
             case .historical:
                 return settings.showHistorical && landmark.distance <= settings.maxDistanceKmHistorical * 1000
@@ -41,6 +43,28 @@ struct ContentView: View {
                 return settings.showOther && landmark.distance <= settings.maxDistanceKmOther * 1000
             }
         }
+        return applyCountLimit(to: filtered)
+    }
+
+    // LAR-23: Return at most maxLandmarkCount, always including the closest and farthest.
+    private func applyCountLimit(to sorted: [Landmark]) -> [Landmark] {
+        let limit = settings.maxLandmarkCount
+        guard sorted.count > limit else { return sorted }
+        guard limit >= 2 else { return Array(sorted.prefix(limit)) }
+
+        var selected = [sorted.first!, sorted.last!]
+        let pool = Array(sorted.dropFirst().dropLast())
+        let needed = limit - 2
+        guard !pool.isEmpty, needed > 0 else {
+            return selected.sorted { $0.distance < $1.distance }
+        }
+
+        let step = Double(pool.count) / Double(needed)
+        for i in 0..<needed {
+            let idx = min(Int((Double(i) * step + step / 2).rounded()), pool.count - 1)
+            selected.append(pool[idx])
+        }
+        return selected.sorted { $0.distance < $1.distance }
     }
 
     var body: some View {
@@ -246,16 +270,39 @@ struct ContentView: View {
             let fromOSM = await osmResults
             let (fromWikipedia, fromNPS) = try await (wikipediaResults, npsResults)
 
-            // Merge and deduplicate by title (case-insensitive), preferring Wikipedia entries
-            var seen = Set<String>()
+            // Merge and deduplicate by title OR geographic proximity (LAR-21).
+            // Prefer Wikipedia → OSM → NPS (iteration order already encodes priority).
+            var seenTitles = Set<String>()
+            var acceptedLocations: [CLLocation] = []
             var merged: [Landmark] = []
             for landmark in (fromWikipedia + fromOSM + fromNPS) {
-                let key = landmark.title.lowercased()
-                if seen.insert(key).inserted {
-                    merged.append(landmark)
+                let titleKey = landmark.title.lowercased()
+                guard seenTitles.insert(titleKey).inserted else { continue }
+
+                let landmarkLoc = CLLocation(latitude: landmark.coordinate.latitude,
+                                             longitude: landmark.coordinate.longitude)
+                let isDuplicate = acceptedLocations.contains {
+                    $0.distance(from: landmarkLoc) < deduplicationProximityMeters
+                }
+                guard !isDuplicate else { continue }
+
+                merged.append(landmark)
+                acceptedLocations.append(landmarkLoc)
+            }
+            var sorted = merged.sorted { $0.distance < $1.distance }
+
+            // Fetch elevations for landmarks that don't already have one (LAR-15)
+            let elevations = await elevationService.fetchElevations(for: sorted)
+            if !elevations.isEmpty {
+                sorted = sorted.map { landmark in
+                    guard let alt = elevations[landmark.id] else { return landmark }
+                    var updated = landmark
+                    updated.altitude = alt
+                    return updated
                 }
             }
-            landmarks = merged.sorted { $0.distance < $1.distance }
+
+            landmarks = sorted
         } catch {
             showError("Couldn't load landmarks: \(error.localizedDescription)")
         }

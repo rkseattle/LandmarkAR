@@ -44,6 +44,20 @@ struct SettingsView: View {
                     }
                 }
 
+                // MARK: Display Limit (LAR-23)
+                Section {
+                    Picker("Max Landmarks", selection: $settings.maxLandmarkCount) {
+                        Text("5").tag(5)
+                        Text("10").tag(10)
+                        Text("25").tag(25)
+                    }
+                    .pickerStyle(.segmented)
+                } header: {
+                    Text("Display Limit")
+                } footer: {
+                    Text("Maximum landmarks shown at once. The closest and farthest are always included.")
+                }
+
                 // MARK: Distance Filter (LAR-4, LAR-13)
                 Section {
                     CategoryDistanceRow(label: "Historical", systemImage: "building.columns.fill",

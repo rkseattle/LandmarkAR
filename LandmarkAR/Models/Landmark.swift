@@ -56,6 +56,7 @@ struct Landmark: Identifiable {
     // Calculated at runtime — filled in after we know the user's location
     var distance: CLLocationDistance = 0   // Meters from user
     var bearing: Double = 0                // Degrees (0=North, 90=East, etc.)
+    var altitude: Double? = nil            // Meters above sea level; nil if unknown (LAR-15)
 }
 
 // MARK: - Wikipedia API Response Models
