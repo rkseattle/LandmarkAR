@@ -120,6 +120,15 @@ class ARLandmarkViewController: UIViewController, ARSessionDelegate {
 
             showLabel(for: landmark, at: screenPoint)
         }
+
+        // LAR-14: Z-order labels so the closest landmark renders on top when pins overlap.
+        // Iterate farthest-first so each bringSubviewToFront call leaves the closest on top.
+        let sortedFarthestFirst = landmarks.sorted { $0.distance > $1.distance }
+        for landmark in sortedFarthestFirst {
+            if let label = labelViews[landmark.id], !label.isHidden {
+                arView.bringSubviewToFront(label)
+            }
+        }
     }
 
     private func worldPosition(for landmark: Landmark, relativeTo userLocation: CLLocation) -> SIMD3<Float>? {
@@ -183,6 +192,7 @@ class ARLandmarkViewController: UIViewController, ARSessionDelegate {
 // LAR-7: No background bubble — text-only with shadow for legibility.
 // LAR-8: Scaled relative to distance from user.
 // LAR-9: Distance displayed prominently below landmark name.
+// LAR-14: Red pin indicator shown above the label text.
 
 class LandmarkLabelView: UIView {
 
@@ -203,6 +213,13 @@ class LandmarkLabelView: UIView {
         // LAR-7: No background or border — transparent view, text only
         backgroundColor = .clear
 
+        // LAR-14: Red pin icon above the landmark name
+        let pinImageView = UIImageView()
+        let pinConfig = UIImage.SymbolConfiguration(pointSize: 22, weight: .bold)
+        pinImageView.image = UIImage(systemName: "mappin.fill", withConfiguration: pinConfig)
+        pinImageView.tintColor = .systemRed
+        pinImageView.contentMode = .scaleAspectFit
+
         // Name label
         nameLabel.text = landmark.title
         nameLabel.textColor = .white
@@ -218,7 +235,7 @@ class LandmarkLabelView: UIView {
         distanceLabel.textAlignment = .center
         distanceLabel.applyShadow()
 
-        let stack = UIStackView(arrangedSubviews: [nameLabel, distanceLabel])
+        let stack = UIStackView(arrangedSubviews: [pinImageView, nameLabel, distanceLabel])
         stack.axis = .vertical
         stack.spacing = 3
         stack.alignment = .center
