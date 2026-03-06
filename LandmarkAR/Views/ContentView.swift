@@ -163,38 +163,28 @@ struct ContentView: View {
 
     private var overlayUI: some View {
         VStack {
-            // Top bar
+            // Top bar (LAR-31)
             HStack {
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("LandmarkAR")
-                        .font(.headline)
-                        .foregroundColor(.white)
-                    if !filteredLandmarks.isEmpty {
-                        Text("\(filteredLandmarks.count) landmarks nearby")
-                            .font(.caption)
-                            .foregroundColor(.white.opacity(0.8))
-                    }
-                }
-                Spacer()
-
-                // Settings button (LAR-2)
-                Button {
-                    showSettings = true
-                } label: {
-                    Image(systemName: "gearshape.fill")
-                        .foregroundColor(.white)
-                        .padding(8)
-                        .background(.ultraThinMaterial)
-                        .clipShape(Circle())
-                }
-
-                // Refresh button
+                // Refresh button — upper left
                 Button {
                     if let location = locationManager.userLocation {
                         Task { await fetchLandmarks(at: location) }
                     }
                 } label: {
                     Image(systemName: "arrow.clockwise")
+                        .foregroundColor(.white)
+                        .padding(8)
+                        .background(.ultraThinMaterial)
+                        .clipShape(Circle())
+                }
+
+                Spacer()
+
+                // Settings button — upper right (LAR-2)
+                Button {
+                    showSettings = true
+                } label: {
+                    Image(systemName: "gearshape.fill")
                         .foregroundColor(.white)
                         .padding(8)
                         .background(.ultraThinMaterial)

@@ -24,6 +24,7 @@
 		A118 /* ElevationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A018 /* ElevationService.swift */; };
 		A119 /* DataSourceCircuitBreaker.swift in Sources */ = {isa = PBXBuildFile; fileRef = A019 /* DataSourceCircuitBreaker.swift */; };
 		A120 /* NetworkMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = A020 /* NetworkMonitor.swift */; };
+		A121 /* SplashScreenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A021 /* SplashScreenView.swift */; };
 		T101 /* LandmarkCategoryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T001 /* LandmarkCategoryTests.swift */; };
 		T102 /* AppSettingsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T002 /* AppSettingsTests.swift */; };
 		T103 /* DataSourceCircuitBreakerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T003 /* DataSourceCircuitBreakerTests.swift */; };
@@ -52,6 +53,7 @@
 		A018 /* ElevationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ElevationService.swift; sourceTree = "<group>"; };
 		A019 /* DataSourceCircuitBreaker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataSourceCircuitBreaker.swift; sourceTree = "<group>"; };
 		A020 /* NetworkMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkMonitor.swift; sourceTree = "<group>"; };
+		A021 /* SplashScreenView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashScreenView.swift; sourceTree = "<group>"; };
 		T001 /* LandmarkCategoryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LandmarkCategoryTests.swift; sourceTree = "<group>"; };
 		T002 /* AppSettingsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettingsTests.swift; sourceTree = "<group>"; };
 		T003 /* DataSourceCircuitBreakerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataSourceCircuitBreakerTests.swift; sourceTree = "<group>"; };
@@ -169,6 +171,7 @@
 				A007 /* LandmarkDetailSheet.swift */,
 				A009 /* SettingsView.swift */,
 				A017 /* ErrorLogView.swift */,
+				A021 /* SplashScreenView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -303,6 +306,7 @@
 				A118 /* ElevationService.swift in Sources */,
 				A119 /* DataSourceCircuitBreaker.swift in Sources */,
 				A120 /* NetworkMonitor.swift in Sources */,
+				A121 /* SplashScreenView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
