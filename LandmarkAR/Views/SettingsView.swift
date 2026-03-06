@@ -21,27 +21,10 @@ struct SettingsView: View {
                     Toggle(isOn: $settings.isOpenStreetMapEnabled) {
                         Label("OpenStreetMap", systemImage: "map")
                     }
-                    Toggle(isOn: $settings.isNPSEnabled) {
-                        Label("National Park Service", systemImage: "tree.fill")
-                    }
-                    if settings.isNPSEnabled {
-                        HStack {
-                            Text("API Key")
-                            Spacer()
-                            SecureField("Required", text: $settings.npsApiKey)
-                                .multilineTextAlignment(.trailing)
-                                .foregroundStyle(.secondary)
-                        }
-                    }
                 } header: {
                     Text("Data Sources")
                 } footer: {
-                    if settings.isNPSEnabled && settings.npsApiKey.isEmpty {
-                        Text("A free NPS API key is required. Get one at nps.gov/subjects/developer.")
-                            .foregroundStyle(.orange)
-                    } else {
-                        Text("Enable or disable location data from each source.")
-                    }
+                    Text("Enable or disable location data from each source.")
                 }
 
                 // MARK: Display Limit (LAR-23)

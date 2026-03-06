@@ -29,12 +29,6 @@ class AppSettings: ObservableObject {
     @Published var isOpenStreetMapEnabled: Bool {
         didSet { UserDefaults.standard.set(isOpenStreetMapEnabled, forKey: Keys.isOpenStreetMapEnabled) }
     }
-    @Published var isNPSEnabled: Bool {
-        didSet { UserDefaults.standard.set(isNPSEnabled, forKey: Keys.isNPSEnabled) }
-    }
-    @Published var npsApiKey: String {
-        didSet { UserDefaults.standard.set(npsApiKey, forKey: Keys.npsApiKey) }
-    }
 
     // MARK: - Distance Filter (LAR-4, LAR-13)
     // Each category has its own distance slider indexed into distanceSteps.
@@ -120,8 +114,6 @@ class AppSettings: ObservableObject {
         let ud = UserDefaults.standard
         isWikipediaEnabled     = ud.object(forKey: Keys.isWikipediaEnabled)     as? Bool ?? true
         isOpenStreetMapEnabled = ud.object(forKey: Keys.isOpenStreetMapEnabled) as? Bool ?? true
-        isNPSEnabled           = ud.object(forKey: Keys.isNPSEnabled)           as? Bool ?? false
-        npsApiKey              = ud.string(forKey: Keys.npsApiKey) ?? "H7f7Y1eEtjYH7it8HOI2YOp6aBicGNA5FWeyDhPN"
         let savedMode = ud.string(forKey: Keys.realtimeUpdateMode).flatMap(RealtimeUpdateMode.init(rawValue:))
         realtimeUpdateMode = savedMode ?? .off
         let savedSize = ud.string(forKey: Keys.labelDisplaySize).flatMap(LabelDisplaySize.init(rawValue:))
@@ -143,8 +135,6 @@ class AppSettings: ObservableObject {
     private enum Keys {
         static let isWikipediaEnabled          = "isWikipediaEnabled"
         static let isOpenStreetMapEnabled      = "isOpenStreetMapEnabled"
-        static let isNPSEnabled                = "isNPSEnabled"
-        static let npsApiKey                   = "npsApiKey"
         static let realtimeUpdateMode          = "realtimeUpdateMode"
         static let labelDisplaySize            = "labelDisplaySize"
         static let maxDistanceIndexHistorical  = "maxDistanceIndexHistorical"

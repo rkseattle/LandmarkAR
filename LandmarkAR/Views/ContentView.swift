@@ -127,14 +127,6 @@ struct ContentView: View {
             guard let location = locationManager.userLocation else { return }
             Task { await fetchLandmarks(at: location) }
         }
-        .onChange(of: settings.isNPSEnabled) { _, _ in
-            guard let location = locationManager.userLocation else { return }
-            Task { await fetchLandmarks(at: location) }
-        }
-        .onChange(of: settings.npsApiKey) { _, _ in
-            guard let location = locationManager.userLocation else { return }
-            Task { await fetchLandmarks(at: location) }
-        }
         // LAR-13: Re-fetch when any per-category distance changes (may expand the radius)
         .onChange(of: settings.maxDistanceIndexHistorical) { _, _ in
             guard let location = locationManager.userLocation else { return }
@@ -355,9 +347,9 @@ struct ContentView: View {
             }
         }
 
-        // NPS
+        // NPS (LAR-17: disabled — service code kept for future re-enablement)
         var fromNPS: [Landmark] = []
-        if settings.isNPSEnabled {
+        if false {
             let src = DataSourceCircuitBreaker.nps
             if circuitBreaker.isAvailable(src) {
                 do {
