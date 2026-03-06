@@ -1,5 +1,13 @@
 import Foundation
 
+// MARK: - LabelDisplaySize (LAR-29)
+
+enum LabelDisplaySize: String, CaseIterable {
+    case small  = "small"
+    case medium = "medium"
+    case large  = "large"
+}
+
 // MARK: - RealtimeUpdateMode (LAR-28)
 
 enum RealtimeUpdateMode: String, CaseIterable {
@@ -95,6 +103,11 @@ class AppSettings: ObservableObject {
         didSet { UserDefaults.standard.set(showOther, forKey: Keys.showOther) }
     }
 
+    // MARK: - Label Display Size (LAR-29)
+    @Published var labelDisplaySize: LabelDisplaySize {
+        didSet { UserDefaults.standard.set(labelDisplaySize.rawValue, forKey: Keys.labelDisplaySize) }
+    }
+
     // MARK: - Real-time Updates (LAR-25, LAR-28)
     /// Controls automatic landmark refresh: off, wi-fi only, or always.
     @Published var realtimeUpdateMode: RealtimeUpdateMode {
@@ -111,6 +124,8 @@ class AppSettings: ObservableObject {
         npsApiKey              = ud.string(forKey: Keys.npsApiKey) ?? "H7f7Y1eEtjYH7it8HOI2YOp6aBicGNA5FWeyDhPN"
         let savedMode = ud.string(forKey: Keys.realtimeUpdateMode).flatMap(RealtimeUpdateMode.init(rawValue:))
         realtimeUpdateMode = savedMode ?? .off
+        let savedSize = ud.string(forKey: Keys.labelDisplaySize).flatMap(LabelDisplaySize.init(rawValue:))
+        labelDisplaySize = savedSize ?? .medium
         // Default index 4 = 10 km (matches old default)
         maxDistanceIndexHistorical = ud.object(forKey: Keys.maxDistanceIndexHistorical) as? Double ?? 4
         maxDistanceIndexNatural    = ud.object(forKey: Keys.maxDistanceIndexNatural)    as? Double ?? 4
@@ -131,6 +146,7 @@ class AppSettings: ObservableObject {
         static let isNPSEnabled                = "isNPSEnabled"
         static let npsApiKey                   = "npsApiKey"
         static let realtimeUpdateMode          = "realtimeUpdateMode"
+        static let labelDisplaySize            = "labelDisplaySize"
         static let maxDistanceIndexHistorical  = "maxDistanceIndexHistorical"
         static let maxDistanceIndexNatural     = "maxDistanceIndexNatural"
         static let maxDistanceIndexCultural    = "maxDistanceIndexCultural"

@@ -58,6 +58,20 @@ struct SettingsView: View {
                     Text("Maximum landmarks shown at once. The closest and farthest are always included.")
                 }
 
+                // MARK: Label Size (LAR-29)
+                Section {
+                    Picker("Label Size", selection: $settings.labelDisplaySize) {
+                        Text("Small").tag(LabelDisplaySize.small)
+                        Text("Medium").tag(LabelDisplaySize.medium)
+                        Text("Large").tag(LabelDisplaySize.large)
+                    }
+                    .pickerStyle(.segmented)
+                } header: {
+                    Text("Label Size")
+                } footer: {
+                    Text("Controls the size of icons and text on the AR view.")
+                }
+
                 // MARK: Category Filters + Distance (LAR-5, LAR-13, LAR-24)
                 // Toggle and distance slider are grouped per category.
                 // The slider is only shown when the category is enabled.

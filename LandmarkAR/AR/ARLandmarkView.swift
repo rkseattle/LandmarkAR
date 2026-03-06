@@ -12,6 +12,7 @@ struct ARLandmarkView: UIViewControllerRepresentable {
     let landmarks: [Landmark]
     let userLocation: CLLocation?
     let heading: CLHeading?
+    let labelDisplaySize: LabelDisplaySize
     @Binding var selectedLandmark: Landmark?
 
     func makeUIViewController(context: Context) -> ARLandmarkViewController {
@@ -19,7 +20,8 @@ struct ARLandmarkView: UIViewControllerRepresentable {
     }
 
     func updateUIViewController(_ vc: ARLandmarkViewController, context: Context) {
-        vc.update(landmarks: landmarks, userLocation: userLocation, heading: heading) { landmark in
+        vc.update(landmarks: landmarks, userLocation: userLocation, heading: heading,
+                  labelDisplaySize: labelDisplaySize) { landmark in
             selectedLandmark = landmark
         }
     }
@@ -37,6 +39,7 @@ class ARLandmarkViewController: UIViewController, ARSessionDelegate {
     private var userLocation: CLLocation?
     private var heading: CLHeading?
     private var onSelect: ((Landmark) -> Void)?
+    private var labelDisplaySize: LabelDisplaySize = .medium
 
     private var frameCount = 0
     private let updateInterval = 30
@@ -87,11 +90,19 @@ class ARLandmarkViewController: UIViewController, ARSessionDelegate {
     func update(landmarks: [Landmark],
                 userLocation: CLLocation?,
                 heading: CLHeading?,
+                labelDisplaySize: LabelDisplaySize,
                 onSelect: @escaping (Landmark) -> Void) {
         self.landmarks = landmarks
         self.userLocation = userLocation
         self.heading = heading
         self.onSelect = onSelect
+
+        // LAR-29: If size changed, remove all labels so they rebuild with the new size
+        if labelDisplaySize != self.labelDisplaySize {
+            self.labelDisplaySize = labelDisplaySize
+            labelViews.values.forEach { $0.removeFromSuperview() }
+            labelViews.removeAll()
+        }
 
         // Remove labels for landmarks that are no longer in the list
         let currentIDs = Set(landmarks.map { $0.id })
@@ -211,7 +222,7 @@ class ARLandmarkViewController: UIViewController, ARSessionDelegate {
             // LAR-8: Update scale whenever position refreshes
             existingLabel.applyDistanceScale(landmark.distance)
         } else {
-            let label = LandmarkLabelView(landmark: landmark)
+            let label = LandmarkLabelView(landmark: landmark, displaySize: labelDisplaySize)
             label.center = clampedPoint
             label.onTap = { [weak self] in
                 self?.onSelect?(landmark)
@@ -237,21 +248,32 @@ class LandmarkLabelView: UIView {
     private let nameLabel = UILabel()
     private let distanceLabel = UILabel()
 
-    init(landmark: Landmark) {
+    init(landmark: Landmark, displaySize: LabelDisplaySize) {
         self.landmark = landmark
         super.init(frame: .zero)
-        setup()
+        setup(displaySize: displaySize)
     }
 
     required init?(coder: NSCoder) { fatalError() }
 
-    private func setup() {
+    // LAR-29: Font and icon sizes per display size setting.
+    private static func sizes(for displaySize: LabelDisplaySize) -> (icon: CGFloat, name: CGFloat, distance: CGFloat) {
+        switch displaySize {
+        case .small:  return (16, 12, 10)
+        case .medium: return (22, 15, 12)
+        case .large:  return (30, 20, 16)
+        }
+    }
+
+    private func setup(displaySize: LabelDisplaySize) {
         // LAR-7: No background or border — transparent view, text only
         backgroundColor = .clear
 
+        let sz = Self.sizes(for: displaySize)
+
         // LAR-14: Category icon above the landmark name, matching the icons in Settings
         let pinImageView = UIImageView()
-        let pinConfig = UIImage.SymbolConfiguration(pointSize: 22, weight: .bold)
+        let pinConfig = UIImage.SymbolConfiguration(pointSize: sz.icon, weight: .bold)
         pinImageView.image = UIImage(systemName: landmark.category.systemImageName, withConfiguration: pinConfig)
         pinImageView.tintColor = .white
         pinImageView.contentMode = .scaleAspectFit
@@ -259,7 +281,7 @@ class LandmarkLabelView: UIView {
         // Name label
         nameLabel.text = landmark.title
         nameLabel.textColor = .white
-        nameLabel.font = UIFont.boldSystemFont(ofSize: 15)
+        nameLabel.font = UIFont.boldSystemFont(ofSize: sz.name)
         nameLabel.numberOfLines = 2
         nameLabel.textAlignment = .center
         nameLabel.applyShadow()
@@ -267,7 +289,7 @@ class LandmarkLabelView: UIView {
         // LAR-9: Distance label — formatted and shown below name
         distanceLabel.text = formattedDistance(landmark.distance)
         distanceLabel.textColor = UIColor.white.withAlphaComponent(0.9)
-        distanceLabel.font = UIFont.systemFont(ofSize: 12, weight: .medium)
+        distanceLabel.font = UIFont.systemFont(ofSize: sz.distance, weight: .medium)
         distanceLabel.textAlignment = .center
         distanceLabel.applyShadow()
 

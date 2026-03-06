@@ -103,6 +103,7 @@ struct ContentView: View {
                     landmarks: filteredLandmarks,
                     userLocation: locationManager.userLocation,
                     heading: locationManager.heading,
+                    labelDisplaySize: settings.labelDisplaySize,
                     selectedLandmark: $selectedLandmark
                 )
                 .ignoresSafeArea()
