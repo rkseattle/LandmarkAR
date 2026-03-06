@@ -1,5 +1,13 @@
 import Foundation
 
+// MARK: - RealtimeUpdateMode (LAR-28)
+
+enum RealtimeUpdateMode: String, CaseIterable {
+    case off      = "off"
+    case wifiOnly = "wifiOnly"
+    case always   = "always"
+}
+
 // MARK: - AppSettings
 // Persists user preferences via UserDefaults.
 // Shared across the app via @StateObject / @EnvironmentObject.
@@ -87,21 +95,22 @@ class AppSettings: ObservableObject {
         didSet { UserDefaults.standard.set(showOther, forKey: Keys.showOther) }
     }
 
-    // MARK: - Real-time Updates (LAR-25)
-    /// When enabled, landmarks refresh every 30 s or after moving 50 m (instead of 200 m).
-    @Published var isRealtimeUpdatesEnabled: Bool {
-        didSet { UserDefaults.standard.set(isRealtimeUpdatesEnabled, forKey: Keys.isRealtimeUpdatesEnabled) }
+    // MARK: - Real-time Updates (LAR-25, LAR-28)
+    /// Controls automatic landmark refresh: off, wi-fi only, or always.
+    @Published var realtimeUpdateMode: RealtimeUpdateMode {
+        didSet { UserDefaults.standard.set(realtimeUpdateMode.rawValue, forKey: Keys.realtimeUpdateMode) }
     }
 
     // MARK: - Init
 
     init() {
         let ud = UserDefaults.standard
-        isWikipediaEnabled        = ud.object(forKey: Keys.isWikipediaEnabled)        as? Bool ?? true
-        isOpenStreetMapEnabled    = ud.object(forKey: Keys.isOpenStreetMapEnabled)    as? Bool ?? true
-        isNPSEnabled              = ud.object(forKey: Keys.isNPSEnabled)              as? Bool ?? false
-        npsApiKey                 = ud.string(forKey: Keys.npsApiKey) ?? "H7f7Y1eEtjYH7it8HOI2YOp6aBicGNA5FWeyDhPN"
-        isRealtimeUpdatesEnabled  = ud.object(forKey: Keys.isRealtimeUpdatesEnabled)  as? Bool ?? false
+        isWikipediaEnabled     = ud.object(forKey: Keys.isWikipediaEnabled)     as? Bool ?? true
+        isOpenStreetMapEnabled = ud.object(forKey: Keys.isOpenStreetMapEnabled) as? Bool ?? true
+        isNPSEnabled           = ud.object(forKey: Keys.isNPSEnabled)           as? Bool ?? false
+        npsApiKey              = ud.string(forKey: Keys.npsApiKey) ?? "H7f7Y1eEtjYH7it8HOI2YOp6aBicGNA5FWeyDhPN"
+        let savedMode = ud.string(forKey: Keys.realtimeUpdateMode).flatMap(RealtimeUpdateMode.init(rawValue:))
+        realtimeUpdateMode = savedMode ?? .off
         // Default index 4 = 10 km (matches old default)
         maxDistanceIndexHistorical = ud.object(forKey: Keys.maxDistanceIndexHistorical) as? Double ?? 4
         maxDistanceIndexNatural    = ud.object(forKey: Keys.maxDistanceIndexNatural)    as? Double ?? 4
@@ -121,7 +130,7 @@ class AppSettings: ObservableObject {
         static let isOpenStreetMapEnabled      = "isOpenStreetMapEnabled"
         static let isNPSEnabled                = "isNPSEnabled"
         static let npsApiKey                   = "npsApiKey"
-        static let isRealtimeUpdatesEnabled    = "isRealtimeUpdatesEnabled"
+        static let realtimeUpdateMode          = "realtimeUpdateMode"
         static let maxDistanceIndexHistorical  = "maxDistanceIndexHistorical"
         static let maxDistanceIndexNatural     = "maxDistanceIndexNatural"
         static let maxDistanceIndexCultural    = "maxDistanceIndexCultural"

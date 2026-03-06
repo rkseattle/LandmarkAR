@@ -14,6 +14,7 @@ struct ContentView: View {
     @StateObject private var settings = AppSettings()
     @StateObject private var errorLogger = ErrorLogger()
     @StateObject private var circuitBreaker = DataSourceCircuitBreaker()
+    @StateObject private var networkMonitor = NetworkMonitor()
 
     @State private var landmarks: [Landmark] = []
     @State private var selectedLandmark: Landmark?
@@ -34,8 +35,17 @@ struct ContentView: View {
     private let realtimeInterval: TimeInterval = 30
     private let deduplicationProximityMeters: CLLocationDistance = 75
 
+    // LAR-28: Real-time is active when mode is "always", or "wifiOnly" while on Wi-Fi.
+    private var isRealtimeActive: Bool {
+        switch settings.realtimeUpdateMode {
+        case .off:      return false
+        case .always:   return true
+        case .wifiOnly: return networkMonitor.isOnWifi
+        }
+    }
+
     private var refetchDistanceThreshold: CLLocationDistance {
-        settings.isRealtimeUpdatesEnabled ? realtimeDistanceThreshold : normalDistanceThreshold
+        isRealtimeActive ? realtimeDistanceThreshold : normalDistanceThreshold
     }
 
     // Landmarks filtered by category toggles, per-category distance, and display limit (LAR-5, LAR-13, LAR-23)
@@ -145,16 +155,9 @@ struct ContentView: View {
             lastFetchLocation = nil
             Task { await fetchLandmarks(at: location) }
         }
-        // LAR-25: Start/stop real-time timer when the toggle changes
-        .onChange(of: settings.isRealtimeUpdatesEnabled) { _, enabled in
-            if enabled {
-                guard let location = locationManager.userLocation else { return }
-                Task { await fetchLandmarks(at: location) }
-                startRealtimeTimer()
-            } else {
-                stopRealtimeTimer()
-            }
-        }
+        // LAR-25/LAR-28: Start/stop real-time timer when mode or Wi-Fi connectivity changes
+        .onChange(of: settings.realtimeUpdateMode) { _, _ in handleRealtimeModeChange() }
+        .onChange(of: networkMonitor.isOnWifi) { _, _ in handleRealtimeModeChange() }
         .sheet(item: $selectedLandmark) { landmark in
             LandmarkDetailSheet(landmark: landmark)
         }
@@ -269,15 +272,25 @@ struct ContentView: View {
         if let last = lastFetchLocation,
            location.distance(from: last) < refetchDistanceThreshold {
             // In real-time mode also apply a time gate so we don't spam on slow movement
-            if settings.isRealtimeUpdatesEnabled,
+            if isRealtimeActive,
                let lastTime = lastFetchTime,
                Date().timeIntervalSince(lastTime) < realtimeInterval {
                 return
-            } else if !settings.isRealtimeUpdatesEnabled {
+            } else if !isRealtimeActive {
                 return
             }
         }
         Task { await fetchLandmarks(at: location) }
+    }
+
+    private func handleRealtimeModeChange() {
+        if isRealtimeActive {
+            guard let location = locationManager.userLocation else { return }
+            Task { await fetchLandmarks(at: location) }
+            startRealtimeTimer()
+        } else {
+            stopRealtimeTimer()
+        }
     }
 
     private func startRealtimeTimer() {
