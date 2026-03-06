@@ -228,6 +228,7 @@ class ARLandmarkViewController: UIViewController, ARSessionDelegate {
 // LAR-8: Scaled relative to distance from user.
 // LAR-9: Distance displayed prominently below landmark name.
 // LAR-14: Red pin indicator shown above the label text.
+// LAR-27: Opacity decreases with distance so the closest label reads clearly when labels overlap.
 
 class LandmarkLabelView: UIView {
 
@@ -299,17 +300,21 @@ class LandmarkLabelView: UIView {
         isUserInteractionEnabled = true
     }
 
-    // LAR-8: Scale the label so closer landmarks appear larger
+    // LAR-8: Scale the label so closer landmarks appear larger.
+    // LAR-27: Also fade distant labels so the closest landmark is visually dominant
+    // when multiple labels overlap in the same screen area.
     func applyDistanceScale(_ distanceMeters: CLLocationDistance) {
         let scale: CGFloat
+        let opacity: CGFloat
         switch distanceMeters {
-        case ..<300:        scale = 1.4
-        case 300..<800:     scale = 1.2
-        case 800..<2000:    scale = 1.0
-        case 2000..<5000:   scale = 0.85
-        default:            scale = 0.70
+        case ..<300:        scale = 1.4; opacity = 1.00
+        case 300..<800:     scale = 1.2; opacity = 0.90
+        case 800..<2000:    scale = 1.0; opacity = 0.75
+        case 2000..<5000:   scale = 0.85; opacity = 0.55
+        default:            scale = 0.70; opacity = 0.40
         }
         transform = CGAffineTransform(scaleX: scale, y: scale)
+        alpha = opacity
     }
 
     @objc private func tapped() {
