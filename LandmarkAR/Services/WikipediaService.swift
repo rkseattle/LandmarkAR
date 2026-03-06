@@ -16,8 +16,9 @@ class WikipediaService {
         // LAR-3: Respect the data source toggle
         guard settings.isWikipediaEnabled else { return [] }
 
-        // LAR-4: Use the user's chosen distance as the search radius (convert km → meters)
-        let radiusMeters = Int(settings.maxDistanceKm * 1000)
+        // LAR-4: Use the user's chosen distance as the search radius (convert km → meters).
+        // Wikipedia GeoSearch caps gsradius at 10,000 m; clamp to avoid API errors.
+        let radiusMeters = min(Int(settings.maxDistanceKm * 1000), 10_000)
         let maxResults = 20
 
         // Step 1: Search for Wikipedia articles near this GPS coordinate
