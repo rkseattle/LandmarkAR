@@ -22,6 +22,7 @@
 		A116 /* ErrorLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = A016 /* ErrorLog.swift */; };
 		A117 /* ErrorLogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A017 /* ErrorLogView.swift */; };
 		A118 /* ElevationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A018 /* ElevationService.swift */; };
+		A119 /* DataSourceCircuitBreaker.swift in Sources */ = {isa = PBXBuildFile; fileRef = A019 /* DataSourceCircuitBreaker.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -42,6 +43,7 @@
 		A016 /* ErrorLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorLog.swift; sourceTree = "<group>"; };
 		A017 /* ErrorLogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorLogView.swift; sourceTree = "<group>"; };
 		A018 /* ElevationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ElevationService.swift; sourceTree = "<group>"; };
+		A019 /* DataSourceCircuitBreaker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataSourceCircuitBreaker.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -85,6 +87,7 @@
 				A003 /* Landmark.swift */,
 				A008S /* AppSettings.swift */,
 				A016 /* ErrorLog.swift */,
+				A019 /* DataSourceCircuitBreaker.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -225,6 +228,7 @@
 				A116 /* ErrorLog.swift in Sources */,
 				A117 /* ErrorLogView.swift in Sources */,
 				A118 /* ElevationService.swift in Sources */,
+				A119 /* DataSourceCircuitBreaker.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

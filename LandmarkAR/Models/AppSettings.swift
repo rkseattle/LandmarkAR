@@ -87,14 +87,21 @@ class AppSettings: ObservableObject {
         didSet { UserDefaults.standard.set(showOther, forKey: Keys.showOther) }
     }
 
+    // MARK: - Real-time Updates (LAR-25)
+    /// When enabled, landmarks refresh every 30 s or after moving 50 m (instead of 200 m).
+    @Published var isRealtimeUpdatesEnabled: Bool {
+        didSet { UserDefaults.standard.set(isRealtimeUpdatesEnabled, forKey: Keys.isRealtimeUpdatesEnabled) }
+    }
+
     // MARK: - Init
 
     init() {
         let ud = UserDefaults.standard
-        isWikipediaEnabled     = ud.object(forKey: Keys.isWikipediaEnabled)     as? Bool ?? true
-        isOpenStreetMapEnabled = ud.object(forKey: Keys.isOpenStreetMapEnabled) as? Bool ?? true
-        isNPSEnabled           = ud.object(forKey: Keys.isNPSEnabled)           as? Bool ?? false
-        npsApiKey              = ud.string(forKey: Keys.npsApiKey) ?? "H7f7Y1eEtjYH7it8HOI2YOp6aBicGNA5FWeyDhPN"
+        isWikipediaEnabled        = ud.object(forKey: Keys.isWikipediaEnabled)        as? Bool ?? true
+        isOpenStreetMapEnabled    = ud.object(forKey: Keys.isOpenStreetMapEnabled)    as? Bool ?? true
+        isNPSEnabled              = ud.object(forKey: Keys.isNPSEnabled)              as? Bool ?? false
+        npsApiKey                 = ud.string(forKey: Keys.npsApiKey) ?? "H7f7Y1eEtjYH7it8HOI2YOp6aBicGNA5FWeyDhPN"
+        isRealtimeUpdatesEnabled  = ud.object(forKey: Keys.isRealtimeUpdatesEnabled)  as? Bool ?? false
         // Default index 4 = 10 km (matches old default)
         maxDistanceIndexHistorical = ud.object(forKey: Keys.maxDistanceIndexHistorical) as? Double ?? 4
         maxDistanceIndexNatural    = ud.object(forKey: Keys.maxDistanceIndexNatural)    as? Double ?? 4
@@ -114,6 +121,7 @@ class AppSettings: ObservableObject {
         static let isOpenStreetMapEnabled      = "isOpenStreetMapEnabled"
         static let isNPSEnabled                = "isNPSEnabled"
         static let npsApiKey                   = "npsApiKey"
+        static let isRealtimeUpdatesEnabled    = "isRealtimeUpdatesEnabled"
         static let maxDistanceIndexHistorical  = "maxDistanceIndexHistorical"
         static let maxDistanceIndexNatural     = "maxDistanceIndexNatural"
         static let maxDistanceIndexCultural    = "maxDistanceIndexCultural"
