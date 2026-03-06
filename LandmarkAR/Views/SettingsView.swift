@@ -80,6 +80,17 @@ struct SettingsView: View {
                     Text("Enable categories and set the maximum distance for each.")
                 }
 
+                // MARK: Real-time Updates (LAR-25)
+                Section {
+                    Toggle(isOn: $settings.isRealtimeUpdatesEnabled) {
+                        Label("Real-time Updates", systemImage: "arrow.clockwise.circle")
+                    }
+                } header: {
+                    Text("Updates")
+                } footer: {
+                    Text("Refreshes landmarks every 30 seconds or after moving 50 m. May increase data usage.")
+                }
+
                 // MARK: Error Log (LAR-16)
                 Section {
                     NavigationLink {
