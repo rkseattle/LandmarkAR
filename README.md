@@ -1,21 +1,57 @@
-# LandmarkAR 🏔️
+# LandmarkAR
 
-An augmented reality iOS app that shows floating labels for nearby natural and historic landmarks using your iPhone's camera, GPS, and compass — powered by Wikipedia.
-
-All of this was produced from the following prompt:
-
-> I would like to develop an augmented reality app for my iphone that will, given my gps location and the location of natural and historic landmarks, show me information about the things in the field of view.
-
+An augmented reality iOS app that overlays floating labels on nearby natural and historic landmarks using your iPhone's camera, GPS, and compass.
 
 ---
 
-## What It Does
+## Features
 
-- Opens your iPhone camera in AR mode
-- Detects your GPS location and compass direction
-- Fetches nearby Wikipedia articles (landmarks, historic sites, parks, etc.) within 10 km
-- Shows a floating label for each one — name + distance — in the direction it exists
-- Tap any label to read the Wikipedia summary and open the full article
+### AR View
+- Live camera feed with floating landmark labels showing name, distance, and category icon
+- Labels are anchored to real compass directions using ARKit's `gravityAndHeading` alignment
+- Label opacity fades with distance so close landmarks are most prominent
+- Tap any label to open the landmark detail sheet
+
+### Landmark Detail Sheet
+- Full Wikipedia summary with a link to read the complete article
+- **Get Directions** — opens the landmark in your preferred map app (Apple Maps, Google Maps, or Waze) with turn-by-turn directions from your current location
+
+### Data Sources
+| Source | What it provides |
+|--------|-----------------|
+| Wikipedia | Articles for landmarks, historic sites, parks, monuments, and more |
+| OpenStreetMap | Points of interest including shops, venues, and infrastructure |
+
+Each source can be independently enabled or disabled in Settings.
+
+### Settings
+| Setting | Options | Default |
+|---------|---------|---------|
+| Data Sources | Wikipedia on/off, OpenStreetMap on/off | Both on |
+| Display Limit | 5 / 10 / 25 | 10 |
+| Label Size | Small / Medium / Large | Medium |
+| Categories | Historical, Natural, Cultural, Other — each with its own distance slider (0.1 km – 100 km) | All on, 10 km |
+| Real-time Updates | Off / Wi-Fi Only / Always | Off |
+| Language | 8 languages (see below) | Device language |
+
+### Language Support
+The app is fully localized in 8 languages. Wikipedia content is fetched from the matching language subdomain (e.g. `ja.wikipedia.org` when Japanese is selected), so landmark descriptions are in your chosen language with no machine translation.
+
+| Language | Native name |
+|----------|-------------|
+| English | English |
+| Japanese | 日本語 |
+| German | Deutsch |
+| French | Français |
+| Spanish | Español |
+| Portuguese | Português |
+| Korean | 한국어 |
+| Italian | Italiano |
+
+### Reliability
+- **Circuit breaker** — if a data source fails repeatedly it is paused automatically and retried after a cooldown, preventing error spam
+- **Network awareness** — real-time updates can be restricted to Wi-Fi to save mobile data
+- **Error log** — all fetch errors are timestamped and viewable in Settings → Diagnostics → Error Log
 
 ---
 
@@ -26,43 +62,28 @@ All of this was produced from the following prompt:
 | Xcode | 15.0+ |
 | iOS | 17.0+ |
 | Device | iPhone with ARKit support (iPhone 6s or newer) |
-| Apple Developer Account | Free account is fine for testing on your own device |
+| Apple Developer Account | Free account is sufficient for personal device testing |
 
-> ⚠️ **ARKit does not work in the iOS Simulator.** You must run this on a real iPhone.
+> **ARKit does not work in the iOS Simulator.** Run on a real iPhone for the AR view.
 
 ---
 
-## Setup Instructions (Step by Step)
+## Building and Running
 
-### Step 1 — Open the project
-1. Unzip the downloaded folder
-2. Double-click **LandmarkAR.xcodeproj** to open it in Xcode
+### 1. Open the project
+Double-click **LandmarkAR.xcodeproj** to open it in Xcode.
 
-### Step 2 — Sign the app with your Apple ID
-1. In Xcode, click on **LandmarkAR** in the left panel (the blue icon at the top)
-2. Select the **LandmarkAR** target
-3. Go to the **Signing & Capabilities** tab
-4. Under **Team**, click the dropdown and select your Apple ID
-   - If you don't see your Apple ID, go to **Xcode → Settings → Accounts** and add it
-5. Change the **Bundle Identifier** from `com.yourname.LandmarkAR` to something unique like `com.yourfirstname.LandmarkAR`
+### 2. Sign the app
+1. Select the **LandmarkAR** target in the Project navigator
+2. Open the **Signing & Capabilities** tab
+3. Under **Team**, select your Apple ID (add it via Xcode → Settings → Accounts if needed)
+4. Set a unique **Bundle Identifier** — e.g. `com.yourname.LandmarkAR`
 
-### Step 3 — Connect your iPhone
-1. Plug your iPhone into your Mac with a USB cable
-2. Trust the computer on your iPhone if prompted
-3. In Xcode, click the device dropdown at the top (where it says a simulator name)
-4. Select your iPhone from the list
-
-### Step 4 — Build and run
-1. Press **⌘R** or click the **▶ Play** button
-2. The first time, iOS may say "Untrusted Developer" — go to:
-   - iPhone Settings → General → VPN & Device Management → your Apple ID → Trust
-3. Launch the app again
-
-### Step 5 — Use it!
-1. Allow location access when prompted
-2. Allow camera access when prompted
-3. Walk outside (GPS works best outdoors)
-4. Point your phone around — labels will appear for nearby landmarks
+### 3. Connect your iPhone and run
+1. Plug in your iPhone and select it from the device picker at the top of Xcode
+2. Press **⌘R** to build and run
+3. If iOS shows "Untrusted Developer": Settings → General → VPN & Device Management → your Apple ID → Trust
+4. Grant location and camera permissions when the app prompts you
 
 ---
 
@@ -70,48 +91,45 @@ All of this was produced from the following prompt:
 
 ```
 LandmarkAR/
-├── LandmarkARApp.swift          # App entry point
+├── LandmarkARApp.swift              # App entry point + splash screen transition
 ├── Models/
-│   └── Landmark.swift           # Data model + Wikipedia API response types
+│   ├── Landmark.swift               # Landmark model + Wikipedia API response types
+│   ├── AppSettings.swift            # User preferences (UserDefaults-backed)
+│   ├── AppLanguage.swift            # Supported languages enum
+│   ├── LocaleBundleEnvironment.swift# SwiftUI environment key for runtime localization
+│   ├── DataSourceCircuitBreaker.swift # Per-source failure tracking + cooldown
+│   └── ErrorLog.swift               # In-memory + persisted error log
 ├── Services/
-│   ├── LocationManager.swift    # GPS + compass (CoreLocation)
-│   └── WikipediaService.swift   # Fetches landmarks from Wikipedia API
+│   ├── LocationManager.swift        # GPS + compass (CoreLocation)
+│   ├── WikipediaService.swift       # GeoSearch + Summary API calls
+│   ├── OpenStreetMapService.swift   # Overpass API calls
+│   ├── ElevationService.swift       # Open-Meteo elevation lookup
+│   ├── NetworkMonitor.swift         # Wi-Fi / cellular detection (Network framework)
+│   └── NPSService.swift             # National Park Service (disabled; kept for future use)
 ├── AR/
-│   └── ARLandmarkView.swift     # AR camera + floating label placement
-└── Views/
-    ├── ContentView.swift         # Root view, state management
-    └── LandmarkDetailSheet.swift # Detail sheet shown when you tap a label
+│   └── ARLandmarkView.swift         # ARSCNView + label placement + tap handling
+├── Views/
+│   ├── ContentView.swift            # Root view + fetch orchestration
+│   ├── SettingsView.swift           # Settings form
+│   ├── LandmarkDetailSheet.swift    # Summary sheet + directions + Wikipedia link
+│   ├── ErrorLogView.swift           # Timestamped error list
+│   └── SplashScreenView.swift       # Launch screen
+└── Resources/
+    ├── Info.plist
+    ├── Assets.xcassets
+    └── [en/ja/de/fr/es/pt/ko/it].lproj/Localizable.strings
 ```
 
 ---
 
-## How It Works (Plain English)
+## How It Works
 
-1. **Location**: The app continuously reads your GPS coordinates and compass heading
-2. **Fetch**: When you first open the app (and every 200m you move), it calls the Wikipedia GeoSearch API asking "what Wikipedia articles exist near this lat/lon?"
-3. **Bearing math**: For each landmark, it calculates the compass direction from you to it
-4. **AR placement**: ARKit is configured with `gravityAndHeading` alignment, meaning the AR world is anchored to real compass north. Labels are placed at a fixed 80m radius in the correct compass direction
-5. **Projection**: Each 3D label position is projected onto the 2D camera screen so it appears in the right place
-6. **Tap**: Tapping a label shows a sheet with the Wikipedia summary and a link to the full article
-
----
-
-## Customizing the App
-
-### Change how far it searches
-In `WikipediaService.swift`, line 12:
-```swift
-private let searchRadiusMeters = 10_000  // change to 5000 for 5km, 20000 for 20km
-```
-
-### Change how many landmarks appear
-In `WikipediaService.swift`, line 15:
-```swift
-private let maxResults = 20  // reduce to 10 for fewer labels
-```
-
-### Change label appearance
-In `ARLandmarkView.swift`, in the `LandmarkLabelView.setup()` method — you can change colors, fonts, corner radius, etc.
+1. **Location** — `LocationManager` streams GPS fixes and compass headings via CoreLocation
+2. **Fetch** — `ContentView` calls each enabled data source when the app opens, after moving 200 m, or on a 30-second timer (when real-time mode is on). Results from all sources are merged and deduplicated by title and geographic proximity (within 75 m)
+3. **Elevation** — `ElevationService` fetches altitudes from Open-Meteo in a single batch request; labels are vertically offset by the landmark's elevation relative to the user
+4. **Bearing math** — For each landmark, a haversine bearing from the user's coordinate is calculated so the label can be placed in the correct compass direction
+5. **AR placement** — ARKit's `gravityAndHeading` world alignment anchors the AR coordinate system to magnetic north. Labels are placed at 80 m radius in the computed bearing direction and projected onto the camera plane
+6. **Language** — `AppSettings.appLanguage` controls both the UI locale (via language-specific `.lproj` bundles loaded at runtime) and the Wikipedia subdomain used for all API calls
 
 ---
 
@@ -119,18 +137,15 @@ In `ARLandmarkView.swift`, in the `LandmarkLabelView.setup()` method — you can
 
 | Problem | Fix |
 |---------|-----|
-| Labels don't appear | Make sure you're outside with good GPS signal |
-| Labels point wrong direction | Slowly wave your phone in a figure-8 to calibrate the compass |
-| "Untrusted Developer" error | iPhone Settings → General → VPN & Device Management → Trust |
-| App crashes immediately | Check that you've set a unique Bundle Identifier in Signing & Capabilities |
-| No landmarks shown | You may be in a remote area with few Wikipedia articles nearby — try a city |
+| No labels appear | Go outside — GPS and compass require an open-sky view |
+| Labels point the wrong way | Slowly wave your phone in a figure-8 to recalibrate the compass |
+| Very few landmarks | Some areas have sparse Wikipedia coverage; try a city centre |
+| "Untrusted Developer" on launch | Settings → General → VPN & Device Management → Trust your Apple ID |
+| Data source errors | Check Settings → Diagnostics → Error Log for details |
+| App won't build | Ensure you have set a unique Bundle Identifier in Signing & Capabilities |
 
 ---
 
-## Next Steps / Ideas
+## License
 
-- Add a **radar/map view** showing all landmarks as a 2D overview
-- Add **filtering** (nature only, historic only, etc.) using Wikipedia categories  
-- Add **landmark images** from Wikipedia's thumbnail API
-- Add **voice** — tap a label to hear it read aloud with AVSpeechSynthesizer
-- Add **OpenStreetMap** as a second data source for more POIs
+Copyright © 2025 Edward Aspen Studios. See [LICENSE](LICENSE) for details.
