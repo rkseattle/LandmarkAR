@@ -1,0 +1,54 @@
+/* Content View */
+"content.findingLandmarks" = "Finding landmarks…";
+"content.permission.title" = "Location Access Required";
+"content.permission.message" = "LandmarkAR needs your location to find nearby landmarks and show them in augmented reality.";
+"content.permission.openSettings" = "Open Settings";
+"content.gps.acquiring" = "Acquiring GPS signal…";
+"content.gps.hint" = "Please stand outside with a clear view of the sky for best results.";
+
+/* Settings */
+"settings.title" = "Settings";
+"settings.done" = "Done";
+"settings.dataSources.header" = "Data Sources";
+"settings.dataSources.footer" = "Enable or disable location data from each source.";
+"settings.dataSources.wikipedia" = "Wikipedia";
+"settings.dataSources.openstreetmap" = "OpenStreetMap";
+"settings.displayLimit.header" = "Display Limit";
+"settings.displayLimit.footer" = "Maximum landmarks shown at once. The closest and farthest are always included.";
+"settings.displayLimit.maxLandmarks" = "Max Landmarks";
+"settings.labelSize.header" = "Label Size";
+"settings.labelSize.footer" = "Controls the size of icons and text on the AR view.";
+"settings.labelSize.small" = "Small";
+"settings.labelSize.medium" = "Medium";
+"settings.labelSize.large" = "Large";
+"settings.categories.header" = "Categories";
+"settings.categories.footer" = "Enable categories and set the maximum distance for each.";
+"settings.categories.historical" = "Historical";
+"settings.categories.natural" = "Natural";
+"settings.categories.cultural" = "Cultural";
+"settings.categories.other" = "Other";
+"settings.realtimeUpdates.header" = "Real-time Updates";
+"settings.realtimeUpdates.footer" = "Refreshes landmarks every 30 s or after moving 50 m. \"Wi-Fi Only\" skips updates on cellular to save data.";
+"settings.realtimeUpdates.off" = "Off";
+"settings.realtimeUpdates.wifiOnly" = "Wi-Fi Only";
+"settings.realtimeUpdates.always" = "Always";
+"settings.diagnostics.header" = "Diagnostics";
+"settings.errorLog" = "Error Log";
+"settings.language.header" = "Language";
+"settings.language.footer" = "Sets the language for the app and Wikipedia content.";
+"settings.language.label" = "Language";
+
+/* Landmark Detail */
+"detail.done" = "Done";
+"detail.readOnWikipedia" = "Read full article on Wikipedia";
+"detail.metersAway" = "%d meters away";
+"detail.kmAway" = "%.1f km away";
+
+/* Error Log */
+"errorLog.title" = "Error Log";
+"errorLog.noErrors" = "No errors logged.";
+"errorLog.clear" = "Clear";
+
+/* Splash Screen */
+"splash.tagline" = "Discover landmarks around you\nin augmented reality";
+"splash.credit" = "by Edward Aspen Studios";

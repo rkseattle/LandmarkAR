@@ -1,0 +1,54 @@
+/* Content View */
+"content.findingLandmarks" = "Procurando pontos de interesse…";
+"content.permission.title" = "Acesso à localização necessário";
+"content.permission.message" = "LandmarkAR precisa da sua localização para encontrar pontos de interesse próximos e exibi-los em realidade aumentada.";
+"content.permission.openSettings" = "Abrir configurações";
+"content.gps.acquiring" = "Obtendo sinal de GPS…";
+"content.gps.hint" = "Para melhores resultados, fique ao ar livre com visão clara do céu.";
+
+/* Settings */
+"settings.title" = "Configurações";
+"settings.done" = "Concluído";
+"settings.dataSources.header" = "Fontes de dados";
+"settings.dataSources.footer" = "Ative ou desative dados de localização de cada fonte.";
+"settings.dataSources.wikipedia" = "Wikipedia";
+"settings.dataSources.openstreetmap" = "OpenStreetMap";
+"settings.displayLimit.header" = "Limite de exibição";
+"settings.displayLimit.footer" = "Número máximo de pontos de interesse exibidos de uma vez. O mais próximo e o mais distante são sempre incluídos.";
+"settings.displayLimit.maxLandmarks" = "Máx. pontos";
+"settings.labelSize.header" = "Tamanho do rótulo";
+"settings.labelSize.footer" = "Controla o tamanho de ícones e texto na visualização AR.";
+"settings.labelSize.small" = "Pequeno";
+"settings.labelSize.medium" = "Médio";
+"settings.labelSize.large" = "Grande";
+"settings.categories.header" = "Categorias";
+"settings.categories.footer" = "Ative categorias e defina a distância máxima para cada uma.";
+"settings.categories.historical" = "Histórico";
+"settings.categories.natural" = "Natural";
+"settings.categories.cultural" = "Cultural";
+"settings.categories.other" = "Outro";
+"settings.realtimeUpdates.header" = "Atualizações em tempo real";
+"settings.realtimeUpdates.footer" = "Atualiza pontos a cada 30 s ou após mover 50 m. «Apenas Wi-Fi» ignora atualizações em dados móveis para economizar.";
+"settings.realtimeUpdates.off" = "Desativado";
+"settings.realtimeUpdates.wifiOnly" = "Apenas Wi-Fi";
+"settings.realtimeUpdates.always" = "Sempre";
+"settings.diagnostics.header" = "Diagnóstico";
+"settings.errorLog" = "Registro de erros";
+"settings.language.header" = "Idioma";
+"settings.language.footer" = "Define o idioma para o aplicativo e conteúdo da Wikipedia.";
+"settings.language.label" = "Idioma";
+
+/* Landmark Detail */
+"detail.done" = "Concluído";
+"detail.readOnWikipedia" = "Ler artigo completo na Wikipedia";
+"detail.metersAway" = "A %d metros";
+"detail.kmAway" = "A %.1f km";
+
+/* Error Log */
+"errorLog.title" = "Registro de erros";
+"errorLog.noErrors" = "Nenhum erro registrado.";
+"errorLog.clear" = "Limpar";
+
+/* Splash Screen */
+"splash.tagline" = "Descubra pontos de interesse\nem realidade aumentada";
+"splash.credit" = "by Edward Aspen Studios";

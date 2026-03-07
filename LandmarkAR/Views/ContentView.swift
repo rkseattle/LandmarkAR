@@ -157,6 +157,14 @@ struct ContentView: View {
         .sheet(isPresented: $showSettings) {
             SettingsView(settings: settings, errorLogger: errorLogger)
         }
+        // LAR-35: Re-fetch when the language changes (Wikipedia subdomain switches)
+        .onChange(of: settings.appLanguage) { _, _ in
+            guard let location = locationManager.userLocation else { return }
+            lastFetchLocation = nil
+            Task { await fetchLandmarks(at: location) }
+        }
+        // LAR-35: Inject the language-specific bundle into the environment for all child views
+        .environment(\.localeBundle, settings.localizedBundle)
     }
 
     // MARK: - Overlay UI
@@ -206,7 +214,7 @@ struct ContentView: View {
                 HStack(spacing: 8) {
                     ProgressView()
                         .tint(.white)
-                    Text("Finding landmarks…")
+                    Text("content.findingLandmarks", bundle: settings.localizedBundle)
                         .font(.caption)
                         .foregroundColor(.white)
                 }
@@ -396,21 +404,25 @@ struct ContentView: View {
 // MARK: - Permission Denied View
 
 struct PermissionDeniedView: View {
+    @Environment(\.localeBundle) private var bundle
+
     var body: some View {
         VStack(spacing: 20) {
             Image(systemName: "location.slash.fill")
                 .font(.system(size: 60))
                 .foregroundColor(.orange)
-            Text("Location Access Required")
+            Text("content.permission.title", bundle: bundle)
                 .font(.title2).bold()
-            Text("LandmarkAR needs your location to find nearby landmarks and show them in augmented reality.")
+            Text("content.permission.message", bundle: bundle)
                 .multilineTextAlignment(.center)
                 .foregroundColor(.secondary)
                 .padding(.horizontal)
-            Button("Open Settings") {
+            Button {
                 if let url = URL(string: UIApplication.openSettingsURLString) {
                     UIApplication.shared.open(url)
                 }
+            } label: {
+                Text("content.permission.openSettings", bundle: bundle)
             }
             .buttonStyle(.borderedProminent)
         }
@@ -421,13 +433,15 @@ struct PermissionDeniedView: View {
 // MARK: - Waiting for Location View
 
 struct WaitingForLocationView: View {
+    @Environment(\.localeBundle) private var bundle
+
     var body: some View {
         VStack(spacing: 20) {
             ProgressView()
                 .scaleEffect(1.5)
-            Text("Acquiring GPS signal…")
+            Text("content.gps.acquiring", bundle: bundle)
                 .font(.headline)
-            Text("Please stand outside with a clear view of the sky for best results.")
+            Text("content.gps.hint", bundle: bundle)
                 .multilineTextAlignment(.center)
                 .foregroundColor(.secondary)
                 .padding(.horizontal)

@@ -7,6 +7,7 @@ import SwiftUI
 struct LandmarkDetailSheet: View {
     let landmark: Landmark
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.localeBundle) private var bundle
 
     var body: some View {
         NavigationStack {
@@ -37,7 +38,7 @@ struct LandmarkDetailSheet: View {
                         Link(destination: url) {
                             HStack {
                                 Image(systemName: "globe")
-                                Text("Read full article on Wikipedia")
+                                Text("detail.readOnWikipedia", bundle: bundle)
                                 Spacer()
                                 Image(systemName: "arrow.up.right")
                             }
@@ -55,7 +56,9 @@ struct LandmarkDetailSheet: View {
             .navigationBarTitleDisplayMode(.large)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("Done") { dismiss() }
+                    Button { dismiss() } label: {
+                        Text("detail.done", bundle: bundle)
+                    }
                 }
             }
         }
@@ -64,9 +67,11 @@ struct LandmarkDetailSheet: View {
     private var formattedDistance: String {
         let meters = landmark.distance
         if meters < 1000 {
-            return "\(Int(meters)) meters away"
+            let fmt = bundle.localizedString(forKey: "detail.metersAway", value: "%d meters away", table: nil)
+            return String(format: fmt, Int(meters))
         } else {
-            return String(format: "%.1f km away", meters / 1000)
+            let fmt = bundle.localizedString(forKey: "detail.kmAway", value: "%.1f km away", table: nil)
+            return String(format: fmt, meters / 1000)
         }
     }
 }

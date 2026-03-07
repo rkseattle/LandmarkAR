@@ -102,6 +102,21 @@ class AppSettings: ObservableObject {
         didSet { UserDefaults.standard.set(labelDisplaySize.rawValue, forKey: Keys.labelDisplaySize) }
     }
 
+    // MARK: - Language (LAR-35)
+    // Stored as the BCP 47 locale code. Defaults to the device system language if supported,
+    // otherwise falls back to English.
+    @Published var appLanguage: AppLanguage {
+        didSet { UserDefaults.standard.set(appLanguage.rawValue, forKey: Keys.appLanguage) }
+    }
+
+    /// The Bundle for the current language's .lproj directory.
+    /// Views pass this to Text(_, bundle:) so language changes take effect immediately.
+    var localizedBundle: Bundle {
+        guard let path = Bundle.main.path(forResource: appLanguage.rawValue, ofType: "lproj"),
+              let bundle = Bundle(path: path) else { return .main }
+        return bundle
+    }
+
     // MARK: - Real-time Updates (LAR-25, LAR-28)
     /// Controls automatic landmark refresh: off, wi-fi only, or always.
     @Published var realtimeUpdateMode: RealtimeUpdateMode {
@@ -118,6 +133,8 @@ class AppSettings: ObservableObject {
         realtimeUpdateMode = savedMode ?? .off
         let savedSize = ud.string(forKey: Keys.labelDisplaySize).flatMap(LabelDisplaySize.init(rawValue:))
         labelDisplaySize = savedSize ?? .medium
+        let savedLang = ud.string(forKey: Keys.appLanguage).flatMap(AppLanguage.init(rawValue:))
+        appLanguage = savedLang ?? AppLanguage.systemDefault()
         // Default index 4 = 10 km (matches old default)
         maxDistanceIndexHistorical = ud.object(forKey: Keys.maxDistanceIndexHistorical) as? Double ?? 4
         maxDistanceIndexNatural    = ud.object(forKey: Keys.maxDistanceIndexNatural)    as? Double ?? 4
@@ -146,5 +163,6 @@ class AppSettings: ObservableObject {
         static let showNatural                 = "showNatural"
         static let showCultural                = "showCultural"
         static let showOther                   = "showOther"
+        static let appLanguage                 = "appLanguage"
     }
 }

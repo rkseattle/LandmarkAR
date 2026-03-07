@@ -21,10 +21,14 @@ class WikipediaService {
         let radiusMeters = min(Int(settings.maxDistanceKm * 1000), 10_000)
         let maxResults = 20
 
+        // LAR-35: Capture the language code once so both steps use the same value.
+        let languageCode = settings.appLanguage.rawValue
+
         // Step 1: Search for Wikipedia articles near this GPS coordinate
         let geoResults = try await geoSearch(near: location,
                                              radiusMeters: radiusMeters,
-                                             maxResults: maxResults)
+                                             maxResults: maxResults,
+                                             languageCode: languageCode)
 
         // Step 2: For each result, fetch a short summary (run all fetches in parallel).
         // Individual article failures are non-fatal — a bad page is skipped rather than
@@ -32,7 +36,7 @@ class WikipediaService {
         let landmarks = await withTaskGroup(of: Landmark?.self) { group in
             for result in geoResults {
                 group.addTask {
-                    await self.buildLandmark(from: result, userLocation: location)
+                    await self.buildLandmark(from: result, userLocation: location, languageCode: languageCode)
                 }
             }
 
@@ -54,9 +58,11 @@ class WikipediaService {
     /// Wikipedia GeoSearch: returns articles near a lat/lon
     private func geoSearch(near location: CLLocation,
                             radiusMeters: Int,
-                            maxResults: Int) async throws -> [WikipediaGeoResult] {
+                            maxResults: Int,
+                            languageCode: String) async throws -> [WikipediaGeoResult] {
         // Docs: https://www.mediawiki.org/wiki/API:Geosearch
-        var components = URLComponents(string: "https://en.wikipedia.org/w/api.php")!
+        // LAR-35: Use the language subdomain from settings (e.g. ja.wikipedia.org)
+        var components = URLComponents(string: "https://\(languageCode).wikipedia.org/w/api.php")!
         components.queryItems = [
             URLQueryItem(name: "action",   value: "query"),
             URLQueryItem(name: "list",     value: "geosearch"),
@@ -73,8 +79,11 @@ class WikipediaService {
 
     /// Fetches a plain-text summary for one Wikipedia article, then builds a Landmark.
     /// Returns nil (rather than throwing) if the page is missing or the response is malformed.
-    private func buildLandmark(from result: WikipediaGeoResult, userLocation: CLLocation) async -> Landmark? {
-        let urlString = "https://en.wikipedia.org/api/rest_v1/page/summary/\(result.title.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? "")"
+    private func buildLandmark(from result: WikipediaGeoResult,
+                                userLocation: CLLocation,
+                                languageCode: String) async -> Landmark? {
+        // LAR-35: Use the language subdomain from settings
+        let urlString = "https://\(languageCode).wikipedia.org/api/rest_v1/page/summary/\(result.title.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? "")"
         guard let url = URL(string: urlString) else { return nil }
 
         do {

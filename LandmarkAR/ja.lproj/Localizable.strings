@@ -1,0 +1,54 @@
+/* Content View */
+"content.findingLandmarks" = "ランドマークを検索中…";
+"content.permission.title" = "位置情報へのアクセスが必要です";
+"content.permission.message" = "LandmarkARは近くのランドマークを見つけてAR表示するために位置情報が必要です。";
+"content.permission.openSettings" = "設定を開く";
+"content.gps.acquiring" = "GPS信号を取得中…";
+"content.gps.hint" = "最良の結果を得るには、空が見える屋外に立ってください。";
+
+/* Settings */
+"settings.title" = "設定";
+"settings.done" = "完了";
+"settings.dataSources.header" = "データソース";
+"settings.dataSources.footer" = "各ソースの位置データを有効または無効にします。";
+"settings.dataSources.wikipedia" = "Wikipedia";
+"settings.dataSources.openstreetmap" = "OpenStreetMap";
+"settings.displayLimit.header" = "表示制限";
+"settings.displayLimit.footer" = "一度に表示されるランドマークの最大数。最も近いものと最も遠いものは常に含まれます。";
+"settings.displayLimit.maxLandmarks" = "最大ランドマーク数";
+"settings.labelSize.header" = "ラベルサイズ";
+"settings.labelSize.footer" = "ARビューのアイコンとテキストのサイズを制御します。";
+"settings.labelSize.small" = "小";
+"settings.labelSize.medium" = "中";
+"settings.labelSize.large" = "大";
+"settings.categories.header" = "カテゴリ";
+"settings.categories.footer" = "カテゴリを有効にして最大距離を設定します。";
+"settings.categories.historical" = "歴史";
+"settings.categories.natural" = "自然";
+"settings.categories.cultural" = "文化";
+"settings.categories.other" = "その他";
+"settings.realtimeUpdates.header" = "リアルタイム更新";
+"settings.realtimeUpdates.footer" = "30秒ごと、または50m移動後にランドマークを更新します。「Wi-Fiのみ」はデータ節約のためにセルラー通信での更新をスキップします。";
+"settings.realtimeUpdates.off" = "オフ";
+"settings.realtimeUpdates.wifiOnly" = "Wi-Fiのみ";
+"settings.realtimeUpdates.always" = "常時";
+"settings.diagnostics.header" = "診断";
+"settings.errorLog" = "エラーログ";
+"settings.language.header" = "言語";
+"settings.language.footer" = "アプリとWikipediaコンテンツの言語を設定します。";
+"settings.language.label" = "言語";
+
+/* Landmark Detail */
+"detail.done" = "完了";
+"detail.readOnWikipedia" = "Wikipediaで全文を読む";
+"detail.metersAway" = "%d m";
+"detail.kmAway" = "%.1f km";
+
+/* Error Log */
+"errorLog.title" = "エラーログ";
+"errorLog.noErrors" = "エラーはありません。";
+"errorLog.clear" = "クリア";
+
+/* Splash Screen */
+"splash.tagline" = "周囲のランドマークを\nAR で発見しよう";
+"splash.credit" = "by Edward Aspen Studios";

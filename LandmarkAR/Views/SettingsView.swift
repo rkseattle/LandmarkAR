@@ -2,12 +2,15 @@ import SwiftUI
 
 // MARK: - SettingsView (LAR-2)
 // Lets users configure data sources (LAR-3), distance filter (LAR-4),
-// and category filters (LAR-5).
+// category filters (LAR-5), and language (LAR-35).
 
 struct SettingsView: View {
     @ObservedObject var settings: AppSettings
     @ObservedObject var errorLogger: ErrorLogger
     @Environment(\.dismiss) private var dismiss
+
+    // LAR-35: Use the language-specific bundle from settings for immediate updates.
+    private var bundle: Bundle { settings.localizedBundle }
 
     var body: some View {
         NavigationStack {
@@ -22,92 +25,129 @@ struct SettingsView: View {
                         Label("OpenStreetMap", systemImage: "map")
                     }
                 } header: {
-                    Text("Data Sources")
+                    Text("settings.dataSources.header", bundle: bundle)
                 } footer: {
-                    Text("Enable or disable location data from each source.")
+                    Text("settings.dataSources.footer", bundle: bundle)
                 }
 
                 // MARK: Display Limit (LAR-23)
                 Section {
-                    Picker("Max Landmarks", selection: $settings.maxLandmarkCount) {
+                    Picker(selection: $settings.maxLandmarkCount) {
                         Text("5").tag(5)
                         Text("10").tag(10)
                         Text("25").tag(25)
+                    } label: {
+                        Text("settings.displayLimit.maxLandmarks", bundle: bundle)
                     }
                     .pickerStyle(.segmented)
                 } header: {
-                    Text("Display Limit")
+                    Text("settings.displayLimit.header", bundle: bundle)
                 } footer: {
-                    Text("Maximum landmarks shown at once. The closest and farthest are always included.")
+                    Text("settings.displayLimit.footer", bundle: bundle)
                 }
 
                 // MARK: Label Size (LAR-29)
                 Section {
-                    Picker("Label Size", selection: $settings.labelDisplaySize) {
-                        Text("Small").tag(LabelDisplaySize.small)
-                        Text("Medium").tag(LabelDisplaySize.medium)
-                        Text("Large").tag(LabelDisplaySize.large)
+                    Picker(selection: $settings.labelDisplaySize) {
+                        Text("settings.labelSize.small",  bundle: bundle).tag(LabelDisplaySize.small)
+                        Text("settings.labelSize.medium", bundle: bundle).tag(LabelDisplaySize.medium)
+                        Text("settings.labelSize.large",  bundle: bundle).tag(LabelDisplaySize.large)
+                    } label: {
+                        Text("settings.labelSize.header", bundle: bundle)
                     }
                     .pickerStyle(.segmented)
                 } header: {
-                    Text("Label Size")
+                    Text("settings.labelSize.header", bundle: bundle)
                 } footer: {
-                    Text("Controls the size of icons and text on the AR view.")
+                    Text("settings.labelSize.footer", bundle: bundle)
                 }
 
                 // MARK: Category Filters + Distance (LAR-5, LAR-13, LAR-24)
                 // Toggle and distance slider are grouped per category.
                 // The slider is only shown when the category is enabled.
                 Section {
-                    CategoryRow(label: "Historical", systemImage: "building.columns.fill",
+                    CategoryRow(label: Text("settings.categories.historical", bundle: bundle),
+                                systemImage: "building.columns.fill",
                                 isEnabled: $settings.showHistorical,
                                 distanceIndex: $settings.maxDistanceIndexHistorical)
-                    CategoryRow(label: "Natural", systemImage: "mountain.2.fill",
+                    CategoryRow(label: Text("settings.categories.natural", bundle: bundle),
+                                systemImage: "mountain.2.fill",
                                 isEnabled: $settings.showNatural,
                                 distanceIndex: $settings.maxDistanceIndexNatural)
-                    CategoryRow(label: "Cultural", systemImage: "theatermasks.fill",
+                    CategoryRow(label: Text("settings.categories.cultural", bundle: bundle),
+                                systemImage: "theatermasks.fill",
                                 isEnabled: $settings.showCultural,
                                 distanceIndex: $settings.maxDistanceIndexCultural)
-                    CategoryRow(label: "Other", systemImage: "mappin.circle.fill",
+                    CategoryRow(label: Text("settings.categories.other", bundle: bundle),
+                                systemImage: "mappin.circle.fill",
                                 isEnabled: $settings.showOther,
                                 distanceIndex: $settings.maxDistanceIndexOther)
                 } header: {
-                    Text("Categories")
+                    Text("settings.categories.header", bundle: bundle)
                 } footer: {
-                    Text("Enable categories and set the maximum distance for each.")
+                    Text("settings.categories.footer", bundle: bundle)
                 }
 
                 // MARK: Real-time Updates (LAR-25, LAR-28)
                 Section {
-                    Picker("Real-time Updates", selection: $settings.realtimeUpdateMode) {
-                        Text("Off").tag(RealtimeUpdateMode.off)
-                        Text("Wi-Fi Only").tag(RealtimeUpdateMode.wifiOnly)
-                        Text("Always").tag(RealtimeUpdateMode.always)
+                    Picker(selection: $settings.realtimeUpdateMode) {
+                        Text("settings.realtimeUpdates.off",      bundle: bundle).tag(RealtimeUpdateMode.off)
+                        Text("settings.realtimeUpdates.wifiOnly", bundle: bundle).tag(RealtimeUpdateMode.wifiOnly)
+                        Text("settings.realtimeUpdates.always",   bundle: bundle).tag(RealtimeUpdateMode.always)
+                    } label: {
+                        Text("settings.realtimeUpdates.header", bundle: bundle)
                     }
                     .pickerStyle(.inline)
                     .labelsHidden()
                 } header: {
-                    Text("Real-time Updates")
+                    Text("settings.realtimeUpdates.header", bundle: bundle)
                 } footer: {
-                    Text("Refreshes landmarks every 30 s or after moving 50 m. \"Wi-Fi Only\" skips updates on cellular to save data.")
+                    Text("settings.realtimeUpdates.footer", bundle: bundle)
+                }
+
+                // MARK: Language (LAR-35)
+                Section {
+                    Picker(selection: $settings.appLanguage) {
+                        ForEach(AppLanguage.allCases) { lang in
+                            Text(lang.nativeName).tag(lang)
+                        }
+                    } label: {
+                        Label {
+                            Text("settings.language.label", bundle: bundle)
+                        } icon: {
+                            Image(systemName: "globe")
+                        }
+                    }
+                    .pickerStyle(.navigationLink)
+                } header: {
+                    Text("settings.language.header", bundle: bundle)
+                } footer: {
+                    Text("settings.language.footer", bundle: bundle)
                 }
 
                 // MARK: Error Log (LAR-16)
                 Section {
                     NavigationLink {
                         ErrorLogView(logger: errorLogger)
+                            .environment(\.localeBundle, bundle)
                     } label: {
-                        Label("Error Log", systemImage: "exclamationmark.triangle")
+                        Label {
+                            Text("settings.errorLog", bundle: bundle)
+                        } icon: {
+                            Image(systemName: "exclamationmark.triangle")
+                        }
                     }
                 } header: {
-                    Text("Diagnostics")
+                    Text("settings.diagnostics.header", bundle: bundle)
                 }
             }
-            .navigationTitle("Settings")
+            .navigationTitle(Text("settings.title", bundle: bundle))
             .navigationBarTitleDisplayMode(.large)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("Done") { dismiss() }
+                    Button { dismiss() } label: {
+                        Text("settings.done", bundle: bundle)
+                    }
                 }
             }
         }
@@ -119,7 +159,7 @@ struct SettingsView: View {
 // The slider is hidden when the category is disabled, but its value is preserved.
 
 private struct CategoryRow: View {
-    let label: String
+    let label: Text
     let systemImage: String
     @Binding var isEnabled: Bool
     @Binding var distanceIndex: Double
@@ -127,7 +167,7 @@ private struct CategoryRow: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
             Toggle(isOn: $isEnabled) {
-                Label(label, systemImage: systemImage)
+                Label(title: { label }, icon: { Image(systemName: systemImage) })
             }
             if isEnabled {
                 HStack {
@@ -138,7 +178,7 @@ private struct CategoryRow: View {
                         .monospacedDigit()
                 }
                 Slider(value: $distanceIndex, in: 0...6, step: 1) {
-                    Text(label)
+                    label
                 } minimumValueLabel: {
                     Text("0.1").font(.caption2)
                 } maximumValueLabel: {

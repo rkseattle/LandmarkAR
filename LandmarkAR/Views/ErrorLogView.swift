@@ -5,6 +5,7 @@ import SwiftUI
 
 struct ErrorLogView: View {
     @ObservedObject var logger: ErrorLogger
+    @Environment(\.localeBundle) private var bundle
 
     private static let dateFormatter: DateFormatter = {
         let f = DateFormatter()
@@ -16,7 +17,7 @@ struct ErrorLogView: View {
     var body: some View {
         List {
             if logger.entries.isEmpty {
-                Text("No errors logged.")
+                Text("errorLog.noErrors", bundle: bundle)
                     .foregroundStyle(.secondary)
             } else {
                 ForEach(logger.entries.reversed()) { entry in
@@ -31,13 +32,15 @@ struct ErrorLogView: View {
                 }
             }
         }
-        .navigationTitle("Error Log")
+        .navigationTitle(Text("errorLog.title", bundle: bundle))
         .navigationBarTitleDisplayMode(.large)
         .toolbar {
             if !logger.entries.isEmpty {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("Clear", role: .destructive) {
+                    Button(role: .destructive) {
                         logger.clear()
+                    } label: {
+                        Text("errorLog.clear", bundle: bundle)
                     }
                 }
             }

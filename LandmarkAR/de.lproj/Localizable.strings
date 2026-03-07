@@ -1,0 +1,54 @@
+/* Content View */
+"content.findingLandmarks" = "Sehenswürdigkeiten suchen…";
+"content.permission.title" = "Standortzugriff erforderlich";
+"content.permission.message" = "LandmarkAR benötigt Ihren Standort, um nahegelegene Sehenswürdigkeiten zu finden und in Augmented Reality anzuzeigen.";
+"content.permission.openSettings" = "Einstellungen öffnen";
+"content.gps.acquiring" = "GPS-Signal wird ermittelt…";
+"content.gps.hint" = "Stehen Sie für beste Ergebnisse im Freien mit freier Sicht auf den Himmel.";
+
+/* Settings */
+"settings.title" = "Einstellungen";
+"settings.done" = "Fertig";
+"settings.dataSources.header" = "Datenquellen";
+"settings.dataSources.footer" = "Standortdaten jeder Quelle aktivieren oder deaktivieren.";
+"settings.dataSources.wikipedia" = "Wikipedia";
+"settings.dataSources.openstreetmap" = "OpenStreetMap";
+"settings.displayLimit.header" = "Anzeigelimit";
+"settings.displayLimit.footer" = "Maximale Anzahl gleichzeitig angezeigter Sehenswürdigkeiten. Das nächste und das entfernteste sind immer enthalten.";
+"settings.displayLimit.maxLandmarks" = "Max. Sehenswürdigkeiten";
+"settings.labelSize.header" = "Beschriftungsgröße";
+"settings.labelSize.footer" = "Steuert die Größe von Symbolen und Text in der AR-Ansicht.";
+"settings.labelSize.small" = "Klein";
+"settings.labelSize.medium" = "Mittel";
+"settings.labelSize.large" = "Groß";
+"settings.categories.header" = "Kategorien";
+"settings.categories.footer" = "Kategorien aktivieren und maximale Entfernung für jede festlegen.";
+"settings.categories.historical" = "Historisch";
+"settings.categories.natural" = "Natürlich";
+"settings.categories.cultural" = "Kulturell";
+"settings.categories.other" = "Sonstige";
+"settings.realtimeUpdates.header" = "Echtzeit-Updates";
+"settings.realtimeUpdates.footer" = "Aktualisiert Sehenswürdigkeiten alle 30 s oder nach 50 m Bewegung. «Nur WLAN» überspringt Mobilfunk-Updates zum Datensparen.";
+"settings.realtimeUpdates.off" = "Aus";
+"settings.realtimeUpdates.wifiOnly" = "Nur WLAN";
+"settings.realtimeUpdates.always" = "Immer";
+"settings.diagnostics.header" = "Diagnose";
+"settings.errorLog" = "Fehlerprotokoll";
+"settings.language.header" = "Sprache";
+"settings.language.footer" = "Legt die Sprache für die App und Wikipedia-Inhalte fest.";
+"settings.language.label" = "Sprache";
+
+/* Landmark Detail */
+"detail.done" = "Fertig";
+"detail.readOnWikipedia" = "Vollständigen Artikel auf Wikipedia lesen";
+"detail.metersAway" = "%d m entfernt";
+"detail.kmAway" = "%.1f km entfernt";
+
+/* Error Log */
+"errorLog.title" = "Fehlerprotokoll";
+"errorLog.noErrors" = "Keine Fehler protokolliert.";
+"errorLog.clear" = "Löschen";
+
+/* Splash Screen */
+"splash.tagline" = "Entdecke Sehenswürdigkeiten\nin Augmented Reality";
+"splash.credit" = "by Edward Aspen Studios";
