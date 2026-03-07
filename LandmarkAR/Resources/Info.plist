@@ -34,6 +34,13 @@
         <string>arkit</string>
     </array>
 
+    <!-- LAR-37: URL schemes for third-party map apps; required for canOpenURL to work -->
+    <key>LSApplicationQueriesSchemes</key>
+    <array>
+        <string>comgooglemaps</string>
+        <string>waze</string>
+    </array>
+
     <!-- Supported orientations -->
     <key>UISupportedInterfaceOrientations</key>
     <array>

@@ -40,6 +40,7 @@
 
 /* Landmark Detail */
 "detail.done" = "Concluído";
+"detail.getDirections" = "Obter direções";
 "detail.readOnWikipedia" = "Ler artigo completo na Wikipedia";
 "detail.metersAway" = "A %d metros";
 "detail.kmAway" = "A %.1f km";
