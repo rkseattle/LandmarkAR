@@ -40,6 +40,7 @@
 
 /* Landmark Detail */
 "detail.done" = "完了";
+"detail.getDirections" = "経路を表示";
 "detail.readOnWikipedia" = "Wikipediaで全文を読む";
 "detail.metersAway" = "%d m";
 "detail.kmAway" = "%.1f km";

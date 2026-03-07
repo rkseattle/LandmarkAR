@@ -40,6 +40,7 @@
 
 /* Landmark Detail */
 "detail.done" = "완료";
+"detail.getDirections" = "길 안내";
 "detail.readOnWikipedia" = "Wikipedia에서 전체 기사 읽기";
 "detail.metersAway" = "%d m 거리";
 "detail.kmAway" = "%.1f km 거리";

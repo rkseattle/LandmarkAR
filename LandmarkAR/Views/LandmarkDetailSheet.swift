@@ -1,3 +1,4 @@
+import MapKit
 import SwiftUI
 
 // MARK: - LandmarkDetailSheet
@@ -33,6 +34,23 @@ struct LandmarkDetailSheet: View {
 
                     Divider()
 
+                    // Get Directions in Maps (LAR-37)
+                    Button {
+                        openInMaps()
+                    } label: {
+                        HStack {
+                            Image(systemName: "map.fill")
+                            Text("detail.getDirections", bundle: bundle)
+                            Spacer()
+                            Image(systemName: "arrow.up.right")
+                        }
+                        .font(.subheadline)
+                        .foregroundColor(.green)
+                        .padding()
+                        .background(Color.green.opacity(0.08))
+                        .cornerRadius(10)
+                    }
+
                     // Link to full Wikipedia article
                     if let url = landmark.wikipediaURL {
                         Link(destination: url) {
@@ -62,6 +80,16 @@ struct LandmarkDetailSheet: View {
                 }
             }
         }
+    }
+
+    // LAR-37: Open Apple Maps with turn-by-turn directions from current location.
+    private func openInMaps() {
+        let placemark = MKPlacemark(coordinate: landmark.coordinate)
+        let mapItem = MKMapItem(placemark: placemark)
+        mapItem.name = landmark.title
+        mapItem.openInMaps(launchOptions: [
+            MKLaunchOptionsDirectionsModeKey: MKLaunchOptionsDirectionsModeDefault
+        ])
     }
 
     private var formattedDistance: String {
