@@ -24,9 +24,9 @@ class OpenStreetMapService {
 
     // MARK: - Fetch Nearby Landmarks
 
-    /// Main entry point. Returns an empty array immediately if OSM is disabled in settings
-    /// or if the Overpass API request fails.
-    func fetchNearbyLandmarks(near location: CLLocation, settings: AppSettings) async -> [Landmark] {
+    /// Main entry point. Returns an empty array immediately if OSM is disabled in settings.
+    /// Throws on network or decode failure so the caller can record a circuit-breaker strike.
+    func fetchNearbyLandmarks(near location: CLLocation, settings: AppSettings) async throws -> [Landmark] {
 
         // LAR-11: Respect the data source toggle
         guard settings.isOpenStreetMapEnabled else { return [] }
@@ -56,10 +56,8 @@ class OpenStreetMapService {
         request.httpBody = "data=\(query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "")".data(using: .utf8)
         request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
 
-        guard let (data, _) = try? await URLSession.shared.data(for: request),
-              let response = try? JSONDecoder().decode(OverpassResponse.self, from: data) else {
-            return []
-        }
+        let (data, _) = try await URLSession.shared.data(for: request)
+        let response = try JSONDecoder().decode(OverpassResponse.self, from: data)
 
         let landmarks: [Landmark] = response.elements.compactMap { element in
             guard let name = element.tags["name"],

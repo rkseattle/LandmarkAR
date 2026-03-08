@@ -37,6 +37,7 @@
 		T106 /* LandmarkModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T006 /* LandmarkModelTests.swift */; };
 		T107 /* AppLanguageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T007 /* AppLanguageTests.swift */; };
 		T108 /* MapsDirectionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T008 /* MapsDirectionsTests.swift */; };
+		T109 /* AppSettingsPersistenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T009 /* AppSettingsPersistenceTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -89,6 +90,7 @@
 		T006 /* LandmarkModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LandmarkModelTests.swift; sourceTree = "<group>"; };
 		T007 /* AppLanguageTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLanguageTests.swift; sourceTree = "<group>"; };
 		T008 /* MapsDirectionsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapsDirectionsTests.swift; sourceTree = "<group>"; };
+		T009 /* AppSettingsPersistenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettingsPersistenceTests.swift; sourceTree = "<group>"; };
 		TESTPROD /* LandmarkARTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LandmarkARTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -205,6 +207,7 @@
 				T006 /* LandmarkModelTests.swift */,
 				T007 /* AppLanguageTests.swift */,
 				T008 /* MapsDirectionsTests.swift */,
+				T009 /* AppSettingsPersistenceTests.swift */,
 			);
 			path = LandmarkARTests;
 			sourceTree = "<group>";
@@ -355,6 +358,7 @@
 				T106 /* LandmarkModelTests.swift in Sources */,
 				T107 /* AppLanguageTests.swift in Sources */,
 				T108 /* MapsDirectionsTests.swift in Sources */,
+				T109 /* AppSettingsPersistenceTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

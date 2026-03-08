@@ -3,6 +3,25 @@ import XCTest
 
 final class AppSettingsTests: XCTestCase {
 
+    // Clear all AppSettings-owned UserDefaults keys before each test so that
+    // AppSettings() always starts from its hardcoded defaults, not values left
+    // behind by a previous test or a previous test run.
+    override func setUp() {
+        super.setUp()
+        AppSettingsTests.clearAppSettingsDefaults()
+    }
+
+    static func clearAppSettingsDefaults() {
+        let keys = [
+            "isWikipediaEnabled", "isOpenStreetMapEnabled",
+            "showHistorical", "showNatural", "showCultural", "showOther",
+            "maxLandmarkCount", "labelDisplaySize", "realtimeUpdateMode", "appLanguage",
+            "maxDistanceIndexHistorical", "maxDistanceIndexNatural",
+            "maxDistanceIndexCultural", "maxDistanceIndexOther"
+        ]
+        keys.forEach { UserDefaults.standard.removeObject(forKey: $0) }
+    }
+
     // MARK: - km(forIndex:)
 
     func testKmForIndexAllSteps() {
@@ -142,5 +161,57 @@ final class AppSettingsTests: XCTestCase {
 
     func testDistanceStepsCount() {
         XCTAssertEqual(AppSettings.distanceSteps.count, 7)
+    }
+
+    // MARK: - Default values
+
+    func testMaxLandmarkCountDefaultsTo10() {
+        let sut = AppSettings()
+        XCTAssertEqual(sut.maxLandmarkCount, 10)
+    }
+
+    func testLabelDisplaySizeDefaultsToMedium() {
+        let sut = AppSettings()
+        XCTAssertEqual(sut.labelDisplaySize, .medium)
+    }
+
+    func testRealtimeUpdateModeDefaultsToOff() {
+        let sut = AppSettings()
+        XCTAssertEqual(sut.realtimeUpdateMode, .off)
+    }
+
+    func testCategoryTogglesDefaultToTrue() {
+        let sut = AppSettings()
+        XCTAssertTrue(sut.showHistorical)
+        XCTAssertTrue(sut.showNatural)
+        XCTAssertTrue(sut.showCultural)
+        XCTAssertTrue(sut.showOther)
+    }
+
+    // MARK: - Category toggle influence on maxDistanceKm
+
+    func testDisablingOneToggleExcludesItFromMaxDistance() {
+        let sut = AppSettings()
+        sut.maxDistanceIndexHistorical = 6  // 100 km
+        sut.maxDistanceIndexNatural    = 3  // 5 km
+        sut.maxDistanceIndexCultural   = 2  // 1 km
+        sut.maxDistanceIndexOther      = 1  // 0.5 km
+        sut.showHistorical = false
+        sut.showNatural    = true
+        sut.showCultural   = true
+        sut.showOther      = true
+
+        // Historical (100 km) is disabled; max of remaining is Natural (5 km)
+        XCTAssertEqual(sut.maxDistanceKm, 5.0)
+    }
+
+    func testDisablingOneToggleDoesNotAffectOtherToggles() {
+        let sut = AppSettings()
+        sut.showHistorical = false
+
+        XCTAssertFalse(sut.showHistorical)
+        XCTAssertTrue(sut.showNatural)
+        XCTAssertTrue(sut.showCultural)
+        XCTAssertTrue(sut.showOther)
     }
 }
