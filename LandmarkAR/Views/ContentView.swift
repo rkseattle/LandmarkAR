@@ -17,10 +17,12 @@ struct ContentView: View {
     @StateObject private var networkMonitor = NetworkMonitor()
 
     @State private var landmarks: [Landmark] = []
+    @State private var displayedLandmarks: [Landmark] = []
     @State private var selectedLandmark: Landmark?
     @State private var isLoading = false
     @State private var errorMessage: String?
     @State private var errorDismissTask: Task<Void, Never>?
+    @State private var activeFetchTask: Task<Void, Never>?
     @State private var lastFetchLocation: CLLocation?
     @State private var lastFetchTime: Date?
     @State private var realtimeTimer: Timer?
@@ -48,8 +50,10 @@ struct ContentView: View {
         isRealtimeActive ? realtimeDistanceThreshold : normalDistanceThreshold
     }
 
-    // Landmarks filtered by category toggles, per-category distance, and display limit (LAR-5, LAR-13, LAR-23)
-    private var filteredLandmarks: [Landmark] {
+    // Recomputes displayedLandmarks from the current landmarks array and filter settings.
+    // Called explicitly after each fetch and when filter-only settings change, rather than
+    // running as a computed property on every SwiftUI render pass (LAR-5, LAR-13, LAR-23).
+    private func updateDisplayedLandmarks() {
         let filtered = landmarks.filter { landmark in
             switch landmark.category {
             case .historical:
@@ -62,7 +66,14 @@ struct ContentView: View {
                 return settings.showOther && landmark.distance <= settings.maxDistanceKmOther * 1000
             }
         }
-        return applyCountLimit(to: filtered)
+        displayedLandmarks = applyCountLimit(to: filtered)
+    }
+
+    // Cancels any in-flight fetch before starting a new one, preventing stale results
+    // from an earlier request from overwriting fresher data if tasks complete out of order.
+    private func scheduleFetch(at location: CLLocation) {
+        activeFetchTask?.cancel()
+        activeFetchTask = Task { await fetchLandmarks(at: location) }
     }
 
     // LAR-23: Return at most maxLandmarkCount, always including the closest and farthest.
@@ -100,7 +111,7 @@ struct ContentView: View {
             // MARK: AR is ready — show the camera + labels
             } else {
                 ARLandmarkView(
-                    landmarks: filteredLandmarks,
+                    landmarks: displayedLandmarks,
                     userLocation: locationManager.userLocation,
                     heading: locationManager.heading,
                     labelDisplaySize: settings.labelDisplaySize,
@@ -121,33 +132,39 @@ struct ContentView: View {
         // Re-fetch when key settings change (LAR-3, LAR-4, LAR-11, LAR-12)
         .onChange(of: settings.isWikipediaEnabled) { _, _ in
             guard let location = locationManager.userLocation else { return }
-            Task { await fetchLandmarks(at: location) }
+            scheduleFetch(at: location)
         }
         .onChange(of: settings.isOpenStreetMapEnabled) { _, _ in
             guard let location = locationManager.userLocation else { return }
-            Task { await fetchLandmarks(at: location) }
+            scheduleFetch(at: location)
         }
         // LAR-13: Re-fetch when any per-category distance changes (may expand the radius)
         .onChange(of: settings.maxDistanceIndexHistorical) { _, _ in
             guard let location = locationManager.userLocation else { return }
             lastFetchLocation = nil
-            Task { await fetchLandmarks(at: location) }
+            scheduleFetch(at: location)
         }
         .onChange(of: settings.maxDistanceIndexNatural) { _, _ in
             guard let location = locationManager.userLocation else { return }
             lastFetchLocation = nil
-            Task { await fetchLandmarks(at: location) }
+            scheduleFetch(at: location)
         }
         .onChange(of: settings.maxDistanceIndexCultural) { _, _ in
             guard let location = locationManager.userLocation else { return }
             lastFetchLocation = nil
-            Task { await fetchLandmarks(at: location) }
+            scheduleFetch(at: location)
         }
         .onChange(of: settings.maxDistanceIndexOther) { _, _ in
             guard let location = locationManager.userLocation else { return }
             lastFetchLocation = nil
-            Task { await fetchLandmarks(at: location) }
+            scheduleFetch(at: location)
         }
+        // Filter-only settings: re-filter existing landmarks without a network round-trip
+        .onChange(of: settings.showHistorical)   { _, _ in updateDisplayedLandmarks() }
+        .onChange(of: settings.showNatural)      { _, _ in updateDisplayedLandmarks() }
+        .onChange(of: settings.showCultural)     { _, _ in updateDisplayedLandmarks() }
+        .onChange(of: settings.showOther)        { _, _ in updateDisplayedLandmarks() }
+        .onChange(of: settings.maxLandmarkCount) { _, _ in updateDisplayedLandmarks() }
         // LAR-25/LAR-28: Start/stop real-time timer when mode or Wi-Fi connectivity changes
         .onChange(of: settings.realtimeUpdateMode) { _, _ in handleRealtimeModeChange() }
         .onChange(of: networkMonitor.isOnWifi) { _, _ in handleRealtimeModeChange() }
@@ -161,7 +178,7 @@ struct ContentView: View {
         .onChange(of: settings.appLanguage) { _, _ in
             guard let location = locationManager.userLocation else { return }
             lastFetchLocation = nil
-            Task { await fetchLandmarks(at: location) }
+            scheduleFetch(at: location)
         }
         // LAR-35: Inject the language-specific bundle into the environment for all child views
         .environment(\.localeBundle, settings.localizedBundle)
@@ -176,7 +193,7 @@ struct ContentView: View {
                 // Refresh button — upper left
                 Button {
                     if let location = locationManager.userLocation {
-                        Task { await fetchLandmarks(at: location) }
+                        scheduleFetch(at: location)
                     }
                 } label: {
                     Image(systemName: "arrow.clockwise")
@@ -271,13 +288,13 @@ struct ContentView: View {
                 return
             }
         }
-        Task { await fetchLandmarks(at: location) }
+        scheduleFetch(at: location)
     }
 
     private func handleRealtimeModeChange() {
         if isRealtimeActive {
             guard let location = locationManager.userLocation else { return }
-            Task { await fetchLandmarks(at: location) }
+            scheduleFetch(at: location)
             startRealtimeTimer()
         } else {
             stopRealtimeTimer()
@@ -287,8 +304,10 @@ struct ContentView: View {
     private func startRealtimeTimer() {
         realtimeTimer?.invalidate()
         realtimeTimer = Timer.scheduledTimer(withTimeInterval: realtimeInterval, repeats: true) { _ in
-            guard let location = locationManager.userLocation else { return }
-            Task { await fetchLandmarks(at: location) }
+            // Skip the tick if the previous fetch is still in flight to avoid queuing
+            // concurrent requests that could overwrite each other's results.
+            guard let location = locationManager.userLocation, !isLoading else { return }
+            scheduleFetch(at: location)
         }
     }
 
@@ -327,9 +346,9 @@ struct ContentView: View {
             guard wikiAvailable else { return [] }
             return try await wikipediaService.fetchNearbyLandmarks(near: location, settings: settings)
         }
-        let osmTask = Task { () -> [Landmark] in
+        let osmTask = Task { () throws -> [Landmark] in
             guard osmAvailable else { return [] }
-            return await osmService.fetchNearbyLandmarks(near: location, settings: settings)
+            return try await osmService.fetchNearbyLandmarks(near: location, settings: settings)
         }
 
         var fromWikipedia: [Landmark] = []
@@ -345,8 +364,21 @@ struct ContentView: View {
             }
         }
 
-        let fromOSM = await osmTask.value
-        if osmAvailable { circuitBreaker.recordSuccess(DataSourceCircuitBreaker.openStreetMap) }
+        var fromOSM: [Landmark] = []
+        do {
+            fromOSM = try await osmTask.value
+            if osmAvailable { circuitBreaker.recordSuccess(DataSourceCircuitBreaker.openStreetMap) }
+        } catch {
+            if osmAvailable {
+                circuitBreaker.recordFailure(DataSourceCircuitBreaker.openStreetMap)
+                let suffix = circuitBreaker.cooldownMinutesRemaining(DataSourceCircuitBreaker.openStreetMap)
+                    .map { " (paused \($0) min)" } ?? ""
+                showError("OpenStreetMap unavailable\(suffix): \(error.localizedDescription)")
+            }
+        }
+
+        // If this fetch was superseded by a newer one, discard results without updating UI.
+        guard !Task.isCancelled else { isLoading = false; return }
 
         // NPS (LAR-17: disabled — service code kept for future re-enablement)
         let fromNPS: [Landmark] = []
@@ -394,6 +426,7 @@ struct ContentView: View {
         }
 
         landmarks = sorted
+        updateDisplayedLandmarks()
         isLoading = false
     }
 }
