@@ -3,6 +3,25 @@ import XCTest
 
 final class AppSettingsTests: XCTestCase {
 
+    // Clear all AppSettings-owned UserDefaults keys before each test so that
+    // AppSettings() always starts from its hardcoded defaults, not values left
+    // behind by a previous test or a previous test run.
+    override func setUp() {
+        super.setUp()
+        AppSettingsTests.clearAppSettingsDefaults()
+    }
+
+    static func clearAppSettingsDefaults() {
+        let keys = [
+            "isWikipediaEnabled", "isOpenStreetMapEnabled",
+            "showHistorical", "showNatural", "showCultural", "showOther",
+            "maxLandmarkCount", "labelDisplaySize", "realtimeUpdateMode", "appLanguage",
+            "maxDistanceIndexHistorical", "maxDistanceIndexNatural",
+            "maxDistanceIndexCultural", "maxDistanceIndexOther"
+        ]
+        keys.forEach { UserDefaults.standard.removeObject(forKey: $0) }
+    }
+
     // MARK: - km(forIndex:)
 
     func testKmForIndexAllSteps() {

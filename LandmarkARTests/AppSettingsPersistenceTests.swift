@@ -8,6 +8,11 @@ import XCTest
 
 final class AppSettingsPersistenceTests: XCTestCase {
 
+    override func setUp() {
+        super.setUp()
+        AppSettingsTests.clearAppSettingsDefaults()
+    }
+
     // MARK: - Immediate-write properties
 
     func testIsWikipediaEnabledPersists() {
