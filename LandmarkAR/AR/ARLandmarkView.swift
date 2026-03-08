@@ -41,6 +41,9 @@ class ARLandmarkViewController: UIViewController, ARSessionDelegate {
     private var onSelect: ((Landmark) -> Void)?
     private var labelDisplaySize: LabelDisplaySize = .medium
 
+    // Cached farthest-first ordering for z-sort. Recomputed only when `landmarks` changes.
+    private var sortedFarthestFirst: [Landmark] = []
+
     private var frameCount = 0
     private let updateInterval = 30
 
@@ -92,10 +95,17 @@ class ARLandmarkViewController: UIViewController, ARSessionDelegate {
                 heading: CLHeading?,
                 labelDisplaySize: LabelDisplaySize,
                 onSelect: @escaping (Landmark) -> Void) {
+        let landmarksChanged = landmarks.map(\.id) != self.landmarks.map(\.id)
         self.landmarks = landmarks
         self.userLocation = userLocation
         self.heading = heading
         self.onSelect = onSelect
+
+        // Recompute the farthest-first sort only when the landmark set actually changes,
+        // not on every heading/location tick that calls update().
+        if landmarksChanged {
+            sortedFarthestFirst = landmarks.sorted { $0.distance > $1.distance }
+        }
 
         // LAR-29: If size changed, remove all labels so they rebuild with the new size
         if labelDisplaySize != self.labelDisplaySize {
@@ -158,7 +168,7 @@ class ARLandmarkViewController: UIViewController, ARSessionDelegate {
 
         // LAR-14: Z-order labels so the closest landmark renders on top when pins overlap.
         // Iterate farthest-first so each bringSubviewToFront call leaves the closest on top.
-        let sortedFarthestFirst = landmarks.sorted { $0.distance > $1.distance }
+        // Uses the cached sort (updated in update() when landmarks change) to avoid re-sorting every 30 frames.
         for landmark in sortedFarthestFirst {
             if let label = labelViews[landmark.id], !label.isHidden {
                 arView.bringSubviewToFront(label)
@@ -247,6 +257,7 @@ class LandmarkLabelView: UIView {
     private let landmark: Landmark
     private let nameLabel = UILabel()
     private let distanceLabel = UILabel()
+    private var lastAppliedDistance: CLLocationDistance = -1
 
     init(landmark: Landmark, displaySize: LabelDisplaySize) {
         self.landmark = landmark
@@ -326,6 +337,10 @@ class LandmarkLabelView: UIView {
     // LAR-27: Also fade distant labels so the closest landmark is visually dominant
     // when multiple labels overlap in the same screen area.
     func applyDistanceScale(_ distanceMeters: CLLocationDistance) {
+        // Landmark distance only changes on a new fetch, not every AR frame — skip redundant work.
+        guard distanceMeters != lastAppliedDistance else { return }
+        lastAppliedDistance = distanceMeters
+
         let scale: CGFloat
         let opacity: CGFloat
         switch distanceMeters {

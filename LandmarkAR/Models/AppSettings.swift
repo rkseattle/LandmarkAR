@@ -24,10 +24,10 @@ class AppSettings: ObservableObject {
 
     // MARK: - Data Sources (LAR-3, LAR-11, LAR-12)
     @Published var isWikipediaEnabled: Bool {
-        didSet { UserDefaults.standard.set(isWikipediaEnabled, forKey: Keys.isWikipediaEnabled) }
+        didSet { deferredWrite(key: Keys.isWikipediaEnabled, value: isWikipediaEnabled) }
     }
     @Published var isOpenStreetMapEnabled: Bool {
-        didSet { UserDefaults.standard.set(isOpenStreetMapEnabled, forKey: Keys.isOpenStreetMapEnabled) }
+        didSet { deferredWrite(key: Keys.isOpenStreetMapEnabled, value: isOpenStreetMapEnabled) }
     }
 
     // MARK: - Distance Filter (LAR-4, LAR-13)
@@ -50,16 +50,16 @@ class AppSettings: ObservableObject {
     }
 
     @Published var maxDistanceIndexHistorical: Double {
-        didSet { UserDefaults.standard.set(maxDistanceIndexHistorical, forKey: Keys.maxDistanceIndexHistorical) }
+        didSet { deferredWrite(key: Keys.maxDistanceIndexHistorical, value: maxDistanceIndexHistorical) }
     }
     @Published var maxDistanceIndexNatural: Double {
-        didSet { UserDefaults.standard.set(maxDistanceIndexNatural, forKey: Keys.maxDistanceIndexNatural) }
+        didSet { deferredWrite(key: Keys.maxDistanceIndexNatural, value: maxDistanceIndexNatural) }
     }
     @Published var maxDistanceIndexCultural: Double {
-        didSet { UserDefaults.standard.set(maxDistanceIndexCultural, forKey: Keys.maxDistanceIndexCultural) }
+        didSet { deferredWrite(key: Keys.maxDistanceIndexCultural, value: maxDistanceIndexCultural) }
     }
     @Published var maxDistanceIndexOther: Double {
-        didSet { UserDefaults.standard.set(maxDistanceIndexOther, forKey: Keys.maxDistanceIndexOther) }
+        didSet { deferredWrite(key: Keys.maxDistanceIndexOther, value: maxDistanceIndexOther) }
     }
 
     var maxDistanceKmHistorical: Double { AppSettings.km(forIndex: maxDistanceIndexHistorical) }
@@ -80,33 +80,33 @@ class AppSettings: ObservableObject {
     // MARK: - Display Limit (LAR-23)
     /// Maximum number of landmarks shown at once. Options: 5, 10, 25.
     @Published var maxLandmarkCount: Int {
-        didSet { UserDefaults.standard.set(maxLandmarkCount, forKey: Keys.maxLandmarkCount) }
+        didSet { deferredWrite(key: Keys.maxLandmarkCount, value: maxLandmarkCount) }
     }
 
     // MARK: - Category Filters (LAR-5)
     @Published var showHistorical: Bool {
-        didSet { UserDefaults.standard.set(showHistorical, forKey: Keys.showHistorical) }
+        didSet { deferredWrite(key: Keys.showHistorical, value: showHistorical) }
     }
     @Published var showNatural: Bool {
-        didSet { UserDefaults.standard.set(showNatural, forKey: Keys.showNatural) }
+        didSet { deferredWrite(key: Keys.showNatural, value: showNatural) }
     }
     @Published var showCultural: Bool {
-        didSet { UserDefaults.standard.set(showCultural, forKey: Keys.showCultural) }
+        didSet { deferredWrite(key: Keys.showCultural, value: showCultural) }
     }
     @Published var showOther: Bool {
-        didSet { UserDefaults.standard.set(showOther, forKey: Keys.showOther) }
+        didSet { deferredWrite(key: Keys.showOther, value: showOther) }
     }
 
     // MARK: - Label Display Size (LAR-29)
     @Published var labelDisplaySize: LabelDisplaySize {
-        didSet { UserDefaults.standard.set(labelDisplaySize.rawValue, forKey: Keys.labelDisplaySize) }
+        didSet { deferredWrite(key: Keys.labelDisplaySize, value: labelDisplaySize.rawValue) }
     }
 
     // MARK: - Language (LAR-35)
     // Stored as the BCP 47 locale code. Defaults to the device system language if supported,
     // otherwise falls back to English.
     @Published var appLanguage: AppLanguage {
-        didSet { UserDefaults.standard.set(appLanguage.rawValue, forKey: Keys.appLanguage) }
+        didSet { deferredWrite(key: Keys.appLanguage, value: appLanguage.rawValue) }
     }
 
     /// The Bundle for the current language's .lproj directory.
@@ -120,7 +120,21 @@ class AppSettings: ObservableObject {
     // MARK: - Real-time Updates (LAR-25, LAR-28)
     /// Controls automatic landmark refresh: off, wi-fi only, or always.
     @Published var realtimeUpdateMode: RealtimeUpdateMode {
-        didSet { UserDefaults.standard.set(realtimeUpdateMode.rawValue, forKey: Keys.realtimeUpdateMode) }
+        didSet { deferredWrite(key: Keys.realtimeUpdateMode, value: realtimeUpdateMode.rawValue) }
+    }
+
+    // MARK: - Deferred Persistence
+
+    // Debounces UserDefaults writes so rapid slider drags don't cause dozens of
+    // synchronous disk writes on the main thread. Each key gets its own pending
+    // work item so independent settings don't cancel each other's saves.
+    private var pendingWrites: [String: DispatchWorkItem] = [:]
+
+    private func deferredWrite(key: String, value: Any) {
+        pendingWrites[key]?.cancel()
+        let item = DispatchWorkItem { UserDefaults.standard.set(value, forKey: key) }
+        pendingWrites[key] = item
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3, execute: item)
     }
 
     // MARK: - Init

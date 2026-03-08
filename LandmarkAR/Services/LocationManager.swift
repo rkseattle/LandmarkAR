@@ -21,6 +21,9 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
         manager.delegate = self
         manager.desiredAccuracy = kCLLocationAccuracyBest
         // Request the best accuracy available — important for AR positioning
+        // Only publish a new location after moving at least 10 m; prevents
+        // hammering fetchLandmarksIfNeeded on every millimetre of GPS drift.
+        manager.distanceFilter = 10
     }
 
     // Call this to start everything (called from the main view on appear)
@@ -34,7 +37,9 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
         authorizationStatus = manager.authorizationStatus
         if manager.authorizationStatus == .authorizedWhenInUse ||
            manager.authorizationStatus == .authorizedAlways {
-            // Start both GPS and compass once we have permission
+            // Start both GPS and compass once we have permission.
+            // Heading filter of 5° prevents excessive redraws from tiny compass jitter.
+            manager.headingFilter = 5
             manager.startUpdatingLocation()
             manager.startUpdatingHeading()
         }
