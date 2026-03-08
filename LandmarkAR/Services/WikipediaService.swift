@@ -7,6 +7,29 @@ import Foundation
 
 class WikipediaService {
 
+    // URLSession with a short request timeout — prevents hanging for the default 60 s.
+    private let session: URLSession = {
+        let config = URLSessionConfiguration.default
+        config.timeoutIntervalForRequest  = 10
+        config.timeoutIntervalForResource = 30
+        return URLSession(configuration: config)
+    }()
+
+    // In-memory response cache. Key: "lat,lon,radius,lang" (coordinates rounded to 3 dp ≈ 100 m).
+    // NSCache evicts automatically under memory pressure.
+    private let cache = NSCache<NSString, CacheBox>()
+
+    private class CacheBox: NSObject {
+        let landmarks: [Landmark]
+        init(_ landmarks: [Landmark]) { self.landmarks = landmarks }
+    }
+
+    private func cacheKey(lat: Double, lon: Double, radius: Int, lang: String) -> NSString {
+        let rLat = (lat * 1000).rounded() / 1000
+        let rLon = (lon * 1000).rounded() / 1000
+        return "\(rLat),\(rLon),\(radius),\(lang)" as NSString
+    }
+
     // MARK: - Fetch Nearby Landmarks
 
     /// Main entry point. Call this with the user's current location and the current settings.
@@ -23,6 +46,15 @@ class WikipediaService {
 
         // LAR-35: Capture the language code once so both steps use the same value.
         let languageCode = settings.appLanguage.rawValue
+
+        // Return cached results when the user hasn't moved far enough to cross a cell boundary.
+        let key = cacheKey(lat: location.coordinate.latitude,
+                           lon: location.coordinate.longitude,
+                           radius: radiusMeters,
+                           lang: languageCode)
+        if let cached = cache.object(forKey: key) {
+            return cached.landmarks
+        }
 
         // Step 1: Search for Wikipedia articles near this GPS coordinate
         let geoResults = try await geoSearch(near: location,
@@ -50,7 +82,9 @@ class WikipediaService {
         }
 
         // Sort by distance so the closest landmarks are first
-        return landmarks.sorted { $0.distance < $1.distance }
+        let sorted = landmarks.sorted { $0.distance < $1.distance }
+        cache.setObject(CacheBox(sorted), forKey: key)
+        return sorted
     }
 
     // MARK: - Private Helpers
@@ -72,7 +106,7 @@ class WikipediaService {
             URLQueryItem(name: "format",   value: "json"),
         ]
 
-        let (data, _) = try await URLSession.shared.data(from: components.url!)
+        let (data, _) = try await session.data(from: components.url!)
         let response = try JSONDecoder().decode(WikipediaGeoSearchResponse.self, from: data)
         return response.query.geosearch
     }
@@ -87,7 +121,7 @@ class WikipediaService {
         guard let url = URL(string: urlString) else { return nil }
 
         do {
-            let (data, _) = try await URLSession.shared.data(from: url)
+            let (data, _) = try await session.data(from: url)
             let summary = try JSONDecoder().decode(WikipediaSummaryResponse.self, from: data)
 
             let landmarkLocation = CLLocation(latitude: result.lat, longitude: result.lon)

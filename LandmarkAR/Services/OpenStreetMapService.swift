@@ -8,6 +8,20 @@ class OpenStreetMapService {
 
     private let overpassURL = URL(string: "https://overpass-api.de/api/interpreter")!
 
+    // In-memory cache: key "lat,lon,radius" (coordinates rounded to 3 dp ≈ 100 m).
+    private let cache = NSCache<NSString, CacheBox>()
+
+    private class CacheBox: NSObject {
+        let landmarks: [Landmark]
+        init(_ landmarks: [Landmark]) { self.landmarks = landmarks }
+    }
+
+    private func cacheKey(lat: Double, lon: Double, radius: Int) -> NSString {
+        let rLat = (lat * 1000).rounded() / 1000
+        let rLon = (lon * 1000).rounded() / 1000
+        return "\(rLat),\(rLon),\(radius)" as NSString
+    }
+
     // MARK: - Fetch Nearby Landmarks
 
     /// Main entry point. Returns an empty array immediately if OSM is disabled in settings
@@ -21,6 +35,11 @@ class OpenStreetMapService {
         let lat = location.coordinate.latitude
         let lon = location.coordinate.longitude
 
+        let key = cacheKey(lat: lat, lon: lon, radius: radiusMeters)
+        if let cached = cache.object(forKey: key) {
+            return cached.landmarks
+        }
+
         // Overpass QL query: fetch tourism, historic, and natural nodes within the radius
         let query = """
         [out:json][timeout:25];
@@ -32,7 +51,7 @@ class OpenStreetMapService {
         out body;
         """
 
-        var request = URLRequest(url: overpassURL)
+        var request = URLRequest(url: overpassURL, timeoutInterval: 15)
         request.httpMethod = "POST"
         request.httpBody = "data=\(query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "")".data(using: .utf8)
         request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
@@ -68,7 +87,9 @@ class OpenStreetMapService {
             )
         }
 
-        return landmarks.sorted { $0.distance < $1.distance }
+        let sorted = landmarks.sorted { $0.distance < $1.distance }
+        cache.setObject(CacheBox(sorted), forKey: key)
+        return sorted
     }
 }
 

@@ -304,84 +304,81 @@ struct ContentView: View {
         lastFetchLocation = location
         lastFetchTime = Date()
 
-        // LAR-26: Fetch each source individually so we can record per-source
-        // successes/failures and skip sources that are in circuit-breaker cooldown.
+        // LAR-26: Check circuit-breaker availability for each source up front, then
+        // launch both network fetches concurrently so neither waits on the other.
 
-        // Wikipedia
+        let wikiAvailable = settings.isWikipediaEnabled &&
+                            circuitBreaker.isAvailable(DataSourceCircuitBreaker.wikipedia)
+        let osmAvailable  = settings.isOpenStreetMapEnabled &&
+                            circuitBreaker.isAvailable(DataSourceCircuitBreaker.openStreetMap)
+
+        if settings.isWikipediaEnabled && !wikiAvailable {
+            let mins = circuitBreaker.cooldownMinutesRemaining(DataSourceCircuitBreaker.wikipedia) ?? 0
+            showError("Wikipedia skipped — too many errors. Retrying in \(mins) min.")
+        }
+        if settings.isOpenStreetMapEnabled && !osmAvailable {
+            let mins = circuitBreaker.cooldownMinutesRemaining(DataSourceCircuitBreaker.openStreetMap) ?? 0
+            showError("OpenStreetMap skipped — too many errors. Retrying in \(mins) min.")
+        }
+
+        // Start both fetches at the same time. Their network I/O runs concurrently;
+        // we collect results below without either blocking the other.
+        let wikiTask = Task { () throws -> [Landmark] in
+            guard wikiAvailable else { return [] }
+            return try await wikipediaService.fetchNearbyLandmarks(near: location, settings: settings)
+        }
+        let osmTask = Task { () -> [Landmark] in
+            guard osmAvailable else { return [] }
+            return await osmService.fetchNearbyLandmarks(near: location, settings: settings)
+        }
+
         var fromWikipedia: [Landmark] = []
-        if settings.isWikipediaEnabled {
-            let src = DataSourceCircuitBreaker.wikipedia
-            if circuitBreaker.isAvailable(src) {
-                do {
-                    fromWikipedia = try await wikipediaService.fetchNearbyLandmarks(near: location, settings: settings)
-                    circuitBreaker.recordSuccess(src)
-                } catch {
-                    circuitBreaker.recordFailure(src)
-                    let suffix = circuitBreaker.cooldownMinutesRemaining(src).map { " (paused \($0) min)" } ?? ""
-                    showError("Wikipedia unavailable\(suffix): \(error.localizedDescription)")
-                }
-            } else {
-                let mins = circuitBreaker.cooldownMinutesRemaining(src) ?? 0
-                showError("Wikipedia skipped — too many errors. Retrying in \(mins) min.")
+        do {
+            fromWikipedia = try await wikiTask.value
+            if wikiAvailable { circuitBreaker.recordSuccess(DataSourceCircuitBreaker.wikipedia) }
+        } catch {
+            if wikiAvailable {
+                circuitBreaker.recordFailure(DataSourceCircuitBreaker.wikipedia)
+                let suffix = circuitBreaker.cooldownMinutesRemaining(DataSourceCircuitBreaker.wikipedia)
+                    .map { " (paused \($0) min)" } ?? ""
+                showError("Wikipedia unavailable\(suffix): \(error.localizedDescription)")
             }
         }
 
-        // OpenStreetMap (non-throwing; returns [] on failure)
-        var fromOSM: [Landmark] = []
-        if settings.isOpenStreetMapEnabled {
-            let src = DataSourceCircuitBreaker.openStreetMap
-            if circuitBreaker.isAvailable(src) {
-                let result = await osmService.fetchNearbyLandmarks(near: location, settings: settings)
-                if result.isEmpty && settings.isOpenStreetMapEnabled {
-                    // Treat an empty result as a soft failure only when we expected data
-                    // (OSM returns [] both when disabled and on network error; we can't distinguish easily,
-                    // so we only record success here — circuit breaker stays neutral on empty results)
-                }
-                fromOSM = result
-                circuitBreaker.recordSuccess(src)
-            } else {
-                let mins = circuitBreaker.cooldownMinutesRemaining(src) ?? 0
-                showError("OpenStreetMap skipped — too many errors. Retrying in \(mins) min.")
-            }
-        }
+        let fromOSM = await osmTask.value
+        if osmAvailable { circuitBreaker.recordSuccess(DataSourceCircuitBreaker.openStreetMap) }
 
         // NPS (LAR-17: disabled — service code kept for future re-enablement)
-        var fromNPS: [Landmark] = []
-        if false {
-            let src = DataSourceCircuitBreaker.nps
-            if circuitBreaker.isAvailable(src) {
-                do {
-                    fromNPS = try await npsService.fetchNearbyLandmarks(near: location, settings: settings)
-                    circuitBreaker.recordSuccess(src)
-                } catch {
-                    circuitBreaker.recordFailure(src)
-                    let suffix = circuitBreaker.cooldownMinutesRemaining(src).map { " (paused \($0) min)" } ?? ""
-                    showError("NPS unavailable\(suffix): \(error.localizedDescription)")
-                }
-            } else {
-                let mins = circuitBreaker.cooldownMinutesRemaining(src) ?? 0
-                showError("NPS skipped — too many errors. Retrying in \(mins) min.")
-            }
-        }
+        let fromNPS: [Landmark] = []
 
         // Merge and deduplicate by title OR geographic proximity (LAR-21).
         // Prefer Wikipedia → OSM → NPS (iteration order already encodes priority).
-        var seenTitles = Set<String>()
-        var acceptedLocations: [CLLocation] = []
+        // Uses a grid-cell Set for O(1) proximity lookup instead of O(n²) linear scan.
+        let gridDegrees = deduplicationProximityMeters / 111_000.0
+        var seenTitles   = Set<String>()
+        var occupiedCells = Set<String>()
         var merged: [Landmark] = []
+
         for landmark in (fromWikipedia + fromOSM + fromNPS) {
             let titleKey = landmark.title.lowercased()
             guard seenTitles.insert(titleKey).inserted else { continue }
 
-            let landmarkLoc = CLLocation(latitude: landmark.coordinate.latitude,
-                                         longitude: landmark.coordinate.longitude)
-            let isDuplicate = acceptedLocations.contains {
-                $0.distance(from: landmarkLoc) < deduplicationProximityMeters
+            let latCell = Int((landmark.coordinate.latitude  / gridDegrees).rounded())
+            let lonCell = Int((landmark.coordinate.longitude / gridDegrees).rounded())
+
+            var nearExisting = false
+            outerLoop: for dLat in -1...1 {
+                for dLon in -1...1 {
+                    if occupiedCells.contains("\(latCell + dLat)_\(lonCell + dLon)") {
+                        nearExisting = true
+                        break outerLoop
+                    }
+                }
             }
-            guard !isDuplicate else { continue }
+            guard !nearExisting else { continue }
 
             merged.append(landmark)
-            acceptedLocations.append(landmarkLoc)
+            occupiedCells.insert("\(latCell)_\(lonCell)")
         }
         var sorted = merged.sorted { $0.distance < $1.distance }
 
