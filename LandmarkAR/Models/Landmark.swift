@@ -18,7 +18,12 @@ enum LandmarkCategory: String {
     }
 
     static func classify(title: String, summary: String) -> LandmarkCategory {
-        let text = (title + " " + summary).lowercased()
+        let text  = (title + " " + summary).lowercased()
+        // Split into individual words so single-word keywords match whole words only,
+        // preventing substrings like "ridge" (natural) from firing on "bridge" (cultural).
+        // Multi-word keywords (e.g. "historic district") still use plain text.contains().
+        let words = text.components(separatedBy: CharacterSet.alphanumerics.inverted)
+                        .filter { !$0.isEmpty }
 
         let historicalKeywords = ["museum", "historic", "monument", "memorial", "war", "battle",
                                   "fort", "castle", "ruin", "colonial", "ancient", "heritage",
@@ -35,9 +40,18 @@ enum LandmarkCategory: String {
                                   "center", "centre", "district", "neighborhood", "street",
                                   "avenue", "hall", "opera", "concert", "sculpture"]
 
-        if historicalKeywords.contains(where: { text.contains($0) }) { return .historical }
-        if naturalKeywords.contains(where:    { text.contains($0) }) { return .natural }
-        if culturalKeywords.contains(where:   { text.contains($0) }) { return .cultural }
+        // A keyword matches if any word in the text starts with it (handles plurals/suffixes)
+        // or, for multi-word keywords, if the full phrase appears anywhere in the text.
+        func matches(_ keywords: [String]) -> Bool {
+            keywords.contains(where: { kw in
+                kw.contains(" ") ? text.contains(kw)
+                                 : words.contains(where: { $0.hasPrefix(kw) })
+            })
+        }
+
+        if matches(historicalKeywords) { return .historical }
+        if matches(naturalKeywords)    { return .natural }
+        if matches(culturalKeywords)   { return .cultural }
         return .other
     }
 }

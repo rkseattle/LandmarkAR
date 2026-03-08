@@ -90,6 +90,30 @@ final class LandmarkCategoryTests: XCTestCase {
         XCTAssertEqual(LandmarkCategory.other.systemImageName, "mappin.circle.fill")
     }
 
+    // MARK: - Substring-pitfall regression
+
+    // "bridge" contains the natural keyword "ridge" as a trailing substring.
+    // The word-level classifier must not fire on "ridge" when the full word is "bridge".
+    func testBridgeClassifiedAsCultural() {
+        XCTAssertEqual(LandmarkCategory.classify(title: "Golden Gate Bridge", summary: ""), .cultural)
+        XCTAssertEqual(LandmarkCategory.classify(title: "Brooklyn Bridge", summary: ""), .cultural)
+    }
+
+    func testRidgeAloneRemainsNatural() {
+        XCTAssertEqual(LandmarkCategory.classify(title: "Blue Ridge", summary: ""), .natural)
+        XCTAssertEqual(LandmarkCategory.classify(title: "Rocky Ridge Overlook", summary: ""), .natural)
+    }
+
+    // MARK: - Edge cases
+
+    func testEmptyInputsClassifyAsOther() {
+        XCTAssertEqual(LandmarkCategory.classify(title: "", summary: ""), .other)
+    }
+
+    func testWhitespaceOnlyInputsClassifyAsOther() {
+        XCTAssertEqual(LandmarkCategory.classify(title: "   ", summary: "   "), .other)
+    }
+
     // MARK: - Raw values
 
     func testRawValues() {
