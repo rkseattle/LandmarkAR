@@ -17,78 +17,27 @@
 		A108 /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = A008S /* AppSettings.swift */; };
 		A109 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A009 /* SettingsView.swift */; };
 		A110 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A010 /* Assets.xcassets */; };
-		D40573522F58FCEB00859722 /* NPSService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D40573502F58FCEB00859722 /* NPSService.swift */; };
-		D40573532F58FCEB00859722 /* OpenStreetMapService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D40573512F58FCEB00859722 /* OpenStreetMapService.swift */; };
+		PRIV02 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = PRIV01 /* PrivacyInfo.xcprivacy */; };
 		A116 /* ErrorLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = A016 /* ErrorLog.swift */; };
 		A117 /* ErrorLogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A017 /* ErrorLogView.swift */; };
 		A118 /* ElevationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A018 /* ElevationService.swift */; };
 		A119 /* DataSourceCircuitBreaker.swift in Sources */ = {isa = PBXBuildFile; fileRef = A019 /* DataSourceCircuitBreaker.swift */; };
 		A120 /* NetworkMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = A020 /* NetworkMonitor.swift */; };
 		A121 /* SplashScreenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A021 /* SplashScreenView.swift */; };
+		A122 /* AppLanguage.swift in Sources */ = {isa = PBXBuildFile; fileRef = A022 /* AppLanguage.swift */; };
+		A123 /* LocaleBundleEnvironment.swift in Sources */ = {isa = PBXBuildFile; fileRef = A023 /* LocaleBundleEnvironment.swift */; };
+		D40573522F58FCEB00859722 /* NPSService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D40573502F58FCEB00859722 /* NPSService.swift */; };
+		D40573532F58FCEB00859722 /* OpenStreetMapService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D40573512F58FCEB00859722 /* OpenStreetMapService.swift */; };
+		LCBF /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = LOCVG /* Localizable.strings */; };
 		T101 /* LandmarkCategoryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T001 /* LandmarkCategoryTests.swift */; };
 		T102 /* AppSettingsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T002 /* AppSettingsTests.swift */; };
 		T103 /* DataSourceCircuitBreakerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T003 /* DataSourceCircuitBreakerTests.swift */; };
 		T104 /* ErrorLoggerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T004 /* ErrorLoggerTests.swift */; };
 		T105 /* BearingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T005 /* BearingTests.swift */; };
 		T106 /* LandmarkModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T006 /* LandmarkModelTests.swift */; };
-		A122 /* AppLanguage.swift in Sources */ = {isa = PBXBuildFile; fileRef = A022 /* AppLanguage.swift */; };
-		A123 /* LocaleBundleEnvironment.swift in Sources */ = {isa = PBXBuildFile; fileRef = A023 /* LocaleBundleEnvironment.swift */; };
 		T107 /* AppLanguageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T007 /* AppLanguageTests.swift */; };
-		LCBF /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = LOCVG /* Localizable.strings */; };
 		T108 /* MapsDirectionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T008 /* MapsDirectionsTests.swift */; };
 /* End PBXBuildFile section */
-
-/* Begin PBXFileReference section */
-		A001 /* LandmarkARApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LandmarkARApp.swift; sourceTree = "<group>"; };
-		A002 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
-		A003 /* Landmark.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Landmark.swift; sourceTree = "<group>"; };
-		A004 /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
-		A005 /* WikipediaService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WikipediaService.swift; sourceTree = "<group>"; };
-		A006 /* ARLandmarkView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARLandmarkView.swift; sourceTree = "<group>"; };
-		A007 /* LandmarkDetailSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LandmarkDetailSheet.swift; sourceTree = "<group>"; };
-		A008 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		A008S /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettings.swift; sourceTree = "<group>"; };
-		A009 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
-		A010 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		A999 /* LandmarkAR.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LandmarkAR.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		D40573502F58FCEB00859722 /* NPSService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NPSService.swift; sourceTree = "<group>"; };
-		D40573512F58FCEB00859722 /* OpenStreetMapService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenStreetMapService.swift; sourceTree = "<group>"; };
-		A016 /* ErrorLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorLog.swift; sourceTree = "<group>"; };
-		A017 /* ErrorLogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorLogView.swift; sourceTree = "<group>"; };
-		A018 /* ElevationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ElevationService.swift; sourceTree = "<group>"; };
-		A019 /* DataSourceCircuitBreaker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataSourceCircuitBreaker.swift; sourceTree = "<group>"; };
-		A020 /* NetworkMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkMonitor.swift; sourceTree = "<group>"; };
-		A021 /* SplashScreenView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashScreenView.swift; sourceTree = "<group>"; };
-		T001 /* LandmarkCategoryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LandmarkCategoryTests.swift; sourceTree = "<group>"; };
-		T002 /* AppSettingsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettingsTests.swift; sourceTree = "<group>"; };
-		T003 /* DataSourceCircuitBreakerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataSourceCircuitBreakerTests.swift; sourceTree = "<group>"; };
-		T004 /* ErrorLoggerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorLoggerTests.swift; sourceTree = "<group>"; };
-		T005 /* BearingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BearingTests.swift; sourceTree = "<group>"; };
-		T006 /* LandmarkModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LandmarkModelTests.swift; sourceTree = "<group>"; };
-		TESTPROD /* LandmarkARTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LandmarkARTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		A022 /* AppLanguage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLanguage.swift; sourceTree = "<group>"; };
-		A023 /* LocaleBundleEnvironment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocaleBundleEnvironment.swift; sourceTree = "<group>"; };
-		T007 /* AppLanguageTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLanguageTests.swift; sourceTree = "<group>"; };
-		LC_EN /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
-		LC_JA /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/Localizable.strings; sourceTree = "<group>"; };
-		LC_DE /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Localizable.strings; sourceTree = "<group>"; };
-		LC_FR /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/Localizable.strings; sourceTree = "<group>"; };
-		LC_ES /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Localizable.strings; sourceTree = "<group>"; };
-		LC_PT /* pt */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pt; path = pt.lproj/Localizable.strings; sourceTree = "<group>"; };
-		LC_KO /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ko; path = ko.lproj/Localizable.strings; sourceTree = "<group>"; };
-		LC_IT /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/Localizable.strings; sourceTree = "<group>"; };
-		T008 /* MapsDirectionsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapsDirectionsTests.swift; sourceTree = "<group>"; };
-/* End PBXFileReference section */
-
-/* Begin PBXFrameworksBuildPhase section */
-		B001 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXContainerItemProxy section */
 		TESTCONTAINERPROXY /* PBXContainerItemProxy */ = {
@@ -100,24 +49,65 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXFileReference section */
+		A001 /* LandmarkARApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LandmarkARApp.swift; sourceTree = "<group>"; };
+		A002 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		A003 /* Landmark.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Landmark.swift; sourceTree = "<group>"; };
+		A004 /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
+		A005 /* WikipediaService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WikipediaService.swift; sourceTree = "<group>"; };
+		A006 /* ARLandmarkView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARLandmarkView.swift; sourceTree = "<group>"; };
+		A007 /* LandmarkDetailSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LandmarkDetailSheet.swift; sourceTree = "<group>"; };
+		A008 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		PRIV01 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		A008S /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettings.swift; sourceTree = "<group>"; };
+		A009 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		A010 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		A016 /* ErrorLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorLog.swift; sourceTree = "<group>"; };
+		A017 /* ErrorLogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorLogView.swift; sourceTree = "<group>"; };
+		A018 /* ElevationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ElevationService.swift; sourceTree = "<group>"; };
+		A019 /* DataSourceCircuitBreaker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataSourceCircuitBreaker.swift; sourceTree = "<group>"; };
+		A020 /* NetworkMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkMonitor.swift; sourceTree = "<group>"; };
+		A021 /* SplashScreenView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashScreenView.swift; sourceTree = "<group>"; };
+		A022 /* AppLanguage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLanguage.swift; sourceTree = "<group>"; };
+		A023 /* LocaleBundleEnvironment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocaleBundleEnvironment.swift; sourceTree = "<group>"; };
+		A999 /* LandmarkAR.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LandmarkAR.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D40573502F58FCEB00859722 /* NPSService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NPSService.swift; sourceTree = "<group>"; };
+		D40573512F58FCEB00859722 /* OpenStreetMapService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenStreetMapService.swift; sourceTree = "<group>"; };
+		LC_DE /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Localizable.strings; sourceTree = "<group>"; };
+		LC_EN /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		LC_ES /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Localizable.strings; sourceTree = "<group>"; };
+		LC_FR /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/Localizable.strings; sourceTree = "<group>"; };
+		LC_IT /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/Localizable.strings; sourceTree = "<group>"; };
+		LC_JA /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/Localizable.strings; sourceTree = "<group>"; };
+		LC_KO /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ko; path = ko.lproj/Localizable.strings; sourceTree = "<group>"; };
+		LC_PT /* pt */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pt; path = pt.lproj/Localizable.strings; sourceTree = "<group>"; };
+		T001 /* LandmarkCategoryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LandmarkCategoryTests.swift; sourceTree = "<group>"; };
+		T002 /* AppSettingsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettingsTests.swift; sourceTree = "<group>"; };
+		T003 /* DataSourceCircuitBreakerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataSourceCircuitBreakerTests.swift; sourceTree = "<group>"; };
+		T004 /* ErrorLoggerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorLoggerTests.swift; sourceTree = "<group>"; };
+		T005 /* BearingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BearingTests.swift; sourceTree = "<group>"; };
+		T006 /* LandmarkModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LandmarkModelTests.swift; sourceTree = "<group>"; };
+		T007 /* AppLanguageTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLanguageTests.swift; sourceTree = "<group>"; };
+		T008 /* MapsDirectionsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapsDirectionsTests.swift; sourceTree = "<group>"; };
+		TESTPROD /* LandmarkARTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LandmarkARTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
 
-/* Begin PBXVariantGroup section */
-		LOCVG /* Localizable.strings */ = {
-			isa = PBXVariantGroup;
-			children = (
-				LC_EN /* en */,
-				LC_JA /* ja */,
-				LC_DE /* de */,
-				LC_FR /* fr */,
-				LC_ES /* es */,
-				LC_PT /* pt */,
-				LC_KO /* ko */,
-				LC_IT /* it */,
+/* Begin PBXFrameworksBuildPhase section */
+		B001 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
-			name = Localizable.strings;
-			sourceTree = "<group>";
+			runOnlyForDeploymentPostprocessing = 0;
 		};
-/* End PBXVariantGroup section */
+		TESTFRAMEWORKS /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
 		ARGROUP /* AR */ = {
@@ -171,6 +161,7 @@
 			isa = PBXGroup;
 			children = (
 				A008 /* Info.plist */,
+				PRIV01 /* PrivacyInfo.xcprivacy */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -203,18 +194,6 @@
 			path = Services;
 			sourceTree = "<group>";
 		};
-		VIEWGROUP /* Views */ = {
-			isa = PBXGroup;
-			children = (
-				A002 /* ContentView.swift */,
-				A007 /* LandmarkDetailSheet.swift */,
-				A009 /* SettingsView.swift */,
-				A017 /* ErrorLogView.swift */,
-				A021 /* SplashScreenView.swift */,
-			);
-			path = Views;
-			sourceTree = "<group>";
-		};
 		TESTGROUP /* LandmarkARTests */ = {
 			isa = PBXGroup;
 			children = (
@@ -228,6 +207,18 @@
 				T008 /* MapsDirectionsTests.swift */,
 			);
 			path = LandmarkARTests;
+			sourceTree = "<group>";
+		};
+		VIEWGROUP /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				A002 /* ContentView.swift */,
+				A007 /* LandmarkDetailSheet.swift */,
+				A009 /* SettingsView.swift */,
+				A017 /* ErrorLogView.swift */,
+				A021 /* SplashScreenView.swift */,
+			);
+			path = Views;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -318,21 +309,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				A110 /* Assets.xcassets in Resources */,
+				PRIV02 /* PrivacyInfo.xcprivacy in Resources */,
 				LCBF /* Localizable.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
-
-/* Begin PBXFrameworksBuildPhase section */
-		TESTFRAMEWORKS /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		SRCPHASE /* Sources */ = {
@@ -385,6 +367,24 @@
 			targetProxy = TESTCONTAINERPROXY /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		LOCVG /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				LC_EN /* en */,
+				LC_JA /* ja */,
+				LC_DE /* de */,
+				LC_FR /* fr */,
+				LC_ES /* es */,
+				LC_PT /* pt */,
+				LC_KO /* ko */,
+				LC_IT /* it */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		DEBUGCONFIG /* Debug */ = {
