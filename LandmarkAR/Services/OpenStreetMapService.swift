@@ -64,6 +64,12 @@ class OpenStreetMapService {
         // Overpass returns 400 for malformed queries and 429 for rate limiting,
         // both with non-JSON bodies that would cause a misleading format error.
         if let http = urlResponse as? HTTPURLResponse, http.statusCode != 200 {
+            // HTTP 429 means Overpass is rate-limiting this client. Return empty results
+            // silently so the circuit breaker is not triggered — the next scheduled fetch
+            // will retry naturally without a 4-minute pause.
+            if http.statusCode == 429 {
+                return []
+            }
             throw URLError(.badServerResponse)
         }
 
