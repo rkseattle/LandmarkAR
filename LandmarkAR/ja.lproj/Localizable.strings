@@ -27,6 +27,10 @@
 "settings.categories.natural" = "自然";
 "settings.categories.cultural" = "文化";
 "settings.categories.other" = "その他";
+"settings.significance.header" = "ランドマークフィルター";
+"settings.significance.iconicLandmarksOnly" = "有名スポットのみ表示";
+"settings.significance.footer" = "有効にすると、Wikipediaの月間閲覧数が10,000以上の有名なランドマークのみ表示されます。";
+
 "settings.realtimeUpdates.header" = "リアルタイム更新";
 "settings.realtimeUpdates.footer" = "30秒ごと、または50m移動後にランドマークを更新します。「Wi-Fiのみ」はデータ節約のためにセルラー通信での更新をスキップします。";
 "settings.realtimeUpdates.off" = "オフ";

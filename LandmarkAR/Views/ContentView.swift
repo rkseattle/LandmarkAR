@@ -129,7 +129,12 @@ struct ContentView: View {
             guard let newLocation = newLocation else { return }
             fetchLandmarksIfNeeded(at: newLocation)
         }
-        // Re-fetch when key settings change (LAR-3, LAR-4, LAR-11, LAR-12)
+        // Re-fetch when key settings change (LAR-3, LAR-4, LAR-11, LAR-12, LAR-39)
+        .onChange(of: settings.isIconicLandmarksOnly) { _, _ in
+            guard let location = locationManager.userLocation else { return }
+            lastFetchLocation = nil
+            scheduleFetch(at: location)
+        }
         .onChange(of: settings.isWikipediaEnabled) { _, _ in
             guard let location = locationManager.userLocation else { return }
             scheduleFetch(at: location)

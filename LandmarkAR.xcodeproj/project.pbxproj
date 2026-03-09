@@ -38,6 +38,7 @@
 		T107 /* AppLanguageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T007 /* AppLanguageTests.swift */; };
 		T108 /* MapsDirectionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T008 /* MapsDirectionsTests.swift */; };
 		T109 /* AppSettingsPersistenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T009 /* AppSettingsPersistenceTests.swift */; };
+		BB39001100000001 /* LandmarkSignificanceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB39001000000001 /* LandmarkSignificanceTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -92,6 +93,7 @@
 		T008 /* MapsDirectionsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapsDirectionsTests.swift; sourceTree = "<group>"; };
 		T009 /* AppSettingsPersistenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettingsPersistenceTests.swift; sourceTree = "<group>"; };
 		TESTPROD /* LandmarkARTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LandmarkARTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		BB39001000000001 /* LandmarkSignificanceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LandmarkSignificanceTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -208,6 +210,7 @@
 				T007 /* AppLanguageTests.swift */,
 				T008 /* MapsDirectionsTests.swift */,
 				T009 /* AppSettingsPersistenceTests.swift */,
+				BB39001000000001 /* LandmarkSignificanceTests.swift */,
 			);
 			path = LandmarkARTests;
 			sourceTree = "<group>";
@@ -359,6 +362,7 @@
 				T107 /* AppLanguageTests.swift in Sources */,
 				T108 /* MapsDirectionsTests.swift in Sources */,
 				T109 /* AppSettingsPersistenceTests.swift in Sources */,
+				BB39001100000001 /* LandmarkSignificanceTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -88,6 +88,17 @@ struct SettingsView: View {
                     Text("settings.categories.footer", bundle: bundle)
                 }
 
+                // MARK: Significance Filter (LAR-39)
+                Section {
+                    Toggle(isOn: $settings.isIconicLandmarksOnly) {
+                        Label("settings.significance.iconicLandmarksOnly", bundle: bundle)
+                    }
+                } header: {
+                    Text("settings.significance.header", bundle: bundle)
+                } footer: {
+                    Text("settings.significance.footer", bundle: bundle)
+                }
+
                 // MARK: Real-time Updates (LAR-25, LAR-28)
                 Section {
                     Picker(selection: $settings.realtimeUpdateMode) {
