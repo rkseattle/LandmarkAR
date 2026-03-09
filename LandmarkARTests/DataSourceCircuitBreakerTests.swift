@@ -101,8 +101,7 @@ final class DataSourceCircuitBreakerTests: XCTestCase {
 
     func testAllSourcesCanOpenIndependently() {
         [DataSourceCircuitBreaker.wikipedia,
-         DataSourceCircuitBreaker.openStreetMap,
-         DataSourceCircuitBreaker.nps].forEach { source in
+         DataSourceCircuitBreaker.openStreetMap].forEach { source in
             for _ in 0..<3 { sut.recordFailure(source) }
             XCTAssertFalse(sut.isAvailable(source), "\(source) should be open")
         }
@@ -113,6 +112,5 @@ final class DataSourceCircuitBreakerTests: XCTestCase {
     func testStaticSourceNames() {
         XCTAssertEqual(DataSourceCircuitBreaker.wikipedia,     "Wikipedia")
         XCTAssertEqual(DataSourceCircuitBreaker.openStreetMap, "OpenStreetMap")
-        XCTAssertEqual(DataSourceCircuitBreaker.nps,           "National Park Service")
     }
 }

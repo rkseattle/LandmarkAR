@@ -26,7 +26,6 @@
 		A121 /* SplashScreenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A021 /* SplashScreenView.swift */; };
 		A122 /* AppLanguage.swift in Sources */ = {isa = PBXBuildFile; fileRef = A022 /* AppLanguage.swift */; };
 		A123 /* LocaleBundleEnvironment.swift in Sources */ = {isa = PBXBuildFile; fileRef = A023 /* LocaleBundleEnvironment.swift */; };
-		D40573522F58FCEB00859722 /* NPSService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D40573502F58FCEB00859722 /* NPSService.swift */; };
 		D40573532F58FCEB00859722 /* OpenStreetMapService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D40573512F58FCEB00859722 /* OpenStreetMapService.swift */; };
 		LCBF /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = LOCVG /* Localizable.strings */; };
 		T101 /* LandmarkCategoryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T001 /* LandmarkCategoryTests.swift */; };
@@ -75,7 +74,6 @@
 		A022 /* AppLanguage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLanguage.swift; sourceTree = "<group>"; };
 		A023 /* LocaleBundleEnvironment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocaleBundleEnvironment.swift; sourceTree = "<group>"; };
 		A999 /* LandmarkAR.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LandmarkAR.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		D40573502F58FCEB00859722 /* NPSService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NPSService.swift; sourceTree = "<group>"; };
 		D40573512F58FCEB00859722 /* OpenStreetMapService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenStreetMapService.swift; sourceTree = "<group>"; };
 		LC_DE /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Localizable.strings; sourceTree = "<group>"; };
 		LC_EN /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -192,7 +190,6 @@
 		SVCGROUP /* Services */ = {
 			isa = PBXGroup;
 			children = (
-				D40573502F58FCEB00859722 /* NPSService.swift */,
 				D40573512F58FCEB00859722 /* OpenStreetMapService.swift */,
 				A004 /* LocationManager.swift */,
 				A005 /* WikipediaService.swift */,
@@ -341,7 +338,6 @@
 				A106 /* ARLandmarkView.swift in Sources */,
 				A107 /* LandmarkDetailSheet.swift in Sources */,
 				A108 /* AppSettings.swift in Sources */,
-				D40573522F58FCEB00859722 /* NPSService.swift in Sources */,
 				D40573532F58FCEB00859722 /* OpenStreetMapService.swift in Sources */,
 				A109 /* SettingsView.swift in Sources */,
 				A116 /* ErrorLog.swift in Sources */,

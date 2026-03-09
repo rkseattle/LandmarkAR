@@ -30,7 +30,6 @@ struct ContentView: View {
 
     private let wikipediaService = WikipediaService()
     private let osmService = OpenStreetMapService()
-    private let npsService = NPSService()
     private let elevationService = ElevationService()
     private let normalDistanceThreshold: CLLocationDistance = 200
     private let realtimeDistanceThreshold: CLLocationDistance = 50
@@ -339,18 +338,15 @@ struct ContentView: View {
         // If this fetch was superseded by a newer one, discard results without updating UI.
         guard !Task.isCancelled else { isLoading = false; return }
 
-        // NPS (LAR-17: disabled — service code kept for future re-enablement)
-        let fromNPS: [Landmark] = []
-
         // Merge and deduplicate by title OR geographic proximity (LAR-21).
-        // Prefer Wikipedia → OSM → NPS (iteration order already encodes priority).
+        // Prefer Wikipedia → OSM (iteration order already encodes priority).
         // Uses a grid-cell Set for O(1) proximity lookup instead of O(n²) linear scan.
         let gridDegrees = deduplicationProximityMeters / 111_000.0
         var seenTitles   = Set<String>()
         var occupiedCells = Set<String>()
         var merged: [Landmark] = []
 
-        for landmark in (fromWikipedia + fromOSM + fromNPS) {
+        for landmark in (fromWikipedia + fromOSM) {
             let titleKey = landmark.title.lowercased()
             guard seenTitles.insert(titleKey).inserted else { continue }
 
