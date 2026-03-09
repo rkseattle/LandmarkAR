@@ -43,6 +43,9 @@
 "settings.realtimeUpdates.off" = "끄기";
 "settings.realtimeUpdates.wifiOnly" = "Wi-Fi 전용";
 "settings.realtimeUpdates.always" = "항상";
+"settings.about.header" = "정보";
+"settings.about.version" = "버전";
+"settings.about.footer" = "랜드마크 데이터는 Wikipedia 및 OpenStreetMap 기여자들이 제공합니다.";
 "settings.diagnostics.header" = "진단";
 "settings.errorLog" = "오류 로그";
 "settings.language.header" = "언어";

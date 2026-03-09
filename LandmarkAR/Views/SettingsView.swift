@@ -12,6 +12,12 @@ struct SettingsView: View {
     // LAR-35: Use the language-specific bundle from settings for immediate updates.
     private var bundle: Bundle { settings.localizedBundle }
 
+    private var appVersion: String {
+        let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "—"
+        let build   = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "—"
+        return "\(version) (\(build))"
+    }
+
     var body: some View {
         NavigationStack {
             Form {
@@ -146,6 +152,30 @@ struct SettingsView: View {
                 } footer: {
                     Text("settings.language.footer", bundle: bundle)
                 }
+                // MARK: About
+                Section {
+                    HStack {
+                        Label {
+                            Text("settings.about.version", bundle: bundle)
+                        } icon: {
+                            Image(systemName: "info.circle")
+                        }
+                        Spacer()
+                        Text(appVersion)
+                            .foregroundStyle(.secondary)
+                    }
+                    Link(destination: URL(string: "https://en.wikipedia.org/wiki/Wikipedia:Copyrights")!) {
+                        Label("Wikipedia", systemImage: "globe")
+                    }
+                    Link(destination: URL(string: "https://www.openstreetmap.org/copyright")!) {
+                        Label("OpenStreetMap", systemImage: "map")
+                    }
+                } header: {
+                    Text("settings.about.header", bundle: bundle)
+                } footer: {
+                    Text("settings.about.footer", bundle: bundle)
+                }
+
             }
             .navigationTitle(Text("settings.title", bundle: bundle))
             .navigationBarTitleDisplayMode(.large)

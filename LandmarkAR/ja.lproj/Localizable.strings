@@ -43,6 +43,9 @@
 "settings.realtimeUpdates.off" = "オフ";
 "settings.realtimeUpdates.wifiOnly" = "Wi-Fiのみ";
 "settings.realtimeUpdates.always" = "常時";
+"settings.about.header" = "このアプリについて";
+"settings.about.version" = "バージョン";
+"settings.about.footer" = "ランドマークデータはWikipediaおよびOpenStreetMapの貢献者が提供しています。";
 "settings.diagnostics.header" = "診断";
 "settings.errorLog" = "エラーログ";
 "settings.language.header" = "言語";

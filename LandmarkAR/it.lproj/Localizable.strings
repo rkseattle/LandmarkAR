@@ -43,6 +43,9 @@
 "settings.realtimeUpdates.off" = "Disattivato";
 "settings.realtimeUpdates.wifiOnly" = "Solo Wi-Fi";
 "settings.realtimeUpdates.always" = "Sempre";
+"settings.about.header" = "Info";
+"settings.about.version" = "Versione";
+"settings.about.footer" = "Dati sui luoghi forniti dai collaboratori di Wikipedia e OpenStreetMap.";
 "settings.diagnostics.header" = "Diagnostica";
 "settings.errorLog" = "Registro errori";
 "settings.language.header" = "Lingua";
