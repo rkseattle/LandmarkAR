@@ -122,63 +122,22 @@ struct ContentView: View {
                 overlayUI
             }
         }
-        .onAppear {
-            locationManager.start()
-        }
-        .onChange(of: locationManager.userLocation) { _, newLocation in
-            guard let newLocation = newLocation else { return }
-            fetchLandmarksIfNeeded(at: newLocation)
-        }
-        // Re-fetch when key settings change (LAR-3, LAR-4, LAR-11, LAR-12)
-        .onChange(of: settings.isWikipediaEnabled) { _, _ in
-            guard let location = locationManager.userLocation else { return }
-            scheduleFetch(at: location)
-        }
-        .onChange(of: settings.isOpenStreetMapEnabled) { _, _ in
-            guard let location = locationManager.userLocation else { return }
-            scheduleFetch(at: location)
-        }
-        // LAR-13: Re-fetch when any per-category distance changes (may expand the radius)
-        .onChange(of: settings.maxDistanceIndexHistorical) { _, _ in
-            guard let location = locationManager.userLocation else { return }
-            lastFetchLocation = nil
-            scheduleFetch(at: location)
-        }
-        .onChange(of: settings.maxDistanceIndexNatural) { _, _ in
-            guard let location = locationManager.userLocation else { return }
-            lastFetchLocation = nil
-            scheduleFetch(at: location)
-        }
-        .onChange(of: settings.maxDistanceIndexCultural) { _, _ in
-            guard let location = locationManager.userLocation else { return }
-            lastFetchLocation = nil
-            scheduleFetch(at: location)
-        }
-        .onChange(of: settings.maxDistanceIndexOther) { _, _ in
-            guard let location = locationManager.userLocation else { return }
-            lastFetchLocation = nil
-            scheduleFetch(at: location)
-        }
-        // Filter-only settings: re-filter existing landmarks without a network round-trip
-        .onChange(of: settings.showHistorical)   { _, _ in updateDisplayedLandmarks() }
-        .onChange(of: settings.showNatural)      { _, _ in updateDisplayedLandmarks() }
-        .onChange(of: settings.showCultural)     { _, _ in updateDisplayedLandmarks() }
-        .onChange(of: settings.showOther)        { _, _ in updateDisplayedLandmarks() }
-        .onChange(of: settings.maxLandmarkCount) { _, _ in updateDisplayedLandmarks() }
-        // LAR-25/LAR-28: Start/stop real-time timer when mode or Wi-Fi connectivity changes
-        .onChange(of: settings.realtimeUpdateMode) { _, _ in handleRealtimeModeChange() }
-        .onChange(of: networkMonitor.isOnWifi) { _, _ in handleRealtimeModeChange() }
+        .onAppear { locationManager.start() }
+        .modifier(LocationAndSettingsObserver(
+            locationManager: locationManager,
+            settings: settings,
+            networkMonitor: networkMonitor,
+            fetchLandmarksIfNeeded: fetchLandmarksIfNeeded,
+            scheduleFetch: scheduleFetch,
+            updateDisplayedLandmarks: updateDisplayedLandmarks,
+            handleRealtimeModeChange: handleRealtimeModeChange,
+            setLastFetchLocation: { lastFetchLocation = $0 }
+        ))
         .sheet(item: $selectedLandmark) { landmark in
             LandmarkDetailSheet(landmark: landmark)
         }
         .sheet(isPresented: $showSettings) {
             SettingsView(settings: settings, errorLogger: errorLogger)
-        }
-        // LAR-35: Re-fetch when the language changes (Wikipedia subdomain switches)
-        .onChange(of: settings.appLanguage) { _, _ in
-            guard let location = locationManager.userLocation else { return }
-            lastFetchLocation = nil
-            scheduleFetch(at: location)
         }
         // LAR-35: Inject the language-specific bundle into the environment for all child views
         .environment(\.localeBundle, settings.localizedBundle)
@@ -428,6 +387,103 @@ struct ContentView: View {
         landmarks = sorted
         updateDisplayedLandmarks()
         isLoading = false
+    }
+}
+
+// MARK: - Settings / Location Observer
+// Extracted from ContentView.body to avoid Swift type-checker timeouts on long
+// modifier chains. Each group of onChange calls is a separate body expression.
+
+private struct LocationAndSettingsObserver: ViewModifier {
+    let locationManager: LocationManager
+    let settings: AppSettings
+    let networkMonitor: NetworkMonitor
+    let fetchLandmarksIfNeeded: (CLLocation) -> Void
+    let scheduleFetch: (CLLocation) -> Void
+    let updateDisplayedLandmarks: () -> Void
+    let handleRealtimeModeChange: () -> Void
+    let setLastFetchLocation: (CLLocation?) -> Void
+
+    func body(content: Content) -> some View {
+        content
+            // Location
+            .onChange(of: locationManager.userLocation) { _, newLocation in
+                guard let newLocation else { return }
+                fetchLandmarksIfNeeded(newLocation)
+            }
+            // Re-fetch when key settings change (LAR-3, LAR-4, LAR-11, LAR-12, LAR-39)
+            .onChange(of: settings.isIconicLandmarksOnly) { _, _ in
+                guard let location = locationManager.userLocation else { return }
+                setLastFetchLocation(nil)
+                scheduleFetch(location)
+            }
+            .onChange(of: settings.isWikipediaEnabled) { _, _ in
+                guard let location = locationManager.userLocation else { return }
+                scheduleFetch(location)
+            }
+            .onChange(of: settings.isOpenStreetMapEnabled) { _, _ in
+                guard let location = locationManager.userLocation else { return }
+                scheduleFetch(location)
+            }
+            // LAR-35: Re-fetch when the language changes
+            .onChange(of: settings.appLanguage) { _, _ in
+                guard let location = locationManager.userLocation else { return }
+                setLastFetchLocation(nil)
+                scheduleFetch(location)
+            }
+            .modifier(DistanceAndFilterObserver(
+                locationManager: locationManager,
+                settings: settings,
+                networkMonitor: networkMonitor,
+                scheduleFetch: scheduleFetch,
+                updateDisplayedLandmarks: updateDisplayedLandmarks,
+                handleRealtimeModeChange: handleRealtimeModeChange,
+                setLastFetchLocation: setLastFetchLocation
+            ))
+    }
+}
+
+private struct DistanceAndFilterObserver: ViewModifier {
+    let locationManager: LocationManager
+    let settings: AppSettings
+    let networkMonitor: NetworkMonitor
+    let scheduleFetch: (CLLocation) -> Void
+    let updateDisplayedLandmarks: () -> Void
+    let handleRealtimeModeChange: () -> Void
+    let setLastFetchLocation: (CLLocation?) -> Void
+
+    func body(content: Content) -> some View {
+        content
+            // LAR-13: Re-fetch when any per-category distance changes
+            .onChange(of: settings.maxDistanceIndexHistorical) { _, _ in
+                guard let location = locationManager.userLocation else { return }
+                setLastFetchLocation(nil)
+                scheduleFetch(location)
+            }
+            .onChange(of: settings.maxDistanceIndexNatural) { _, _ in
+                guard let location = locationManager.userLocation else { return }
+                setLastFetchLocation(nil)
+                scheduleFetch(location)
+            }
+            .onChange(of: settings.maxDistanceIndexCultural) { _, _ in
+                guard let location = locationManager.userLocation else { return }
+                setLastFetchLocation(nil)
+                scheduleFetch(location)
+            }
+            .onChange(of: settings.maxDistanceIndexOther) { _, _ in
+                guard let location = locationManager.userLocation else { return }
+                setLastFetchLocation(nil)
+                scheduleFetch(location)
+            }
+            // Filter-only: re-filter without a network round-trip
+            .onChange(of: settings.showHistorical)   { _, _ in updateDisplayedLandmarks() }
+            .onChange(of: settings.showNatural)      { _, _ in updateDisplayedLandmarks() }
+            .onChange(of: settings.showCultural)     { _, _ in updateDisplayedLandmarks() }
+            .onChange(of: settings.showOther)        { _, _ in updateDisplayedLandmarks() }
+            .onChange(of: settings.maxLandmarkCount) { _, _ in updateDisplayedLandmarks() }
+            // LAR-25/LAR-28: real-time timer
+            .onChange(of: settings.realtimeUpdateMode) { _, _ in handleRealtimeModeChange() }
+            .onChange(of: networkMonitor.isOnWifi)     { _, _ in handleRealtimeModeChange() }
     }
 }
 

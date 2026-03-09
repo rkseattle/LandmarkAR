@@ -71,6 +71,11 @@ struct Landmark: Identifiable {
     var distance: CLLocationDistance = 0   // Meters from user
     var bearing: Double = 0                // Degrees (0=North, 90=East, etc.)
     var altitude: Double? = nil            // Meters above sea level; nil if unknown (LAR-15)
+
+    // LAR-39: Significance scoring from Wikipedia pageviews + article length.
+    // nil pageviews = API call failed (landmark is kept, scored on article length only).
+    var significanceScore: Double = 0
+    var pageviews: Int? = nil
 }
 
 // MARK: - Wikipedia API Response Models
@@ -106,4 +111,15 @@ struct WikipediaContentURLs: Codable {
 
 struct WikipediaDesktopURL: Codable {
     let page: String?
+}
+
+// MARK: - Wikipedia Pageviews Response (LAR-39)
+// Maps the Wikimedia pageviews REST API response for monthly article view counts.
+
+struct WikipediaPageviewsResponse: Codable {
+    let items: [WikipediaPageviewItem]
+}
+
+struct WikipediaPageviewItem: Codable {
+    let views: Int
 }

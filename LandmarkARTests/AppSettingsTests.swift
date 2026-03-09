@@ -17,7 +17,8 @@ final class AppSettingsTests: XCTestCase {
             "showHistorical", "showNatural", "showCultural", "showOther",
             "maxLandmarkCount", "labelDisplaySize", "realtimeUpdateMode", "appLanguage",
             "maxDistanceIndexHistorical", "maxDistanceIndexNatural",
-            "maxDistanceIndexCultural", "maxDistanceIndexOther"
+            "maxDistanceIndexCultural", "maxDistanceIndexOther",
+            "isIconicLandmarksOnly"
         ]
         keys.forEach { UserDefaults.standard.removeObject(forKey: $0) }
     }

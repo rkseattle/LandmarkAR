@@ -30,6 +30,11 @@ class AppSettings: ObservableObject {
         didSet { UserDefaults.standard.set(isOpenStreetMapEnabled, forKey: Keys.isOpenStreetMapEnabled) }
     }
 
+    // LAR-39: When enabled, only landmarks with 10,000+ monthly Wikipedia views are shown.
+    @Published var isIconicLandmarksOnly: Bool {
+        didSet { UserDefaults.standard.set(isIconicLandmarksOnly, forKey: Keys.isIconicLandmarksOnly) }
+    }
+
     // MARK: - Distance Filter (LAR-4, LAR-13)
     // Each category has its own distance slider indexed into distanceSteps.
     // The overall maxDistanceKm is the max of all four, used as the API fetch radius.
@@ -144,6 +149,7 @@ class AppSettings: ObservableObject {
         let ud = UserDefaults.standard
         isWikipediaEnabled     = ud.object(forKey: Keys.isWikipediaEnabled)     as? Bool ?? true
         isOpenStreetMapEnabled = ud.object(forKey: Keys.isOpenStreetMapEnabled) as? Bool ?? true
+        isIconicLandmarksOnly  = ud.object(forKey: Keys.isIconicLandmarksOnly)  as? Bool ?? false
         let savedMode = ud.string(forKey: Keys.realtimeUpdateMode).flatMap(RealtimeUpdateMode.init(rawValue:))
         realtimeUpdateMode = savedMode ?? .off
         let savedSize = ud.string(forKey: Keys.labelDisplaySize).flatMap(LabelDisplaySize.init(rawValue:))
@@ -179,5 +185,6 @@ class AppSettings: ObservableObject {
         static let showCultural                = "showCultural"
         static let showOther                   = "showOther"
         static let appLanguage                 = "appLanguage"
+        static let isIconicLandmarksOnly       = "isIconicLandmarksOnly"
     }
 }

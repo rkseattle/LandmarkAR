@@ -27,6 +27,10 @@
 "settings.categories.natural" = "Naturale";
 "settings.categories.cultural" = "Culturale";
 "settings.categories.other" = "Altro";
+"settings.significance.header" = "Filtro luoghi";
+"settings.significance.iconicLandmarksOnly" = "Solo luoghi iconici";
+"settings.significance.footer" = "Se attivato, mostra solo i luoghi famosi con 10.000+ visualizzazioni mensili su Wikipedia.";
+
 "settings.realtimeUpdates.header" = "Aggiornamenti in tempo reale";
 "settings.realtimeUpdates.footer" = "Aggiorna i luoghi ogni 30 s o dopo essersi spostati di 50 m. «Solo Wi-Fi» salta gli aggiornamenti in rete cellulare per risparmiare dati.";
 "settings.realtimeUpdates.off" = "Disattivato";

@@ -27,6 +27,10 @@
 "settings.categories.natural" = "자연";
 "settings.categories.cultural" = "문화";
 "settings.categories.other" = "기타";
+"settings.significance.header" = "명소 필터";
+"settings.significance.iconicLandmarksOnly" = "유명 명소만 표시";
+"settings.significance.footer" = "활성화하면 월간 위키피디아 조회수 10,000 이상인 유명 명소만 표시됩니다.";
+
 "settings.realtimeUpdates.header" = "실시간 업데이트";
 "settings.realtimeUpdates.footer" = "30초마다 또는 50m 이동 후 랜드마크를 새로 고칩니다. 「Wi-Fi 전용」은 데이터 절약을 위해 셀룰러 업데이트를 건너뜁니다.";
 "settings.realtimeUpdates.off" = "끄기";

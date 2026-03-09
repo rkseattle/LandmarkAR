@@ -30,6 +30,34 @@ class WikipediaService {
         return "\(rLat),\(rLon),\(radius),\(lang)" as NSString
     }
 
+    // LAR-39: Per-title pageview cache for the session lifetime.
+    // Avoids redundant API calls when the user moves slightly and results overlap.
+    private let pageviewCache = NSCache<NSString, PageviewBox>()
+
+    private class PageviewBox: NSObject {
+        let views: Int
+        init(_ views: Int) { self.views = views }
+    }
+
+    // MARK: - LAR-39: Significance Scoring Constants
+
+    /// Minimum monthly pageview count to pass the default significance filter.
+    static let minPageviewThreshold = 1_000
+
+    /// Monthly pageview count required when "Iconic Landmarks Only" is enabled.
+    static let iconicPageviewThreshold = 10_000
+
+    /// Extract character count used to normalize the article-length signal to [0, 1].
+    static let maxExtractLengthForNormalization = 2_000
+
+    /// Composite significance score: pageviews (primary) + normalized article length (secondary).
+    /// A nil pageview count means the API call failed; fall back to article-length-only scoring.
+    static func significanceScore(pageviews: Int?, extractLength: Int) -> Double {
+        let normalizedLength = min(Double(extractLength) / Double(maxExtractLengthForNormalization), 1.0)
+        let views = Double(pageviews ?? 0)
+        return views * 0.8 + normalizedLength * 0.2
+    }
+
     // MARK: - Fetch Nearby Landmarks
 
     /// Main entry point. Call this with the user's current location and the current settings.
@@ -81,8 +109,25 @@ class WikipediaService {
             return results
         }
 
-        // Sort by distance so the closest landmarks are first
-        let sorted = landmarks.sorted { $0.distance < $1.distance }
+        // LAR-39: Apply significance threshold filtering.
+        // Landmarks where the pageviews fetch failed (pageviews == nil) are kept as-is
+        // per the fallback requirement; only landmarks with a known low view count are dropped.
+        let threshold = settings.isIconicLandmarksOnly
+            ? WikipediaService.iconicPageviewThreshold
+            : WikipediaService.minPageviewThreshold
+        let filtered = landmarks.filter { landmark in
+            guard let views = landmark.pageviews else { return true }
+            return views >= threshold
+        }
+
+        // Sort by significance descending so the highest-priority landmarks are first.
+        // Distance is a tiebreaker to maintain stable ordering for equal scores.
+        let sorted = filtered.sorted {
+            if $0.significanceScore != $1.significanceScore {
+                return $0.significanceScore > $1.significanceScore
+            }
+            return $0.distance < $1.distance
+        }
         cache.setObject(CacheBox(sorted), forKey: key)
         return sorted
     }
@@ -112,17 +157,24 @@ class WikipediaService {
     }
 
     /// Fetches a plain-text summary for one Wikipedia article, then builds a Landmark.
+    /// Also fetches monthly pageview count in parallel to compute a significance score.
     /// Returns nil (rather than throwing) if the page is missing or the response is malformed.
     private func buildLandmark(from result: WikipediaGeoResult,
                                 userLocation: CLLocation,
                                 languageCode: String) async -> Landmark? {
         // LAR-35: Use the language subdomain from settings
-        let urlString = "https://\(languageCode).wikipedia.org/api/rest_v1/page/summary/\(result.title.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? "")"
-        guard let url = URL(string: urlString) else { return nil }
+        let encodedTitle = result.title.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
+        let summaryURLString = "https://\(languageCode).wikipedia.org/api/rest_v1/page/summary/\(encodedTitle)"
+        guard let summaryURL = URL(string: summaryURLString) else { return nil }
 
         do {
-            let (data, _) = try await session.data(from: url)
+            // LAR-39: Fetch summary and pageviews in parallel to avoid sequential latency.
+            async let summaryFetch = session.data(from: summaryURL)
+            async let pageviewsFetch = fetchPageviews(title: result.title, languageCode: languageCode)
+
+            let (data, _) = try await summaryFetch
             let summary = try JSONDecoder().decode(WikipediaSummaryResponse.self, from: data)
+            let views = await pageviewsFetch
 
             let landmarkLocation = CLLocation(latitude: result.lat, longitude: result.lon)
             let landmarkCoord = CLLocationCoordinate2D(latitude: result.lat, longitude: result.lon)
@@ -135,6 +187,9 @@ class WikipediaService {
             // LAR-5: Classify the landmark into a category
             let category = LandmarkCategory.classify(title: result.title, summary: extract)
 
+            // LAR-39: Compute composite significance score
+            let score = WikipediaService.significanceScore(pageviews: views, extractLength: extract.count)
+
             return Landmark(
                 id: "\(result.pageid)",
                 title: result.title,
@@ -143,11 +198,49 @@ class WikipediaService {
                 wikipediaURL: pageURL,
                 category: category,
                 distance: distance,
-                bearing: bearing
+                bearing: bearing,
+                significanceScore: score,
+                pageviews: views
             )
         } catch {
             return nil
         }
+    }
+
+    /// Fetches the 30-day view count for a Wikipedia article from the Wikimedia pageviews API.
+    /// Returns nil on any network or decode failure (caller keeps the landmark via fallback scoring).
+    /// Results are cached per title for the session lifetime.
+    private func fetchPageviews(title: String, languageCode: String) async -> Int? {
+        let cacheKey = "\(languageCode):\(title)" as NSString
+        if let cached = pageviewCache.object(forKey: cacheKey) {
+            return cached.views
+        }
+
+        let encodedTitle = title.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
+        let timestamp = currentMonthTimestamp()
+        let urlString = "https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/\(languageCode).wikipedia.org/all-access/all-agents/\(encodedTitle)/monthly/\(timestamp)/\(timestamp)"
+        guard let url = URL(string: urlString) else { return nil }
+
+        do {
+            let (data, _) = try await session.data(from: url)
+            let response = try JSONDecoder().decode(WikipediaPageviewsResponse.self, from: data)
+            let views = response.items.first?.views
+            if let views = views {
+                pageviewCache.setObject(PageviewBox(views), forKey: cacheKey)
+            }
+            return views
+        } catch {
+            return nil
+        }
+    }
+
+    /// Returns the current month as a Wikimedia pageviews timestamp (e.g. "20240101").
+    private func currentMonthTimestamp() -> String {
+        let calendar = Calendar.current
+        let now = Date()
+        let year  = calendar.component(.year,  from: now)
+        let month = calendar.component(.month, from: now)
+        return String(format: "%04d%02d01", year, month)
     }
 }
 
