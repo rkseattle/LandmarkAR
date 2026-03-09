@@ -154,12 +154,11 @@ class WikipediaService {
         let (data, urlResponse) = try await session.data(from: components.url!)
 
         // Reject non-200 responses before attempting JSON decoding — same pattern as LAR-44.
-        // Wikipedia returns 429 for rate limiting with a non-JSON body that would otherwise
-        // produce a misleading format error and trigger the circuit breaker.
+        // Wikipedia returns 429 for rate limiting and 5xx for transient server errors, both
+        // with non-JSON bodies that would otherwise produce a misleading format error.
         if let http = urlResponse as? HTTPURLResponse, http.statusCode != 200 {
-            if http.statusCode == 429 {
-                return []
-            }
+            let isTransient = http.statusCode == 429 || (http.statusCode >= 500 && http.statusCode < 600)
+            if isTransient { return [] }
             throw URLError(.badServerResponse)
         }
 

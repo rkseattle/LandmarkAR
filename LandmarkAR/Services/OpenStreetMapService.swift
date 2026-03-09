@@ -61,15 +61,14 @@ class OpenStreetMapService {
         let (data, urlResponse) = try await URLSession.shared.data(for: request)
 
         // LAR-44: Reject non-200 responses before attempting JSON decoding.
-        // Overpass returns 400 for malformed queries and 429 for rate limiting,
-        // both with non-JSON bodies that would cause a misleading format error.
+        // Overpass returns 400 for malformed queries, 429 for rate limiting, and
+        // 5xx codes (503 overloaded, 504 gateway timeout) under heavy load — all
+        // with non-JSON bodies that would cause a misleading format error.
         if let http = urlResponse as? HTTPURLResponse, http.statusCode != 200 {
-            // HTTP 429 means Overpass is rate-limiting this client. Return empty results
-            // silently so the circuit breaker is not triggered — the next scheduled fetch
-            // will retry naturally without a 4-minute pause.
-            if http.statusCode == 429 {
-                return []
-            }
+            // Transient server-side errors: return empty results silently so the
+            // circuit breaker is not triggered. The next scheduled fetch will retry.
+            let isTransient = http.statusCode == 429 || (http.statusCode >= 500 && http.statusCode < 600)
+            if isTransient { return [] }
             throw URLError(.badServerResponse)
         }
 
