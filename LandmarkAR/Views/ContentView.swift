@@ -307,7 +307,7 @@ struct ContentView: View {
         }
         let osmTask = Task { () throws -> [Landmark] in
             guard osmAvailable else { return [] }
-            return try await osmService.fetchNearbyLandmarks(near: location, settings: settings)
+            return try await osmService.fetchNearbyLandmarks(near: location, settings: settings, wikipediaService: wikipediaService)
         }
 
         var fromWikipedia: [Landmark] = []
