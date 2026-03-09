@@ -10,7 +10,6 @@ class DataSourceCircuitBreaker: ObservableObject {
 
     static let wikipedia     = "Wikipedia"
     static let openStreetMap = "OpenStreetMap"
-    static let nps           = "National Park Service"
 
     private struct SourceState {
         var failureCount = 0
