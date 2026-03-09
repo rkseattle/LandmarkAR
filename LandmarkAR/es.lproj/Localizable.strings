@@ -24,6 +24,10 @@
 "settings.labelSize.small" = "Pequeño";
 "settings.labelSize.medium" = "Mediano";
 "settings.labelSize.large" = "Grande";
+"settings.filters.header" = "Filtros";
+"settings.filters.footer" = "Activa categorías y establece la distancia máxima de búsqueda para cada una. «Solo lugares icónicos» restringe los resultados a lugares famosos.";
+"settings.appearance.header" = "Apariencia";
+"settings.app.header" = "App";
 "settings.categories.header" = "Categorías";
 "settings.categories.footer" = "Activa categorías y establece la distancia máxima para cada una.";
 "settings.categories.historical" = "Histórico";
@@ -39,6 +43,9 @@
 "settings.realtimeUpdates.off" = "Desactivado";
 "settings.realtimeUpdates.wifiOnly" = "Solo Wi-Fi";
 "settings.realtimeUpdates.always" = "Siempre";
+"settings.about.header" = "Acerca de";
+"settings.about.version" = "Versión";
+"settings.about.footer" = "Datos de lugares proporcionados por colaboradores de Wikipedia y OpenStreetMap.";
 "settings.diagnostics.header" = "Diagnóstico";
 "settings.errorLog" = "Registro de errores";
 "settings.language.header" = "Idioma";

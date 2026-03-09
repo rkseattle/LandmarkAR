@@ -24,6 +24,10 @@
 "settings.labelSize.small" = "Klein";
 "settings.labelSize.medium" = "Mittel";
 "settings.labelSize.large" = "Groß";
+"settings.filters.header" = "Filter";
+"settings.filters.footer" = "Kategorien aktivieren und maximale Suchdistanz für jede festlegen. \U201eNur ikonische Wahrzeichen\U201c beschränkt Ergebnisse auf bekannte Sehenswürdigkeiten.";
+"settings.appearance.header" = "Darstellung";
+"settings.app.header" = "App";
 "settings.categories.header" = "Kategorien";
 "settings.categories.footer" = "Kategorien aktivieren und maximale Entfernung für jede festlegen.";
 "settings.categories.historical" = "Historisch";
@@ -39,6 +43,9 @@
 "settings.realtimeUpdates.off" = "Aus";
 "settings.realtimeUpdates.wifiOnly" = "Nur WLAN";
 "settings.realtimeUpdates.always" = "Immer";
+"settings.about.header" = "Über";
+"settings.about.version" = "Version";
+"settings.about.footer" = "Sehenswürdigkeitsdaten von Wikipedia- und OpenStreetMap-Mitwirkenden.";
 "settings.diagnostics.header" = "Diagnose";
 "settings.errorLog" = "Fehlerprotokoll";
 "settings.language.header" = "Sprache";

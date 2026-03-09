@@ -12,6 +12,12 @@ struct SettingsView: View {
     // LAR-35: Use the language-specific bundle from settings for immediate updates.
     private var bundle: Bundle { settings.localizedBundle }
 
+    private var appVersion: String {
+        let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "—"
+        let build   = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "—"
+        return "\(version) (\(build))"
+    }
+
     var body: some View {
         NavigationStack {
             Form {
@@ -30,54 +36,9 @@ struct SettingsView: View {
                     Text("settings.dataSources.footer", bundle: bundle)
                 }
 
-                // MARK: Display Limit (LAR-23)
-                Section {
-                    Picker(selection: $settings.maxLandmarkCount) {
-                        Text("5").tag(5)
-                        Text("10").tag(10)
-                        Text("25").tag(25)
-                    } label: {
-                        Text("settings.displayLimit.maxLandmarks", bundle: bundle)
-                    }
-                    .pickerStyle(.segmented)
-                } header: {
-                    Text("settings.displayLimit.header", bundle: bundle)
-                } footer: {
-                    Text("settings.displayLimit.footer", bundle: bundle)
-                }
-
-                // MARK: Distance Units
-                Section {
-                    Picker(selection: $settings.distanceUnit) {
-                        Text("settings.distanceUnit.km",    bundle: bundle).tag(DistanceUnit.kilometers)
-                        Text("settings.distanceUnit.miles", bundle: bundle).tag(DistanceUnit.miles)
-                    } label: {
-                        Text("settings.distanceUnit.header", bundle: bundle)
-                    }
-                    .pickerStyle(.segmented)
-                } header: {
-                    Text("settings.distanceUnit.header", bundle: bundle)
-                }
-
-                // MARK: Label Size (LAR-29)
-                Section {
-                    Picker(selection: $settings.labelDisplaySize) {
-                        Text("settings.labelSize.small",  bundle: bundle).tag(LabelDisplaySize.small)
-                        Text("settings.labelSize.medium", bundle: bundle).tag(LabelDisplaySize.medium)
-                        Text("settings.labelSize.large",  bundle: bundle).tag(LabelDisplaySize.large)
-                    } label: {
-                        Text("settings.labelSize.header", bundle: bundle)
-                    }
-                    .pickerStyle(.segmented)
-                } header: {
-                    Text("settings.labelSize.header", bundle: bundle)
-                } footer: {
-                    Text("settings.labelSize.footer", bundle: bundle)
-                }
-
-                // MARK: Category Filters + Distance (LAR-5, LAR-13, LAR-24)
-                // Toggle and distance slider are grouped per category.
-                // The slider is only shown when the category is enabled.
+                // MARK: Filters (LAR-5, LAR-13, LAR-23, LAR-24, LAR-39)
+                // Category toggles + per-category distance, significance filter, and display limit
+                // are all grouped here because they collectively answer "what landmarks appear".
                 Section {
                     CategoryRow(label: Text("settings.categories.historical", bundle: bundle),
                                 systemImage: "building.columns.fill",
@@ -99,14 +60,6 @@ struct SettingsView: View {
                                 isEnabled: $settings.showOther,
                                 distanceIndex: $settings.maxDistanceIndexOther,
                                 distanceUnit: settings.distanceUnit)
-                } header: {
-                    Text("settings.categories.header", bundle: bundle)
-                } footer: {
-                    Text("settings.categories.footer", bundle: bundle)
-                }
-
-                // MARK: Significance Filter (LAR-39)
-                Section {
                     Toggle(isOn: $settings.isIconicLandmarksOnly) {
                         Label {
                             Text("settings.significance.iconicLandmarksOnly", bundle: bundle)
@@ -114,10 +67,42 @@ struct SettingsView: View {
                             Image(systemName: "star.fill")
                         }
                     }
+                    Picker(selection: $settings.maxLandmarkCount) {
+                        Text("5").tag(5)
+                        Text("10").tag(10)
+                        Text("25").tag(25)
+                    } label: {
+                        Text("settings.displayLimit.maxLandmarks", bundle: bundle)
+                    }
+                    .pickerStyle(.segmented)
                 } header: {
-                    Text("settings.significance.header", bundle: bundle)
+                    Text("settings.filters.header", bundle: bundle)
                 } footer: {
-                    Text("settings.significance.footer", bundle: bundle)
+                    Text("settings.filters.footer", bundle: bundle)
+                }
+
+                // MARK: Appearance (LAR-29)
+                // Distance units and label size both control how things look in AR.
+                Section {
+                    Picker(selection: $settings.distanceUnit) {
+                        Text("settings.distanceUnit.km",    bundle: bundle).tag(DistanceUnit.kilometers)
+                        Text("settings.distanceUnit.miles", bundle: bundle).tag(DistanceUnit.miles)
+                    } label: {
+                        Text("settings.distanceUnit.header", bundle: bundle)
+                    }
+                    .pickerStyle(.segmented)
+                    Picker(selection: $settings.labelDisplaySize) {
+                        Text("settings.labelSize.small",  bundle: bundle).tag(LabelDisplaySize.small)
+                        Text("settings.labelSize.medium", bundle: bundle).tag(LabelDisplaySize.medium)
+                        Text("settings.labelSize.large",  bundle: bundle).tag(LabelDisplaySize.large)
+                    } label: {
+                        Text("settings.labelSize.header", bundle: bundle)
+                    }
+                    .pickerStyle(.segmented)
+                } header: {
+                    Text("settings.appearance.header", bundle: bundle)
+                } footer: {
+                    Text("settings.labelSize.footer", bundle: bundle)
                 }
 
                 // MARK: Real-time Updates (LAR-25, LAR-28)
@@ -137,7 +122,8 @@ struct SettingsView: View {
                     Text("settings.realtimeUpdates.footer", bundle: bundle)
                 }
 
-                // MARK: Language (LAR-35)
+                // MARK: App (LAR-16, LAR-35)
+                // Language and diagnostics share this section as app-level settings.
                 Section {
                     Picker(selection: $settings.appLanguage) {
                         ForEach(AppLanguage.allCases) { lang in
@@ -151,14 +137,6 @@ struct SettingsView: View {
                         }
                     }
                     .pickerStyle(.navigationLink)
-                } header: {
-                    Text("settings.language.header", bundle: bundle)
-                } footer: {
-                    Text("settings.language.footer", bundle: bundle)
-                }
-
-                // MARK: Error Log (LAR-16)
-                Section {
                     NavigationLink {
                         ErrorLogView(logger: errorLogger)
                             .environment(\.localeBundle, bundle)
@@ -170,8 +148,34 @@ struct SettingsView: View {
                         }
                     }
                 } header: {
-                    Text("settings.diagnostics.header", bundle: bundle)
+                    Text("settings.app.header", bundle: bundle)
+                } footer: {
+                    Text("settings.language.footer", bundle: bundle)
                 }
+                // MARK: About
+                Section {
+                    HStack {
+                        Label {
+                            Text("settings.about.version", bundle: bundle)
+                        } icon: {
+                            Image(systemName: "info.circle")
+                        }
+                        Spacer()
+                        Text(appVersion)
+                            .foregroundStyle(.secondary)
+                    }
+                    Link(destination: URL(string: "https://en.wikipedia.org/wiki/Wikipedia:Copyrights")!) {
+                        Label("Wikipedia", systemImage: "globe")
+                    }
+                    Link(destination: URL(string: "https://www.openstreetmap.org/copyright")!) {
+                        Label("OpenStreetMap", systemImage: "map")
+                    }
+                } header: {
+                    Text("settings.about.header", bundle: bundle)
+                } footer: {
+                    Text("settings.about.footer", bundle: bundle)
+                }
+
             }
             .navigationTitle(Text("settings.title", bundle: bundle))
             .navigationBarTitleDisplayMode(.large)

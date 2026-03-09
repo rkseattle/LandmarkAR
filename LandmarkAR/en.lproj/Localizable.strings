@@ -24,6 +24,10 @@
 "settings.labelSize.small" = "Small";
 "settings.labelSize.medium" = "Medium";
 "settings.labelSize.large" = "Large";
+"settings.filters.header" = "Filters";
+"settings.filters.footer" = "Enable categories and set the maximum search distance for each. \"Iconic Landmarks Only\" restricts results to well-known landmarks.";
+"settings.appearance.header" = "Appearance";
+"settings.app.header" = "App";
 "settings.categories.header" = "Categories";
 "settings.categories.footer" = "Enable categories and set the maximum distance for each.";
 "settings.categories.historical" = "Historical";
@@ -39,6 +43,9 @@
 "settings.realtimeUpdates.off" = "Off";
 "settings.realtimeUpdates.wifiOnly" = "Wi-Fi Only";
 "settings.realtimeUpdates.always" = "Always";
+"settings.about.header" = "About";
+"settings.about.version" = "Version";
+"settings.about.footer" = "Landmark data provided by Wikipedia and OpenStreetMap contributors.";
 "settings.diagnostics.header" = "Diagnostics";
 "settings.errorLog" = "Error Log";
 "settings.language.header" = "Language";
