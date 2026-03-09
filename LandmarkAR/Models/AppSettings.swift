@@ -1,3 +1,4 @@
+import CoreLocation
 import Foundation
 
 // MARK: - LabelDisplaySize (LAR-29)
@@ -6,6 +7,57 @@ enum LabelDisplaySize: String, CaseIterable {
     case small  = "small"
     case medium = "medium"
     case large  = "large"
+}
+
+// MARK: - LabelDisplaySize Distance Scaling (LAR-43)
+
+extension LabelDisplaySize {
+
+    // Distance thresholds for logarithmic label size interpolation.
+    static let minScaleDistanceMeters: CLLocationDistance = 200   // full (max) size at or below this
+    static let maxScaleDistanceMeters: CLLocationDistance = 5000  // minimum size at or above this
+
+    // Minimum readable sizes applied as a floor regardless of distance or user setting.
+    static let minTitleFontSize: CGFloat    = 10
+    static let minDistanceFontSize: CGFloat = 8
+
+    // Maximum title font size — applied when a landmark is within minScaleDistanceMeters.
+    var maxTitleFontSize: CGFloat {
+        switch self {
+        case .small:  return 13
+        case .medium: return 17
+        case .large:  return 22
+        }
+    }
+
+    // Distance badge font is always 65% of the title font size.
+    var maxDistanceFontSize: CGFloat { (maxTitleFontSize * 0.65).rounded() }
+
+    // Maximum label width — applied when a landmark is within minScaleDistanceMeters.
+    var maxLabelWidth: CGFloat {
+        switch self {
+        case .small:  return 130
+        case .medium: return 165
+        case .large:  return 210
+        }
+    }
+
+    // Category icon size (unchanged from LAR-29 values).
+    var iconSize: CGFloat {
+        switch self {
+        case .small:  return 16
+        case .medium: return 22
+        case .large:  return 30
+        }
+    }
+
+    /// Returns a scale factor in [0, 1] using an inverse logarithmic curve.
+    /// 1.0 at ≤minScaleDistanceMeters (full size), 0.0 at ≥maxScaleDistanceMeters (minimum size).
+    static func scaleFactor(for distanceMeters: CLLocationDistance) -> CGFloat {
+        let clamped = max(minScaleDistanceMeters, min(maxScaleDistanceMeters, distanceMeters))
+        let logRange = log(maxScaleDistanceMeters) - log(minScaleDistanceMeters)
+        return CGFloat((log(maxScaleDistanceMeters) - log(clamped)) / logRange)
+    }
 }
 
 // MARK: - RealtimeUpdateMode (LAR-28)

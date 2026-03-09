@@ -40,6 +40,7 @@
 		T109 /* AppSettingsPersistenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T009 /* AppSettingsPersistenceTests.swift */; };
 		BB39001100000001 /* LandmarkSignificanceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB39001000000001 /* LandmarkSignificanceTests.swift */; };
 		BB39002100000001 /* LabelColorSchemeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB39002000000001 /* LabelColorSchemeTests.swift */; };
+		BB39003100000001 /* DistanceScalingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB39003000000001 /* DistanceScalingTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -96,6 +97,7 @@
 		TESTPROD /* LandmarkARTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LandmarkARTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		BB39001000000001 /* LandmarkSignificanceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LandmarkSignificanceTests.swift; sourceTree = "<group>"; };
 		BB39002000000001 /* LabelColorSchemeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LabelColorSchemeTests.swift; sourceTree = "<group>"; };
+		BB39003000000001 /* DistanceScalingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DistanceScalingTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -214,6 +216,7 @@
 				T009 /* AppSettingsPersistenceTests.swift */,
 				BB39001000000001 /* LandmarkSignificanceTests.swift */,
 				BB39002000000001 /* LabelColorSchemeTests.swift */,
+				BB39003000000001 /* DistanceScalingTests.swift */,
 			);
 			path = LandmarkARTests;
 			sourceTree = "<group>";
@@ -367,6 +370,7 @@
 				T109 /* AppSettingsPersistenceTests.swift in Sources */,
 				BB39001100000001 /* LandmarkSignificanceTests.swift in Sources */,
 				BB39002100000001 /* LabelColorSchemeTests.swift in Sources */,
+				BB39003100000001 /* DistanceScalingTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
