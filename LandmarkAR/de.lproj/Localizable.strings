@@ -24,6 +24,10 @@
 "settings.labelSize.small" = "Klein";
 "settings.labelSize.medium" = "Mittel";
 "settings.labelSize.large" = "Groß";
+"settings.filters.header" = "Filter";
+"settings.filters.footer" = "Kategorien aktivieren und maximale Suchdistanz für jede festlegen. \U201eNur ikonische Wahrzeichen\U201c beschränkt Ergebnisse auf bekannte Sehenswürdigkeiten.";
+"settings.appearance.header" = "Darstellung";
+"settings.app.header" = "App";
 "settings.categories.header" = "Kategorien";
 "settings.categories.footer" = "Kategorien aktivieren und maximale Entfernung für jede festlegen.";
 "settings.categories.historical" = "Historisch";

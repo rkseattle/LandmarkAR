@@ -24,6 +24,10 @@
 "settings.labelSize.small" = "Pequeño";
 "settings.labelSize.medium" = "Mediano";
 "settings.labelSize.large" = "Grande";
+"settings.filters.header" = "Filtros";
+"settings.filters.footer" = "Activa categorías y establece la distancia máxima de búsqueda para cada una. «Solo lugares icónicos» restringe los resultados a lugares famosos.";
+"settings.appearance.header" = "Apariencia";
+"settings.app.header" = "App";
 "settings.categories.header" = "Categorías";
 "settings.categories.footer" = "Activa categorías y establece la distancia máxima para cada una.";
 "settings.categories.historical" = "Histórico";

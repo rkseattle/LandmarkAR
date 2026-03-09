@@ -24,6 +24,10 @@
 "settings.labelSize.small" = "Small";
 "settings.labelSize.medium" = "Medium";
 "settings.labelSize.large" = "Large";
+"settings.filters.header" = "Filters";
+"settings.filters.footer" = "Enable categories and set the maximum search distance for each. \"Iconic Landmarks Only\" restricts results to well-known landmarks.";
+"settings.appearance.header" = "Appearance";
+"settings.app.header" = "App";
 "settings.categories.header" = "Categories";
 "settings.categories.footer" = "Enable categories and set the maximum distance for each.";
 "settings.categories.historical" = "Historical";

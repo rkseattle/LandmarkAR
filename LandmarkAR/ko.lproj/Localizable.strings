@@ -24,6 +24,10 @@
 "settings.labelSize.small" = "소";
 "settings.labelSize.medium" = "중";
 "settings.labelSize.large" = "대";
+"settings.filters.header" = "필터";
+"settings.filters.footer" = "카테고리를 활성화하고 각각의 최대 검색 거리를 설정합니다. 「유명 명소만 표시」는 유명한 명소로 결과를 제한합니다.";
+"settings.appearance.header" = "디스플레이";
+"settings.app.header" = "앱";
 "settings.categories.header" = "카테고리";
 "settings.categories.footer" = "카테고리를 활성화하고 각각의 최대 거리를 설정합니다.";
 "settings.categories.historical" = "역사";

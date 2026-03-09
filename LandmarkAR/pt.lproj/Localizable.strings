@@ -24,6 +24,10 @@
 "settings.labelSize.small" = "Pequeno";
 "settings.labelSize.medium" = "Médio";
 "settings.labelSize.large" = "Grande";
+"settings.filters.header" = "Filtros";
+"settings.filters.footer" = "Ative categorias e defina a distância máxima de busca para cada uma. «Apenas marcos icônicos» restringe os resultados a locais famosos.";
+"settings.appearance.header" = "Aparência";
+"settings.app.header" = "App";
 "settings.categories.header" = "Categorias";
 "settings.categories.footer" = "Ative categorias e defina a distância máxima para cada uma.";
 "settings.categories.historical" = "Histórico";

@@ -24,6 +24,10 @@
 "settings.labelSize.small" = "小";
 "settings.labelSize.medium" = "中";
 "settings.labelSize.large" = "大";
+"settings.filters.header" = "フィルター";
+"settings.filters.footer" = "カテゴリを有効にして最大検索距離を設定します。「有名スポットのみ表示」は有名なランドマークのみに絞り込みます。";
+"settings.appearance.header" = "表示設定";
+"settings.app.header" = "アプリ";
 "settings.categories.header" = "カテゴリ";
 "settings.categories.footer" = "カテゴリを有効にして最大距離を設定します。";
 "settings.categories.historical" = "歴史";
