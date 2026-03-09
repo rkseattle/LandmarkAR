@@ -371,6 +371,7 @@ class LandmarkLabelView: UIView {
 
     var onTap: (() -> Void)?
     private let landmark: Landmark
+    private let displaySize: LabelDisplaySize
     private let nameLabel = UILabel()
     private let distanceLabel = UILabel()
     private let pinImageView = UIImageView()
@@ -378,42 +379,32 @@ class LandmarkLabelView: UIView {
 
     init(landmark: Landmark, displaySize: LabelDisplaySize) {
         self.landmark = landmark
+        self.displaySize = displaySize
         super.init(frame: .zero)
-        setup(displaySize: displaySize)
+        setup()
     }
 
     required init?(coder: NSCoder) { fatalError() }
 
-    // LAR-29: Font and icon sizes per display size setting.
-    private static func sizes(for displaySize: LabelDisplaySize) -> (icon: CGFloat, name: CGFloat, distance: CGFloat) {
-        switch displaySize {
-        case .small:  return (16, 12, 10)
-        case .medium: return (22, 15, 12)
-        case .large:  return (30, 20, 16)
-        }
-    }
-
-    private func setup(displaySize: LabelDisplaySize) {
+    private func setup() {
         // LAR-7: No background — text-only with shadow for legibility.
         backgroundColor = .clear
 
-        let sz = Self.sizes(for: displaySize)
-
-        // LAR-14: Category icon above the landmark name, matching the icons in Settings
-        let pinConfig = UIImage.SymbolConfiguration(pointSize: sz.icon, weight: .bold)
+        // LAR-43: Use max sizes from LabelDisplaySize — these are the full sizes applied at ≤200m.
+        let pinConfig = UIImage.SymbolConfiguration(pointSize: displaySize.iconSize, weight: .bold)
         pinImageView.image = UIImage(systemName: landmark.category.systemImageName, withConfiguration: pinConfig)
         pinImageView.contentMode = .scaleAspectFit
 
         // Name label
         nameLabel.text = landmark.title
-        nameLabel.font = UIFont.boldSystemFont(ofSize: sz.name)
+        nameLabel.font = UIFont.boldSystemFont(ofSize: displaySize.maxTitleFontSize)
         nameLabel.numberOfLines = 2
         nameLabel.textAlignment = .center
         nameLabel.applyShadow()
 
         // LAR-9: Distance label — formatted and shown below name
         distanceLabel.text = formattedDistance(landmark.distance)
-        distanceLabel.font = UIFont.systemFont(ofSize: sz.distance, weight: .medium)
+        distanceLabel.font = UIFont.systemFont(ofSize: displaySize.maxDistanceFontSize, weight: .medium)
         distanceLabel.textAlignment = .center
         distanceLabel.applyShadow()
 
@@ -424,7 +415,7 @@ class LandmarkLabelView: UIView {
         stack.translatesAutoresizingMaskIntoConstraints = false
         addSubview(stack)
 
-        let targetWidth: CGFloat = 160
+        let targetWidth = displaySize.maxLabelWidth
         nameLabel.preferredMaxLayoutWidth = targetWidth
 
         NSLayoutConstraint.activate([
@@ -441,7 +432,7 @@ class LandmarkLabelView: UIView {
         // Apply default dark scheme before the first luma sample arrives.
         applyColorScheme(.dark)
 
-        // LAR-8: Apply initial distance-based scale
+        // LAR-43: Apply initial distance-based scale
         applyDistanceScale(landmark.distance)
 
         let tap = UITapGestureRecognizer(target: self, action: #selector(tapped))
@@ -456,24 +447,29 @@ class LandmarkLabelView: UIView {
         pinImageView.tintColor = scheme.iconTintColor
     }
 
-    // LAR-8: Scale the label so closer landmarks appear larger.
-    // LAR-27: Also fade distant labels so the closest landmark is visually dominant
-    // when multiple labels overlap in the same screen area.
+    // LAR-43: Scale the label using an inverse logarithmic curve so closer landmarks appear larger.
+    // The user's LabelDisplaySize defines the max size at ≤200m; LabelDisplaySize.minTitleFontSize
+    // is the floor at ≥5,000m. Between those distances the scale interpolates on a log curve.
+    // LAR-27: Opacity step-table kept unchanged — fades distant labels so the closest reads first.
     func applyDistanceScale(_ distanceMeters: CLLocationDistance) {
         // Landmark distance only changes on a new fetch, not every AR frame — skip redundant work.
         guard distanceMeters != lastAppliedDistance else { return }
         lastAppliedDistance = distanceMeters
 
-        let scale: CGFloat
+        let factor = LabelDisplaySize.scaleFactor(for: distanceMeters)
+        let minScale = LabelDisplaySize.minTitleFontSize / displaySize.maxTitleFontSize
+        let scale = minScale + (1.0 - minScale) * factor
+        transform = CGAffineTransform(scaleX: scale, y: scale)
+
+        // LAR-27: Opacity decreases with distance so the closest landmark is visually dominant.
         let opacity: CGFloat
         switch distanceMeters {
-        case ..<300:        scale = 1.4; opacity = 1.00
-        case 300..<800:     scale = 1.2; opacity = 0.90
-        case 800..<2000:    scale = 1.0; opacity = 0.75
-        case 2000..<5000:   scale = 0.85; opacity = 0.55
-        default:            scale = 0.70; opacity = 0.40
+        case ..<300:      opacity = 1.00
+        case 300..<800:   opacity = 0.90
+        case 800..<2000:  opacity = 0.75
+        case 2000..<5000: opacity = 0.55
+        default:          opacity = 0.40
         }
-        transform = CGAffineTransform(scaleX: scale, y: scale)
         alpha = opacity
     }
 
