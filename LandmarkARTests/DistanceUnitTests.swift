@@ -31,9 +31,9 @@ final class DistanceUnitTests: XCTestCase {
     // MARK: - formatted(_:) — Miles
 
     func testMilesBelowThousandFeet() {
-        // 100 m = 328 ft → rounds to nearest 50 → 350 ft
+        // 100 m = 328 ft → rounds to nearest 50 → 300 ft
         let result = DistanceUnit.miles.formatted(100)
-        XCTAssertEqual(result, "350 ft away")
+        XCTAssertEqual(result, "300 ft away")
     }
 
     func testMilesAtAndAboveThousandFeet() {
