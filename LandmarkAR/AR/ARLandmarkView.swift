@@ -43,6 +43,11 @@ class ARLandmarkViewController: UIViewController, ARSessionDelegate {
     private var labelDisplaySize: LabelDisplaySize = .medium
     private var distanceUnit: DistanceUnit = .kilometers
 
+    // LAR-46: Maximum number of landmark labels that may appear on screen simultaneously.
+    // Landmarks outside the field of view do not count against this limit.
+    // Increase WikipediaService.geoSearchLimit proportionally if this is raised.
+    static let maxVisibleLabels = 10
+
     // Cached farthest-first ordering for z-sort. Recomputed only when `landmarks` changes.
     private var sortedFarthestFirst: [Landmark] = []
 
@@ -162,29 +167,50 @@ class ARLandmarkViewController: UIViewController, ARSessionDelegate {
             zFar: 1000
         )
 
-        for landmark in landmarks {
-            guard let worldPosition = worldPosition(for: landmark, relativeTo: userLocation) else { continue }
+        // LAR-42: Visible region with inset so labels near the edge don't clip.
+        let edgeInset: CGFloat = 75
+        let visibleRect = arView.bounds.insetBy(dx: edgeInset, dy: edgeInset)
 
-            guard let screenPoint = project(worldPosition,
-                                            camera: viewMatrix,
-                                            projection: projectionMatrix,
-                                            viewSize: arView.bounds.size) else {
+        // Pass 1: project all landmarks; separate on-screen from off-screen.
+        // `landmarks` is pre-sorted by significance descending (WikipediaService), so
+        // the first maxVisibleLabels on-screen entries are already highest-priority.
+        var onScreen: [(landmark: Landmark, point: CGPoint)] = []
+        for landmark in landmarks {
+            guard let worldPos = worldPosition(for: landmark, relativeTo: userLocation),
+                  let screenPt = project(worldPos,
+                                         camera: viewMatrix,
+                                         projection: projectionMatrix,
+                                         viewSize: arView.bounds.size),
+                  visibleRect.contains(screenPt) else {
                 labelViews[landmark.id]?.isHidden = true
                 continue
             }
+            onScreen.append((landmark, screenPt))
+        }
 
-            showLabel(for: landmark, at: screenPoint)
+        // LAR-46: Cap visible labels at maxVisibleLabels. Labels beyond the cap are
+        // hidden but not removed, so they reappear instantly when a higher-ranked
+        // label pans out of view.
+        let allowedIDs = Set(onScreen.prefix(ARLandmarkViewController.maxVisibleLabels).map { $0.landmark.id })
 
-            // LAR-40: Sample luma beneath the label and apply a WCAG-compliant color scheme.
-            // Falls back to .dark (the previous default) if the pixel buffer is inaccessible.
-            if let label = labelViews[landmark.id], !label.isHidden {
-                let luma = sampleLuma(at: screenPoint,
-                                      in: arFrame.capturedImage,
-                                      viewSize: arView.bounds.size,
-                                      orientation: orientation)
-                let scheme: LabelColorScheme = (luma ?? 0) > LabelColorScheme.lumaThreshold ? .light : .dark
-                label.applyColorScheme(scheme)
+        for entry in onScreen {
+            if allowedIDs.contains(entry.landmark.id) {
+                showLabel(for: entry.landmark, at: entry.point)
+            } else {
+                labelViews[entry.landmark.id]?.isHidden = true
             }
+        }
+
+        // LAR-40: Sample luma beneath each visible label and apply a WCAG-compliant color scheme.
+        // Falls back to .dark (the previous default) if the pixel buffer is inaccessible.
+        for entry in onScreen where allowedIDs.contains(entry.landmark.id) {
+            guard let label = labelViews[entry.landmark.id], !label.isHidden else { continue }
+            let luma = sampleLuma(at: entry.point,
+                                  in: arFrame.capturedImage,
+                                  viewSize: arView.bounds.size,
+                                  orientation: orientation)
+            let scheme: LabelColorScheme = (luma ?? 0) > LabelColorScheme.lumaThreshold ? .light : .dark
+            label.applyColorScheme(scheme)
         }
 
         // LAR-14: Z-order labels so the closest landmark renders on top when pins overlap.
@@ -242,20 +268,12 @@ class ARLandmarkViewController: UIViewController, ARSessionDelegate {
     // MARK: - Label UI
 
     private func showLabel(for landmark: Landmark, at point: CGPoint) {
-        // LAR-42: Replace edge clamping with a visibility check so labels disappear
-        // when their landmark leaves the field of view, rather than stacking at the edges.
-        let edgeInset: CGFloat = 75
-        let visibleRect = arView.bounds.insetBy(dx: edgeInset, dy: edgeInset)
-        let isOnScreen = visibleRect.contains(point)
-
         if let existingLabel = labelViews[landmark.id] {
-            existingLabel.isHidden = !isOnScreen
-            if isOnScreen {
-                existingLabel.center = point
-                // LAR-8: Update scale whenever position refreshes
-                existingLabel.applyDistanceScale(landmark.distance)
-            }
-        } else if isOnScreen {
+            existingLabel.isHidden = false
+            existingLabel.center = point
+            // LAR-8: Update scale whenever position refreshes
+            existingLabel.applyDistanceScale(landmark.distance)
+        } else {
             let label = LandmarkLabelView(landmark: landmark, displaySize: labelDisplaySize, distanceUnit: distanceUnit)
             label.center = point
             label.onTap = { [weak self] in

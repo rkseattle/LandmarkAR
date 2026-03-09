@@ -41,6 +41,7 @@
 		BB39002100000001 /* LabelColorSchemeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB39002000000001 /* LabelColorSchemeTests.swift */; };
 		BB39003100000001 /* DistanceScalingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB39003000000001 /* DistanceScalingTests.swift */; };
 		BB39003300000001 /* DistanceUnitTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB39003200000001 /* DistanceUnitTests.swift */; };
+		BB39005100000001 /* VisibleLabelCapTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB39005000000001 /* VisibleLabelCapTests.swift */; };
 		BB39004100000001 /* WikidataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB39004000000001 /* WikidataService.swift */; };
 		BB39004300000001 /* WikidataServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB39004200000001 /* WikidataServiceTests.swift */; };
 /* End PBXBuildFile section */
@@ -100,6 +101,7 @@
 		BB39002000000001 /* LabelColorSchemeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LabelColorSchemeTests.swift; sourceTree = "<group>"; };
 		BB39003000000001 /* DistanceScalingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DistanceScalingTests.swift; sourceTree = "<group>"; };
 		BB39003200000001 /* DistanceUnitTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DistanceUnitTests.swift; sourceTree = "<group>"; };
+		BB39005000000001 /* VisibleLabelCapTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisibleLabelCapTests.swift; sourceTree = "<group>"; };
 		BB39004000000001 /* WikidataService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WikidataService.swift; sourceTree = "<group>"; };
 		BB39004200000001 /* WikidataServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WikidataServiceTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -222,6 +224,7 @@
 				BB39002000000001 /* LabelColorSchemeTests.swift */,
 				BB39003000000001 /* DistanceScalingTests.swift */,
 				BB39003200000001 /* DistanceUnitTests.swift */,
+				BB39005000000001 /* VisibleLabelCapTests.swift */,
 				BB39004200000001 /* WikidataServiceTests.swift */,
 			);
 			path = LandmarkARTests;
@@ -378,6 +381,7 @@
 				BB39002100000001 /* LabelColorSchemeTests.swift in Sources */,
 				BB39003100000001 /* DistanceScalingTests.swift in Sources */,
 				BB39003300000001 /* DistanceUnitTests.swift in Sources */,
+				BB39005100000001 /* VisibleLabelCapTests.swift in Sources */,
 				BB39004300000001 /* WikidataServiceTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
