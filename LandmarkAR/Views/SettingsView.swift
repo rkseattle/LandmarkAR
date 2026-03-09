@@ -91,7 +91,11 @@ struct SettingsView: View {
                 // MARK: Significance Filter (LAR-39)
                 Section {
                     Toggle(isOn: $settings.isIconicLandmarksOnly) {
-                        Label("settings.significance.iconicLandmarksOnly", bundle: bundle)
+                        Label {
+                            Text("settings.significance.iconicLandmarksOnly", bundle: bundle)
+                        } icon: {
+                            Image(systemName: "star.fill")
+                        }
                     }
                 } header: {
                     Text("settings.significance.header", bundle: bundle)
