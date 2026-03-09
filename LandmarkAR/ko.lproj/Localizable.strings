@@ -16,6 +16,9 @@
 "settings.displayLimit.header" = "표시 한도";
 "settings.displayLimit.footer" = "한 번에 표시되는 최대 랜드마크 수. 가장 가까운 것과 가장 먼 것은 항상 포함됩니다.";
 "settings.displayLimit.maxLandmarks" = "최대 랜드마크";
+"settings.distanceUnit.header" = "거리 단위";
+"settings.distanceUnit.km" = "킬로미터";
+"settings.distanceUnit.miles" = "마일";
 "settings.labelSize.header" = "레이블 크기";
 "settings.labelSize.footer" = "AR 보기에서 아이콘과 텍스트 크기를 조절합니다.";
 "settings.labelSize.small" = "소";
@@ -48,6 +51,8 @@
 "detail.readOnWikipedia" = "Wikipedia에서 전체 기사 읽기";
 "detail.metersAway" = "%d m 거리";
 "detail.kmAway" = "%.1f km 거리";
+"detail.feetAway" = "%d 피트 거리";
+"detail.milesAway" = "%.1f 마일 거리";
 
 /* Error Log */
 "errorLog.title" = "오류 로그";

@@ -16,6 +16,9 @@
 "settings.displayLimit.header" = "Anzeigelimit";
 "settings.displayLimit.footer" = "Maximale Anzahl gleichzeitig angezeigter Sehenswürdigkeiten. Das nächste und das entfernteste sind immer enthalten.";
 "settings.displayLimit.maxLandmarks" = "Max. Sehenswürdigkeiten";
+"settings.distanceUnit.header" = "Entfernungseinheiten";
+"settings.distanceUnit.km" = "Kilometer";
+"settings.distanceUnit.miles" = "Meilen";
 "settings.labelSize.header" = "Beschriftungsgröße";
 "settings.labelSize.footer" = "Steuert die Größe von Symbolen und Text in der AR-Ansicht.";
 "settings.labelSize.small" = "Klein";
@@ -48,6 +51,8 @@
 "detail.readOnWikipedia" = "Vollständigen Artikel auf Wikipedia lesen";
 "detail.metersAway" = "%d m entfernt";
 "detail.kmAway" = "%.1f km entfernt";
+"detail.feetAway" = "%d Fuß entfernt";
+"detail.milesAway" = "%.1f Meilen entfernt";
 
 /* Error Log */
 "errorLog.title" = "Fehlerprotokoll";

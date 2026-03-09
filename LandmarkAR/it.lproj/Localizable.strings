@@ -16,6 +16,9 @@
 "settings.displayLimit.header" = "Limite di visualizzazione";
 "settings.displayLimit.footer" = "Numero massimo di luoghi mostrati contemporaneamente. Il più vicino e il più lontano sono sempre inclusi.";
 "settings.displayLimit.maxLandmarks" = "Max luoghi";
+"settings.distanceUnit.header" = "Unità di distanza";
+"settings.distanceUnit.km" = "Chilometri";
+"settings.distanceUnit.miles" = "Miglia";
 "settings.labelSize.header" = "Dimensione etichette";
 "settings.labelSize.footer" = "Controlla la dimensione di icone e testo nella visualizzazione AR.";
 "settings.labelSize.small" = "Piccolo";
@@ -48,6 +51,8 @@
 "detail.readOnWikipedia" = "Leggi l'articolo completo su Wikipedia";
 "detail.metersAway" = "A %d metri";
 "detail.kmAway" = "A %.1f km";
+"detail.feetAway" = "A %d piedi";
+"detail.milesAway" = "A %.1f mi";
 
 /* Error Log */
 "errorLog.title" = "Registro errori";

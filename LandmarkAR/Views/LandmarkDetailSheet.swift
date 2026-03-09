@@ -8,6 +8,7 @@ import UIKit
 
 struct LandmarkDetailSheet: View {
     let landmark: Landmark
+    let distanceUnit: DistanceUnit
     @Environment(\.dismiss) private var dismiss
     @Environment(\.localeBundle) private var bundle
 
@@ -137,12 +138,24 @@ struct LandmarkDetailSheet: View {
 
     private var formattedDistance: String {
         let meters = landmark.distance
-        if meters < 1000 {
-            let fmt = bundle.localizedString(forKey: "detail.metersAway", value: "%d meters away", table: nil)
-            return String(format: fmt, Int(meters))
-        } else {
-            let fmt = bundle.localizedString(forKey: "detail.kmAway", value: "%.1f km away", table: nil)
-            return String(format: fmt, meters / 1000)
+        switch distanceUnit {
+        case .kilometers:
+            if meters < 1000 {
+                let fmt = bundle.localizedString(forKey: "detail.metersAway", value: "%d meters away", table: nil)
+                return String(format: fmt, Int(meters))
+            } else {
+                let fmt = bundle.localizedString(forKey: "detail.kmAway", value: "%.1f km away", table: nil)
+                return String(format: fmt, meters / 1000)
+            }
+        case .miles:
+            let feet = meters / 0.3048
+            if feet < 1000 {
+                let fmt = bundle.localizedString(forKey: "detail.feetAway", value: "%d ft away", table: nil)
+                return String(format: fmt, Int((feet / 50).rounded() * 50))
+            } else {
+                let fmt = bundle.localizedString(forKey: "detail.milesAway", value: "%.1f mi away", table: nil)
+                return String(format: fmt, meters / 1609.344)
+            }
         }
     }
 }

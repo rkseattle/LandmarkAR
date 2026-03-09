@@ -16,6 +16,9 @@
 "settings.displayLimit.header" = "表示制限";
 "settings.displayLimit.footer" = "一度に表示されるランドマークの最大数。最も近いものと最も遠いものは常に含まれます。";
 "settings.displayLimit.maxLandmarks" = "最大ランドマーク数";
+"settings.distanceUnit.header" = "距離単位";
+"settings.distanceUnit.km" = "キロメートル";
+"settings.distanceUnit.miles" = "マイル";
 "settings.labelSize.header" = "ラベルサイズ";
 "settings.labelSize.footer" = "ARビューのアイコンとテキストのサイズを制御します。";
 "settings.labelSize.small" = "小";
@@ -48,6 +51,8 @@
 "detail.readOnWikipedia" = "Wikipediaで全文を読む";
 "detail.metersAway" = "%d m";
 "detail.kmAway" = "%.1f km";
+"detail.feetAway" = "%d フィート";
+"detail.milesAway" = "%.1f マイル";
 
 /* Error Log */
 "errorLog.title" = "エラーログ";
