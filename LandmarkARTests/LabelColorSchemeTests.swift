@@ -47,31 +47,11 @@ final class LabelColorSchemeTests: XCTestCase {
 
     // MARK: - Light scheme colors
 
-    func test_lightScheme_backgroundColor() {
-        let color = LabelColorScheme.light.backgroundColor
-        var alpha: CGFloat = 0
-        color.getWhite(nil, alpha: &alpha)
-        XCTAssertEqual(alpha, 0.75, accuracy: 0.001)
-        // Should be a white-based color
-        var white: CGFloat = 0
-        color.getWhite(&white, alpha: nil)
-        XCTAssertGreaterThan(white, 0.9)
-    }
-
     func test_lightScheme_textColorIsDark() {
         let color = LabelColorScheme.light.textColor
         var white: CGFloat = 0
         color.getWhite(&white, alpha: nil)
         XCTAssertLessThan(white, 0.2, "Light scheme text should be dark")
-    }
-
-    func test_lightScheme_borderColorIsDark() {
-        let color = LabelColorScheme.light.borderColor
-        var white: CGFloat = 0
-        var alpha: CGFloat = 0
-        color.getWhite(&white, alpha: &alpha)
-        XCTAssertLessThan(white, 0.2, "Light scheme border should be dark")
-        XCTAssertEqual(alpha, 0.2, accuracy: 0.001)
     }
 
     func test_lightScheme_iconTintIsDark() {
@@ -83,29 +63,11 @@ final class LabelColorSchemeTests: XCTestCase {
 
     // MARK: - Dark scheme colors
 
-    func test_darkScheme_backgroundColor() {
-        let color = LabelColorScheme.dark.backgroundColor
-        var white: CGFloat = 0
-        var alpha: CGFloat = 0
-        color.getWhite(&white, alpha: &alpha)
-        XCTAssertLessThan(white, 0.1, "Dark scheme background should be near-black")
-        XCTAssertEqual(alpha, 0.65, accuracy: 0.001)
-    }
-
     func test_darkScheme_textColorIsWhite() {
         let color = LabelColorScheme.dark.textColor
         var white: CGFloat = 0
         color.getWhite(&white, alpha: nil)
         XCTAssertEqual(white, 1.0, accuracy: 0.001, "Dark scheme text should be white")
-    }
-
-    func test_darkScheme_borderColorIsLight() {
-        let color = LabelColorScheme.dark.borderColor
-        var white: CGFloat = 0
-        var alpha: CGFloat = 0
-        color.getWhite(&white, alpha: &alpha)
-        XCTAssertEqual(white, 1.0, accuracy: 0.001, "Dark scheme border should be white")
-        XCTAssertEqual(alpha, 0.3, accuracy: 0.001)
     }
 
     func test_darkScheme_iconTintIsWhite() {

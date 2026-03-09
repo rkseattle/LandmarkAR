@@ -333,13 +333,6 @@ enum LabelColorScheme {
     // Side length (in pixel-buffer pixels) of the region sampled beneath each label.
     static let sampleSize = 20
 
-    var backgroundColor: UIColor {
-        switch self {
-        case .light: return UIColor.white.withAlphaComponent(0.75)
-        case .dark:  return UIColor.black.withAlphaComponent(0.65)
-        }
-    }
-
     var textColor: UIColor {
         switch self {
         case .light: return UIColor(white: 0.1, alpha: 1.0)
@@ -351,13 +344,6 @@ enum LabelColorScheme {
         switch self {
         case .light: return UIColor(white: 0.1, alpha: 0.9)
         case .dark:  return UIColor.white.withAlphaComponent(0.9)
-        }
-    }
-
-    var borderColor: UIColor {
-        switch self {
-        case .light: return UIColor.black.withAlphaComponent(0.2)
-        case .dark:  return UIColor.white.withAlphaComponent(0.3)
         }
     }
 
@@ -405,10 +391,8 @@ class LandmarkLabelView: UIView {
     }
 
     private func setup(displaySize: LabelDisplaySize) {
-        // LAR-40: Background pill with border; colors are set dynamically via applyColorScheme().
-        // Defaults to dark scheme so labels are immediately readable before the first luma sample.
-        layer.cornerRadius = 8
-        layer.borderWidth = 1
+        // LAR-7: No background — text-only with shadow for legibility.
+        backgroundColor = .clear
 
         let sz = Self.sizes(for: displaySize)
 
@@ -449,7 +433,7 @@ class LandmarkLabelView: UIView {
         let size = stack.systemLayoutSizeFitting(
             CGSize(width: targetWidth, height: UIView.layoutFittingCompressedSize.height)
         )
-        frame = CGRect(origin: .zero, size: CGSize(width: targetWidth, height: size.height + 16))
+        frame = CGRect(origin: .zero, size: CGSize(width: targetWidth, height: size.height + 8))
 
         // Apply default dark scheme before the first luma sample arrives.
         applyColorScheme(.dark)
@@ -462,10 +446,8 @@ class LandmarkLabelView: UIView {
         isUserInteractionEnabled = true
     }
 
-    // LAR-40: Update all color elements to match the sampled background luminance.
+    // LAR-40: Update text and icon colors to match the sampled background luminance.
     func applyColorScheme(_ scheme: LabelColorScheme) {
-        backgroundColor = scheme.backgroundColor
-        layer.borderColor = scheme.borderColor.cgColor
         nameLabel.textColor = scheme.textColor
         distanceLabel.textColor = scheme.distanceTextColor
         pinImageView.tintColor = scheme.iconTintColor
