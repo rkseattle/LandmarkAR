@@ -51,15 +51,25 @@ class OpenStreetMapService {
         out body;
         """
 
-        var request = URLRequest(url: overpassURL, timeoutInterval: 15)
+        // LAR-44: Request timeout must exceed the Overpass query timeout (25 s) so the
+        // server can finish and return a well-formed response rather than timing out first.
+        var request = URLRequest(url: overpassURL, timeoutInterval: 30)
         request.httpMethod = "POST"
         request.httpBody = "data=\(query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "")".data(using: .utf8)
         request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
 
-        let (data, _) = try await URLSession.shared.data(for: request)
+        let (data, urlResponse) = try await URLSession.shared.data(for: request)
+
+        // LAR-44: Reject non-200 responses before attempting JSON decoding.
+        // Overpass returns 400 for malformed queries and 429 for rate limiting,
+        // both with non-JSON bodies that would cause a misleading format error.
+        if let http = urlResponse as? HTTPURLResponse, http.statusCode != 200 {
+            throw URLError(.badServerResponse)
+        }
+
         let response = try JSONDecoder().decode(OverpassResponse.self, from: data)
 
-        let landmarks: [Landmark] = response.elements.compactMap { element in
+        let landmarks: [Landmark] = (response.elements ?? []).compactMap { element in
             guard let name = element.tags["name"],
                   let lat = element.lat,
                   let lon = element.lon else { return nil }
@@ -94,7 +104,9 @@ class OpenStreetMapService {
 // MARK: - Overpass API Response Models
 
 private struct OverpassResponse: Codable {
-    let elements: [OverpassElement]
+    // LAR-44: elements is optional — Overpass error envelopes may omit it entirely,
+    // containing only a "remark" field. Treat a missing/empty elements list as zero results.
+    let elements: [OverpassElement]?
 }
 
 private struct OverpassElement: Codable {
