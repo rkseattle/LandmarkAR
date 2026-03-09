@@ -16,6 +16,9 @@
 "settings.displayLimit.header" = "Display Limit";
 "settings.displayLimit.footer" = "Maximum landmarks shown at once. The closest and farthest are always included.";
 "settings.displayLimit.maxLandmarks" = "Max Landmarks";
+"settings.distanceUnit.header" = "Distance Units";
+"settings.distanceUnit.km" = "Kilometers";
+"settings.distanceUnit.miles" = "Miles";
 "settings.labelSize.header" = "Label Size";
 "settings.labelSize.footer" = "Controls the size of icons and text on the AR view.";
 "settings.labelSize.small" = "Small";
@@ -48,6 +51,8 @@
 "detail.readOnWikipedia" = "Read full article on Wikipedia";
 "detail.metersAway" = "%d meters away";
 "detail.kmAway" = "%.1f km away";
+"detail.feetAway" = "%d ft away";
+"detail.milesAway" = "%.1f mi away";
 
 /* Error Log */
 "errorLog.title" = "Error Log";

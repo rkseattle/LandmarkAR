@@ -114,6 +114,7 @@ struct ContentView: View {
                     userLocation: locationManager.userLocation,
                     heading: locationManager.heading,
                     labelDisplaySize: settings.labelDisplaySize,
+                    distanceUnit: settings.distanceUnit,
                     selectedLandmark: $selectedLandmark
                 )
                 .ignoresSafeArea()
@@ -133,7 +134,7 @@ struct ContentView: View {
             setLastFetchLocation: { lastFetchLocation = $0 }
         ))
         .sheet(item: $selectedLandmark) { landmark in
-            LandmarkDetailSheet(landmark: landmark)
+            LandmarkDetailSheet(landmark: landmark, distanceUnit: settings.distanceUnit)
         }
         .sheet(isPresented: $showSettings) {
             SettingsView(settings: settings, errorLogger: errorLogger)

@@ -46,6 +46,19 @@ struct SettingsView: View {
                     Text("settings.displayLimit.footer", bundle: bundle)
                 }
 
+                // MARK: Distance Units
+                Section {
+                    Picker(selection: $settings.distanceUnit) {
+                        Text("settings.distanceUnit.km",    bundle: bundle).tag(DistanceUnit.kilometers)
+                        Text("settings.distanceUnit.miles", bundle: bundle).tag(DistanceUnit.miles)
+                    } label: {
+                        Text("settings.distanceUnit.header", bundle: bundle)
+                    }
+                    .pickerStyle(.segmented)
+                } header: {
+                    Text("settings.distanceUnit.header", bundle: bundle)
+                }
+
                 // MARK: Label Size (LAR-29)
                 Section {
                     Picker(selection: $settings.labelDisplaySize) {
@@ -69,19 +82,23 @@ struct SettingsView: View {
                     CategoryRow(label: Text("settings.categories.historical", bundle: bundle),
                                 systemImage: "building.columns.fill",
                                 isEnabled: $settings.showHistorical,
-                                distanceIndex: $settings.maxDistanceIndexHistorical)
+                                distanceIndex: $settings.maxDistanceIndexHistorical,
+                                distanceUnit: settings.distanceUnit)
                     CategoryRow(label: Text("settings.categories.natural", bundle: bundle),
                                 systemImage: "mountain.2.fill",
                                 isEnabled: $settings.showNatural,
-                                distanceIndex: $settings.maxDistanceIndexNatural)
+                                distanceIndex: $settings.maxDistanceIndexNatural,
+                                distanceUnit: settings.distanceUnit)
                     CategoryRow(label: Text("settings.categories.cultural", bundle: bundle),
                                 systemImage: "theatermasks.fill",
                                 isEnabled: $settings.showCultural,
-                                distanceIndex: $settings.maxDistanceIndexCultural)
+                                distanceIndex: $settings.maxDistanceIndexCultural,
+                                distanceUnit: settings.distanceUnit)
                     CategoryRow(label: Text("settings.categories.other", bundle: bundle),
                                 systemImage: "mappin.circle.fill",
                                 isEnabled: $settings.showOther,
-                                distanceIndex: $settings.maxDistanceIndexOther)
+                                distanceIndex: $settings.maxDistanceIndexOther,
+                                distanceUnit: settings.distanceUnit)
                 } header: {
                     Text("settings.categories.header", bundle: bundle)
                 } footer: {
@@ -178,6 +195,7 @@ private struct CategoryRow: View {
     let systemImage: String
     @Binding var isEnabled: Bool
     @Binding var distanceIndex: Double
+    let distanceUnit: DistanceUnit
 
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
@@ -187,7 +205,7 @@ private struct CategoryRow: View {
             if isEnabled {
                 HStack {
                     Spacer()
-                    Text(AppSettings.distanceLabel(forIndex: distanceIndex))
+                    Text(distanceUnit.sliderLabel(km: AppSettings.km(forIndex: distanceIndex)))
                         .font(.caption)
                         .foregroundStyle(.secondary)
                         .monospacedDigit()

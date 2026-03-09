@@ -13,6 +13,7 @@ struct ARLandmarkView: UIViewControllerRepresentable {
     let userLocation: CLLocation?
     let heading: CLHeading?
     let labelDisplaySize: LabelDisplaySize
+    let distanceUnit: DistanceUnit
     @Binding var selectedLandmark: Landmark?
 
     func makeUIViewController(context: Context) -> ARLandmarkViewController {
@@ -21,7 +22,7 @@ struct ARLandmarkView: UIViewControllerRepresentable {
 
     func updateUIViewController(_ vc: ARLandmarkViewController, context: Context) {
         vc.update(landmarks: landmarks, userLocation: userLocation, heading: heading,
-                  labelDisplaySize: labelDisplaySize) { landmark in
+                  labelDisplaySize: labelDisplaySize, distanceUnit: distanceUnit) { landmark in
             selectedLandmark = landmark
         }
     }
@@ -40,6 +41,7 @@ class ARLandmarkViewController: UIViewController, ARSessionDelegate {
     private var heading: CLHeading?
     private var onSelect: ((Landmark) -> Void)?
     private var labelDisplaySize: LabelDisplaySize = .medium
+    private var distanceUnit: DistanceUnit = .kilometers
 
     // Cached farthest-first ordering for z-sort. Recomputed only when `landmarks` changes.
     private var sortedFarthestFirst: [Landmark] = []
@@ -94,6 +96,7 @@ class ARLandmarkViewController: UIViewController, ARSessionDelegate {
                 userLocation: CLLocation?,
                 heading: CLHeading?,
                 labelDisplaySize: LabelDisplaySize,
+                distanceUnit: DistanceUnit,
                 onSelect: @escaping (Landmark) -> Void) {
         let landmarksChanged = landmarks.map(\.id) != self.landmarks.map(\.id)
         self.landmarks = landmarks
@@ -110,6 +113,13 @@ class ARLandmarkViewController: UIViewController, ARSessionDelegate {
         // LAR-29: If size changed, remove all labels so they rebuild with the new size
         if labelDisplaySize != self.labelDisplaySize {
             self.labelDisplaySize = labelDisplaySize
+            labelViews.values.forEach { $0.removeFromSuperview() }
+            labelViews.removeAll()
+        }
+
+        // Rebuild labels when the distance unit changes so the distance text is reformatted.
+        if distanceUnit != self.distanceUnit {
+            self.distanceUnit = distanceUnit
             labelViews.values.forEach { $0.removeFromSuperview() }
             labelViews.removeAll()
         }
@@ -246,7 +256,7 @@ class ARLandmarkViewController: UIViewController, ARSessionDelegate {
                 existingLabel.applyDistanceScale(landmark.distance)
             }
         } else if isOnScreen {
-            let label = LandmarkLabelView(landmark: landmark, displaySize: labelDisplaySize)
+            let label = LandmarkLabelView(landmark: landmark, displaySize: labelDisplaySize, distanceUnit: distanceUnit)
             label.center = point
             label.onTap = { [weak self] in
                 self?.onSelect?(landmark)
@@ -372,14 +382,16 @@ class LandmarkLabelView: UIView {
     var onTap: (() -> Void)?
     private let landmark: Landmark
     private let displaySize: LabelDisplaySize
+    private let distanceUnit: DistanceUnit
     private let nameLabel = UILabel()
     private let distanceLabel = UILabel()
     private let pinImageView = UIImageView()
     private var lastAppliedDistance: CLLocationDistance = -1
 
-    init(landmark: Landmark, displaySize: LabelDisplaySize) {
+    init(landmark: Landmark, displaySize: LabelDisplaySize, distanceUnit: DistanceUnit) {
         self.landmark = landmark
         self.displaySize = displaySize
+        self.distanceUnit = distanceUnit
         super.init(frame: .zero)
         setup()
     }
@@ -477,15 +489,9 @@ class LandmarkLabelView: UIView {
         onTap?()
     }
 
-    // LAR-9: Human-readable distance string
+    // LAR-9: Human-readable distance string — delegates to DistanceUnit for unit-aware formatting.
     private func formattedDistance(_ meters: CLLocationDistance) -> String {
-        if meters < 100 {
-            return "< 100 m away"
-        } else if meters < 1000 {
-            return "\(Int((meters / 100).rounded() * 100)) m away"
-        } else {
-            return String(format: "%.1f km away", meters / 1000)
-        }
+        distanceUnit.formatted(meters)
     }
 }
 

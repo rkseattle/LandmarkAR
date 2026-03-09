@@ -1,6 +1,51 @@
 import CoreLocation
 import Foundation
 
+// MARK: - DistanceUnit
+
+enum DistanceUnit: String, CaseIterable {
+    case kilometers = "kilometers"
+    case miles      = "miles"
+
+    /// Formats a raw meter value as a human-readable distance string for display in the AR
+    /// overlay and detail sheet (e.g. "320 m away", "1.4 km away", "800 ft away", "0.9 mi away").
+    func formatted(_ meters: CLLocationDistance) -> String {
+        switch self {
+        case .kilometers:
+            if meters < 100 {
+                return "< 100 m away"
+            } else if meters < 1000 {
+                return "\(Int((meters / 100).rounded() * 100)) m away"
+            } else {
+                return String(format: "%.1f km away", meters / 1000)
+            }
+        case .miles:
+            let feet = meters / 0.3048
+            if feet < 1000 {
+                return String(format: "%d ft away", Int((feet / 50).rounded() * 50))
+            } else {
+                return String(format: "%.1f mi away", meters / 1609.344)
+            }
+        }
+    }
+
+    /// Formats a kilometer value as a compact label for Settings distance sliders.
+    func sliderLabel(km: Double) -> String {
+        switch self {
+        case .kilometers:
+            return km < 1 ? "\(km) km" : "\(Int(km)) km"
+        case .miles:
+            let mi = km * 0.621371
+            return mi < 1 ? String(format: "%.1f mi", mi) : "\(Int(mi.rounded())) mi"
+        }
+    }
+
+    /// Returns `.miles` for US/UK locales, `.kilometers` everywhere else.
+    static func systemDefault() -> DistanceUnit {
+        Locale.current.usesMetricSystem ? .kilometers : .miles
+    }
+}
+
 // MARK: - LabelDisplaySize (LAR-29)
 
 enum LabelDisplaySize: String, CaseIterable {
@@ -159,6 +204,11 @@ class AppSettings: ObservableObject {
         didSet { UserDefaults.standard.set(labelDisplaySize.rawValue, forKey: Keys.labelDisplaySize) }
     }
 
+    // MARK: - Distance Unit
+    @Published var distanceUnit: DistanceUnit {
+        didSet { UserDefaults.standard.set(distanceUnit.rawValue, forKey: Keys.distanceUnit) }
+    }
+
     // MARK: - Language (LAR-35)
     // Stored as the BCP 47 locale code. Defaults to the device system language if supported,
     // otherwise falls back to English.
@@ -206,6 +256,8 @@ class AppSettings: ObservableObject {
         realtimeUpdateMode = savedMode ?? .off
         let savedSize = ud.string(forKey: Keys.labelDisplaySize).flatMap(LabelDisplaySize.init(rawValue:))
         labelDisplaySize = savedSize ?? .medium
+        let savedUnit = ud.string(forKey: Keys.distanceUnit).flatMap(DistanceUnit.init(rawValue:))
+        distanceUnit = savedUnit ?? DistanceUnit.systemDefault()
         let savedLang = ud.string(forKey: Keys.appLanguage).flatMap(AppLanguage.init(rawValue:))
         appLanguage = savedLang ?? AppLanguage.systemDefault()
         // Default index 4 = 10 km (matches old default)
@@ -227,6 +279,7 @@ class AppSettings: ObservableObject {
         static let isOpenStreetMapEnabled      = "isOpenStreetMapEnabled"
         static let realtimeUpdateMode          = "realtimeUpdateMode"
         static let labelDisplaySize            = "labelDisplaySize"
+        static let distanceUnit                = "distanceUnit"
         static let maxDistanceIndexHistorical  = "maxDistanceIndexHistorical"
         static let maxDistanceIndexNatural     = "maxDistanceIndexNatural"
         static let maxDistanceIndexCultural    = "maxDistanceIndexCultural"
