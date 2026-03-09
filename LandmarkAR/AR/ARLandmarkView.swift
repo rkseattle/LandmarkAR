@@ -167,7 +167,7 @@ class ARLandmarkViewController: UIViewController, ARSessionDelegate {
 
             // LAR-40: Sample luma beneath the label and apply a WCAG-compliant color scheme.
             // Falls back to .dark (the previous default) if the pixel buffer is inaccessible.
-            if let label = labelViews[landmark.id] {
+            if let label = labelViews[landmark.id], !label.isHidden {
                 let luma = sampleLuma(at: screenPoint,
                                       in: arFrame.capturedImage,
                                       viewSize: arView.bounds.size,
@@ -232,19 +232,22 @@ class ARLandmarkViewController: UIViewController, ARSessionDelegate {
     // MARK: - Label UI
 
     private func showLabel(for landmark: Landmark, at point: CGPoint) {
-        let padding: CGFloat = 80
-        let clampedX = max(padding, min(arView.bounds.width - padding, point.x))
-        let clampedY = max(padding, min(arView.bounds.height - padding, point.y))
-        let clampedPoint = CGPoint(x: clampedX, y: clampedY)
+        // LAR-42: Replace edge clamping with a visibility check so labels disappear
+        // when their landmark leaves the field of view, rather than stacking at the edges.
+        let edgeInset: CGFloat = 75
+        let visibleRect = arView.bounds.insetBy(dx: edgeInset, dy: edgeInset)
+        let isOnScreen = visibleRect.contains(point)
 
         if let existingLabel = labelViews[landmark.id] {
-            existingLabel.isHidden = false
-            existingLabel.center = clampedPoint
-            // LAR-8: Update scale whenever position refreshes
-            existingLabel.applyDistanceScale(landmark.distance)
-        } else {
+            existingLabel.isHidden = !isOnScreen
+            if isOnScreen {
+                existingLabel.center = point
+                // LAR-8: Update scale whenever position refreshes
+                existingLabel.applyDistanceScale(landmark.distance)
+            }
+        } else if isOnScreen {
             let label = LandmarkLabelView(landmark: landmark, displaySize: labelDisplaySize)
-            label.center = clampedPoint
+            label.center = point
             label.onTap = { [weak self] in
                 self?.onSelect?(landmark)
             }
