@@ -39,6 +39,13 @@ class WikipediaService {
         init(_ views: Int) { self.views = views }
     }
 
+    // MARK: - LAR-46: Fetch Pool Size
+
+    /// Number of candidates fetched from the Wikipedia GeoSearch API.
+    /// Larger than `ARLandmarkViewController.maxVisibleLabels` so off-screen landmarks
+    /// don't starve the visible arc of results.
+    static let geoSearchLimit = 50
+
     // MARK: - LAR-39: Significance Scoring Constants
 
     /// Minimum monthly pageview count to pass the default significance filter.
@@ -70,7 +77,6 @@ class WikipediaService {
         // LAR-4: Use the user's chosen distance as the search radius (convert km → meters).
         // Wikipedia GeoSearch caps gsradius at 10,000 m; clamp to avoid API errors.
         let radiusMeters = min(Int(settings.maxDistanceKm * 1000), 10_000)
-        let maxResults = 20
 
         // LAR-35: Capture the language code once so both steps use the same value.
         let languageCode = settings.appLanguage.rawValue
@@ -87,7 +93,7 @@ class WikipediaService {
         // Step 1: Search for Wikipedia articles near this GPS coordinate
         let geoResults = try await geoSearch(near: location,
                                              radiusMeters: radiusMeters,
-                                             maxResults: maxResults,
+                                             maxResults: WikipediaService.geoSearchLimit,
                                              languageCode: languageCode)
 
         // Step 2: For each result, fetch a short summary (run all fetches in parallel).
