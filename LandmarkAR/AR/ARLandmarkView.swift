@@ -164,6 +164,17 @@ class ARLandmarkViewController: UIViewController, ARSessionDelegate {
             }
 
             showLabel(for: landmark, at: screenPoint)
+
+            // LAR-40: Sample luma beneath the label and apply a WCAG-compliant color scheme.
+            // Falls back to .dark (the previous default) if the pixel buffer is inaccessible.
+            if let label = labelViews[landmark.id] {
+                let luma = sampleLuma(at: screenPoint,
+                                      in: arFrame.capturedImage,
+                                      viewSize: arView.bounds.size,
+                                      orientation: orientation)
+                let scheme: LabelColorScheme = (luma ?? 0) > LabelColorScheme.lumaThreshold ? .light : .dark
+                label.applyColorScheme(scheme)
+            }
         }
 
         // LAR-14: Z-order labels so the closest landmark renders on top when pins overlap.
@@ -241,6 +252,121 @@ class ARLandmarkViewController: UIViewController, ARSessionDelegate {
             labelViews[landmark.id] = label
         }
     }
+
+    // MARK: - LAR-40: Luma Sampling
+
+    // Samples the average Y (luma) value of a LabelColorScheme.sampleSize × sampleSize region
+    // of the captured camera frame centered on the given screen point.
+    // The capturedImage is always in sensor (landscape) orientation; screen coordinates are
+    // remapped to buffer coordinates based on the current interface orientation.
+    // Returns nil if the pixel buffer cannot be accessed, which the caller treats as dark.
+    private func sampleLuma(at screenPoint: CGPoint,
+                            in pixelBuffer: CVPixelBuffer,
+                            viewSize: CGSize,
+                            orientation: UIInterfaceOrientation) -> UInt8? {
+        guard CVPixelBufferLockBaseAddress(pixelBuffer, .readOnly) == kCVReturnSuccess else { return nil }
+        defer { CVPixelBufferUnlockBaseAddress(pixelBuffer, .readOnly) }
+
+        // Plane 0 is the Y (luma) channel in YCbCr format.
+        guard let baseAddress = CVPixelBufferGetBaseAddressOfPlane(pixelBuffer, 0) else { return nil }
+        let bufferWidth  = CVPixelBufferGetWidthOfPlane(pixelBuffer, 0)
+        let bufferHeight = CVPixelBufferGetHeightOfPlane(pixelBuffer, 0)
+        let bytesPerRow  = CVPixelBufferGetBytesPerRowOfPlane(pixelBuffer, 0)
+        guard bufferWidth > 0, bufferHeight > 0 else { return nil }
+
+        // Normalised screen fractions in [0, 1]
+        let nx = screenPoint.x / viewSize.width
+        let ny = screenPoint.y / viewSize.height
+
+        // The captured image sensor is always landscape. Map the screen-space fraction
+        // to the corresponding buffer coordinate for each device orientation.
+        let bufferX: Int
+        let bufferY: Int
+        switch orientation {
+        case .portrait:
+            bufferX = Int(ny * CGFloat(bufferWidth))
+            bufferY = Int((1 - nx) * CGFloat(bufferHeight))
+        case .portraitUpsideDown:
+            bufferX = Int((1 - ny) * CGFloat(bufferWidth))
+            bufferY = Int(nx * CGFloat(bufferHeight))
+        case .landscapeLeft:
+            bufferX = Int((1 - nx) * CGFloat(bufferWidth))
+            bufferY = Int((1 - ny) * CGFloat(bufferHeight))
+        default: // landscapeRight or unknown
+            bufferX = Int(nx * CGFloat(bufferWidth))
+            bufferY = Int(ny * CGFloat(bufferHeight))
+        }
+
+        let half   = LabelColorScheme.sampleSize / 2
+        let startX = max(0, bufferX - half)
+        let endX   = min(bufferWidth  - 1, bufferX + half)
+        let startY = max(0, bufferY - half)
+        let endY   = min(bufferHeight - 1, bufferY + half)
+        guard endX > startX, endY > startY else { return nil }
+
+        let yPlane = baseAddress.assumingMemoryBound(to: UInt8.self)
+        var sum = 0
+        var count = 0
+        for row in startY...endY {
+            for col in startX...endX {
+                sum += Int(yPlane[row * bytesPerRow + col])
+                count += 1
+            }
+        }
+        guard count > 0 else { return nil }
+        return UInt8(sum / count)
+    }
+}
+
+// MARK: - LabelColorScheme
+// LAR-40: Defines the two color states for AR labels based on background luminance.
+// light — for bright backgrounds (sky, snow): dark text on a white pill
+// dark  — for dark backgrounds (buildings, foliage): white text on a black pill (previous default)
+
+enum LabelColorScheme {
+    case light
+    case dark
+
+    // Y-channel threshold (0–255). Values above this indicate a bright background.
+    static let lumaThreshold: UInt8 = 128
+
+    // Side length (in pixel-buffer pixels) of the region sampled beneath each label.
+    static let sampleSize = 20
+
+    var backgroundColor: UIColor {
+        switch self {
+        case .light: return UIColor.white.withAlphaComponent(0.75)
+        case .dark:  return UIColor.black.withAlphaComponent(0.65)
+        }
+    }
+
+    var textColor: UIColor {
+        switch self {
+        case .light: return UIColor(white: 0.1, alpha: 1.0)
+        case .dark:  return .white
+        }
+    }
+
+    var distanceTextColor: UIColor {
+        switch self {
+        case .light: return UIColor(white: 0.1, alpha: 0.9)
+        case .dark:  return UIColor.white.withAlphaComponent(0.9)
+        }
+    }
+
+    var borderColor: UIColor {
+        switch self {
+        case .light: return UIColor.black.withAlphaComponent(0.2)
+        case .dark:  return UIColor.white.withAlphaComponent(0.3)
+        }
+    }
+
+    var iconTintColor: UIColor {
+        switch self {
+        case .light: return UIColor(white: 0.1, alpha: 1.0)
+        case .dark:  return .white
+        }
+    }
 }
 
 // MARK: - LandmarkLabelView
@@ -250,6 +376,7 @@ class ARLandmarkViewController: UIViewController, ARSessionDelegate {
 // LAR-9: Distance displayed prominently below landmark name.
 // LAR-14: Red pin indicator shown above the label text.
 // LAR-27: Opacity decreases with distance so the closest label reads clearly when labels overlap.
+// LAR-40: Background pill and text color adapt to background luminance for WCAG 2.1 contrast.
 
 class LandmarkLabelView: UIView {
 
@@ -257,6 +384,7 @@ class LandmarkLabelView: UIView {
     private let landmark: Landmark
     private let nameLabel = UILabel()
     private let distanceLabel = UILabel()
+    private let pinImageView = UIImageView()
     private var lastAppliedDistance: CLLocationDistance = -1
 
     init(landmark: Landmark, displaySize: LabelDisplaySize) {
@@ -277,21 +405,20 @@ class LandmarkLabelView: UIView {
     }
 
     private func setup(displaySize: LabelDisplaySize) {
-        // LAR-7: No background or border — transparent view, text only
-        backgroundColor = .clear
+        // LAR-40: Background pill with border; colors are set dynamically via applyColorScheme().
+        // Defaults to dark scheme so labels are immediately readable before the first luma sample.
+        layer.cornerRadius = 8
+        layer.borderWidth = 1
 
         let sz = Self.sizes(for: displaySize)
 
         // LAR-14: Category icon above the landmark name, matching the icons in Settings
-        let pinImageView = UIImageView()
         let pinConfig = UIImage.SymbolConfiguration(pointSize: sz.icon, weight: .bold)
         pinImageView.image = UIImage(systemName: landmark.category.systemImageName, withConfiguration: pinConfig)
-        pinImageView.tintColor = .white
         pinImageView.contentMode = .scaleAspectFit
 
         // Name label
         nameLabel.text = landmark.title
-        nameLabel.textColor = .white
         nameLabel.font = UIFont.boldSystemFont(ofSize: sz.name)
         nameLabel.numberOfLines = 2
         nameLabel.textAlignment = .center
@@ -299,7 +426,6 @@ class LandmarkLabelView: UIView {
 
         // LAR-9: Distance label — formatted and shown below name
         distanceLabel.text = formattedDistance(landmark.distance)
-        distanceLabel.textColor = UIColor.white.withAlphaComponent(0.9)
         distanceLabel.font = UIFont.systemFont(ofSize: sz.distance, weight: .medium)
         distanceLabel.textAlignment = .center
         distanceLabel.applyShadow()
@@ -323,7 +449,10 @@ class LandmarkLabelView: UIView {
         let size = stack.systemLayoutSizeFitting(
             CGSize(width: targetWidth, height: UIView.layoutFittingCompressedSize.height)
         )
-        frame = CGRect(origin: .zero, size: CGSize(width: targetWidth, height: size.height + 8))
+        frame = CGRect(origin: .zero, size: CGSize(width: targetWidth, height: size.height + 16))
+
+        // Apply default dark scheme before the first luma sample arrives.
+        applyColorScheme(.dark)
 
         // LAR-8: Apply initial distance-based scale
         applyDistanceScale(landmark.distance)
@@ -331,6 +460,15 @@ class LandmarkLabelView: UIView {
         let tap = UITapGestureRecognizer(target: self, action: #selector(tapped))
         addGestureRecognizer(tap)
         isUserInteractionEnabled = true
+    }
+
+    // LAR-40: Update all color elements to match the sampled background luminance.
+    func applyColorScheme(_ scheme: LabelColorScheme) {
+        backgroundColor = scheme.backgroundColor
+        layer.borderColor = scheme.borderColor.cgColor
+        nameLabel.textColor = scheme.textColor
+        distanceLabel.textColor = scheme.distanceTextColor
+        pinImageView.tintColor = scheme.iconTintColor
     }
 
     // LAR-8: Scale the label so closer landmarks appear larger.
