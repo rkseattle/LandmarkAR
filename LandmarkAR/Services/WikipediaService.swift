@@ -132,6 +132,22 @@ class WikipediaService {
         return sorted
     }
 
+    // MARK: - Stage 3 Cross-Reference (LAR-45)
+
+    /// Returns the Wikipedia URL of the closest article within 50 m of the given
+    /// coordinate, or nil if none is found. Used as the last-resort stage in the
+    /// OSM Wikipedia link resolution pipeline.
+    func closestWikipediaURL(near location: CLLocation, languageCode: String) async -> URL? {
+        guard let results = try? await geoSearch(near: location,
+                                                 radiusMeters: 50,
+                                                 maxResults: 1,
+                                                 languageCode: languageCode),
+              let first = results.first,
+              first.dist <= 50 else { return nil }
+        let encoded = first.title.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? first.title
+        return URL(string: "https://\(languageCode).wikipedia.org/wiki/\(encoded)")
+    }
+
     // MARK: - Private Helpers
 
     /// Wikipedia GeoSearch: returns articles near a lat/lon

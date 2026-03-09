@@ -41,6 +41,8 @@
 		BB39002100000001 /* LabelColorSchemeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB39002000000001 /* LabelColorSchemeTests.swift */; };
 		BB39003100000001 /* DistanceScalingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB39003000000001 /* DistanceScalingTests.swift */; };
 		BB39003300000001 /* DistanceUnitTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB39003200000001 /* DistanceUnitTests.swift */; };
+		BB39004100000001 /* WikidataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB39004000000001 /* WikidataService.swift */; };
+		BB39004300000001 /* WikidataServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB39004200000001 /* WikidataServiceTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -98,6 +100,8 @@
 		BB39002000000001 /* LabelColorSchemeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LabelColorSchemeTests.swift; sourceTree = "<group>"; };
 		BB39003000000001 /* DistanceScalingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DistanceScalingTests.swift; sourceTree = "<group>"; };
 		BB39003200000001 /* DistanceUnitTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DistanceUnitTests.swift; sourceTree = "<group>"; };
+		BB39004000000001 /* WikidataService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WikidataService.swift; sourceTree = "<group>"; };
+		BB39004200000001 /* WikidataServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WikidataServiceTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -193,6 +197,7 @@
 			isa = PBXGroup;
 			children = (
 				D40573512F58FCEB00859722 /* OpenStreetMapService.swift */,
+				BB39004000000001 /* WikidataService.swift */,
 				A004 /* LocationManager.swift */,
 				A005 /* WikipediaService.swift */,
 				A018 /* ElevationService.swift */,
@@ -217,6 +222,7 @@
 				BB39002000000001 /* LabelColorSchemeTests.swift */,
 				BB39003000000001 /* DistanceScalingTests.swift */,
 				BB39003200000001 /* DistanceUnitTests.swift */,
+				BB39004200000001 /* WikidataServiceTests.swift */,
 			);
 			path = LandmarkARTests;
 			sourceTree = "<group>";
@@ -342,6 +348,7 @@
 				A107 /* LandmarkDetailSheet.swift in Sources */,
 				A108 /* AppSettings.swift in Sources */,
 				D40573532F58FCEB00859722 /* OpenStreetMapService.swift in Sources */,
+				BB39004100000001 /* WikidataService.swift in Sources */,
 				A109 /* SettingsView.swift in Sources */,
 				A116 /* ErrorLog.swift in Sources */,
 				A117 /* ErrorLogView.swift in Sources */,
@@ -371,6 +378,7 @@
 				BB39002100000001 /* LabelColorSchemeTests.swift in Sources */,
 				BB39003100000001 /* DistanceScalingTests.swift in Sources */,
 				BB39003300000001 /* DistanceUnitTests.swift in Sources */,
+				BB39004300000001 /* WikidataServiceTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
