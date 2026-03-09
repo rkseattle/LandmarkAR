@@ -151,7 +151,18 @@ class WikipediaService {
             URLQueryItem(name: "format",   value: "json"),
         ]
 
-        let (data, _) = try await session.data(from: components.url!)
+        let (data, urlResponse) = try await session.data(from: components.url!)
+
+        // Reject non-200 responses before attempting JSON decoding — same pattern as LAR-44.
+        // Wikipedia returns 429 for rate limiting with a non-JSON body that would otherwise
+        // produce a misleading format error and trigger the circuit breaker.
+        if let http = urlResponse as? HTTPURLResponse, http.statusCode != 200 {
+            if http.statusCode == 429 {
+                return []
+            }
+            throw URLError(.badServerResponse)
+        }
+
         let response = try JSONDecoder().decode(WikipediaGeoSearchResponse.self, from: data)
         return response.query.geosearch
     }
