@@ -45,6 +45,7 @@
 "settings.realtimeUpdates.always" = "常時";
 "settings.about.header" = "このアプリについて";
 "settings.about.version" = "バージョン";
+"settings.about.wikipedia.url" = "https://ja.wikipedia.org/wiki/Wikipedia:%E8%91%97%E4%BD%9C%E6%A8%A9";
 "settings.about.footer" = "ランドマークデータはWikipediaおよびOpenStreetMapの貢献者が提供しています。";
 "settings.diagnostics.header" = "診断";
 "settings.errorLog" = "エラーログ";

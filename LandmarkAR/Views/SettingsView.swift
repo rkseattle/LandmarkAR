@@ -12,6 +12,11 @@ struct SettingsView: View {
     // LAR-35: Use the language-specific bundle from settings for immediate updates.
     private var bundle: Bundle { settings.localizedBundle }
 
+    private var wikipediaCopyrightURL: URL {
+        let urlString = NSLocalizedString("settings.about.wikipedia.url", bundle: bundle, comment: "")
+        return URL(string: urlString) ?? URL(string: "https://en.wikipedia.org/wiki/Wikipedia:Copyrights")!
+    }
+
     private var appVersion: String {
         let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "—"
         let build   = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "—"
@@ -164,7 +169,7 @@ struct SettingsView: View {
                         Text(appVersion)
                             .foregroundStyle(.secondary)
                     }
-                    Link(destination: URL(string: "https://en.wikipedia.org/wiki/Wikipedia:Copyrights")!) {
+                    Link(destination: wikipediaCopyrightURL) {
                         Label("Wikipedia", systemImage: "globe")
                     }
                     Link(destination: URL(string: "https://www.openstreetmap.org/copyright")!) {
