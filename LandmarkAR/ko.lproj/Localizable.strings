@@ -45,6 +45,7 @@
 "settings.realtimeUpdates.always" = "항상";
 "settings.about.header" = "정보";
 "settings.about.version" = "버전";
+"settings.about.wikipedia.url" = "https://ko.wikipedia.org/wiki/%EC%9C%84%ED%82%A4%EB%B0%B1%EA%B3%BC:%EC%A0%80%EC%9E%91%EA%B6%8C";
 "settings.about.footer" = "랜드마크 데이터는 Wikipedia 및 OpenStreetMap 기여자들이 제공합니다.";
 "settings.diagnostics.header" = "진단";
 "settings.errorLog" = "오류 로그";

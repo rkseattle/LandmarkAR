@@ -45,6 +45,7 @@
 "settings.realtimeUpdates.always" = "Always";
 "settings.about.header" = "About";
 "settings.about.version" = "Version";
+"settings.about.wikipedia.url" = "https://en.wikipedia.org/wiki/Wikipedia:Copyrights";
 "settings.about.footer" = "Landmark data provided by Wikipedia and OpenStreetMap contributors.";
 "settings.diagnostics.header" = "Diagnostics";
 "settings.errorLog" = "Error Log";

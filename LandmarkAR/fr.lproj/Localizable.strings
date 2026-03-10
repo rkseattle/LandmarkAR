@@ -45,6 +45,7 @@
 "settings.realtimeUpdates.always" = "Toujours";
 "settings.about.header" = "À propos";
 "settings.about.version" = "Version";
+"settings.about.wikipedia.url" = "https://fr.wikipedia.org/wiki/Wikip%C3%A9dia:Droits_d%27auteur";
 "settings.about.footer" = "Données sur les lieux fournies par les contributeurs de Wikipédia et d'OpenStreetMap.";
 "settings.diagnostics.header" = "Diagnostics";
 "settings.errorLog" = "Journal des erreurs";
