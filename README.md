@@ -11,6 +11,7 @@ An augmented reality iOS app that overlays floating labels on nearby natural and
 - Labels are anchored to real compass directions using ARKit's `gravityAndHeading` alignment
 - Label opacity fades with distance so close landmarks are most prominent
 - Tap any label to open the landmark detail sheet
+- **Compass bar** at the top of the AR view shows current heading (N/NE/E/SE/S/SW/W/NW), the live heading in degrees, and chevron indicators for off-screen landmarks so you always know which way to turn
 
 ### Landmark Detail Sheet
 - Full Wikipedia summary with a link to read the complete article
@@ -110,6 +111,7 @@ LandmarkAR/
 │   └── ARLandmarkView.swift         # ARSCNView + label placement + tap handling
 ├── Views/
 │   ├── ContentView.swift            # Root view + fetch orchestration
+│   ├── CompassBarView.swift         # Compass heading bar + off-screen landmark chevrons
 │   ├── SettingsView.swift           # Settings form
 │   ├── LandmarkDetailSheet.swift    # Summary sheet + directions + Wikipedia link
 │   ├── ErrorLogView.swift           # Timestamped error list

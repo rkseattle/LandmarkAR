@@ -67,6 +67,9 @@
 "errorLog.noErrors" = "오류가 없습니다.";
 "errorLog.clear" = "지우기";
 
+/* Compass Bar */
+"compass.calibrating" = "나침반 보정 중…";
+
 /* Splash Screen */
 "splash.tagline" = "주변 랜드마크를\n증강 현실로 발견하세요";
 "splash.credit" = "by Edward Aspen Studios";

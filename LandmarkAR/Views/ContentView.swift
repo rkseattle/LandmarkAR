@@ -146,7 +146,14 @@ struct ContentView: View {
     // MARK: - Overlay UI
 
     private var overlayUI: some View {
-        VStack {
+        VStack(spacing: 0) {
+            // Compass bar (LAR-50) — spans full width above the top toolbar
+            CompassBarView(
+                heading: locationManager.heading,
+                landmarks: landmarks,
+                userLocation: locationManager.userLocation
+            )
+
             // Top bar (LAR-31)
             HStack {
                 // Refresh button — upper left

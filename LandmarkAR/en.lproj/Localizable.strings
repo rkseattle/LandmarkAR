@@ -67,6 +67,9 @@
 "errorLog.noErrors" = "No errors logged.";
 "errorLog.clear" = "Clear";
 
+/* Compass Bar */
+"compass.calibrating" = "Calibrating compass…";
+
 /* Splash Screen */
 "splash.tagline" = "Discover landmarks around you\nin augmented reality";
 "splash.credit" = "by Edward Aspen Studios";

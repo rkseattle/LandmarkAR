@@ -44,6 +44,9 @@
 		BB39005100000001 /* VisibleLabelCapTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB39005000000001 /* VisibleLabelCapTests.swift */; };
 		BB39004100000001 /* WikidataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB39004000000001 /* WikidataService.swift */; };
 		BB39004300000001 /* WikidataServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB39004200000001 /* WikidataServiceTests.swift */; };
+		LAR50A1 /* CompassBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = LAR50A0 /* CompassBarView.swift */; };
+		LAR50B1 /* CompassBarViewTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = LAR50B0 /* CompassBarViewTests.swift */; };
+		LAR50C1 /* LocationManagerOrientationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = LAR50C0 /* LocationManagerOrientationTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -104,6 +107,9 @@
 		BB39005000000001 /* VisibleLabelCapTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisibleLabelCapTests.swift; sourceTree = "<group>"; };
 		BB39004000000001 /* WikidataService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WikidataService.swift; sourceTree = "<group>"; };
 		BB39004200000001 /* WikidataServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WikidataServiceTests.swift; sourceTree = "<group>"; };
+		LAR50A0 /* CompassBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompassBarView.swift; sourceTree = "<group>"; };
+		LAR50B0 /* CompassBarViewTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompassBarViewTests.swift; sourceTree = "<group>"; };
+		LAR50C0 /* LocationManagerOrientationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManagerOrientationTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -226,6 +232,8 @@
 				BB39003200000001 /* DistanceUnitTests.swift */,
 				BB39005000000001 /* VisibleLabelCapTests.swift */,
 				BB39004200000001 /* WikidataServiceTests.swift */,
+				LAR50B0 /* CompassBarViewTests.swift */,
+				LAR50C0 /* LocationManagerOrientationTests.swift */,
 			);
 			path = LandmarkARTests;
 			sourceTree = "<group>";
@@ -234,6 +242,7 @@
 			isa = PBXGroup;
 			children = (
 				A002 /* ContentView.swift */,
+				LAR50A0 /* CompassBarView.swift */,
 				A007 /* LandmarkDetailSheet.swift */,
 				A009 /* SettingsView.swift */,
 				A017 /* ErrorLogView.swift */,
@@ -361,6 +370,7 @@
 				A121 /* SplashScreenView.swift in Sources */,
 				A122 /* AppLanguage.swift in Sources */,
 				A123 /* LocaleBundleEnvironment.swift in Sources */,
+				LAR50A1 /* CompassBarView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -383,6 +393,8 @@
 				BB39003300000001 /* DistanceUnitTests.swift in Sources */,
 				BB39005100000001 /* VisibleLabelCapTests.swift in Sources */,
 				BB39004300000001 /* WikidataServiceTests.swift in Sources */,
+				LAR50B1 /* CompassBarViewTests.swift in Sources */,
+				LAR50C1 /* LocationManagerOrientationTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

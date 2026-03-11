@@ -42,7 +42,7 @@ enum DistanceUnit: String, CaseIterable {
 
     /// Returns `.miles` for US/UK locales, `.kilometers` everywhere else.
     static func systemDefault() -> DistanceUnit {
-        Locale.current.usesMetricSystem ? .kilometers : .miles
+        Locale.current.measurementSystem == .metric ? .kilometers : .miles
     }
 }
 

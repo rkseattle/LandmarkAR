@@ -67,6 +67,9 @@
 "errorLog.noErrors" = "No hay errores registrados.";
 "errorLog.clear" = "Borrar";
 
+/* Compass Bar */
+"compass.calibrating" = "Calibrando la brújula…";
+
 /* Splash Screen */
 "splash.tagline" = "Descubre lugares de interés\nen realidad aumentada";
 "splash.credit" = "by Edward Aspen Studios";
