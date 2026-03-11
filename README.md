@@ -124,6 +124,35 @@ LandmarkAR/
 
 ---
 
+## Testing
+
+### Unit Tests
+
+Run with **⌘U** in Xcode or `xcodebuild test -scheme LandmarkAR`. All unit tests are fast and offline.
+
+### Integration Tests
+
+Integration tests make live network calls to Wikipedia, OpenStreetMap, Open-Elevation, and Wikidata. They are skipped by default and must be opted in.
+
+**To run in Xcode:**
+1. Product → Scheme → Edit Scheme → Test → Arguments → Environment Variables
+2. Add `RUN_INTEGRATION_TESTS` = `1`
+3. Press **⌘U**
+
+**To run from the command line:**
+```
+RUN_INTEGRATION_TESTS=1 xcodebuild test -scheme LandmarkAR
+```
+
+| Integration test class | API under test |
+|------------------------|---------------|
+| `WikipediaServiceIntegrationTests` | Wikipedia GeoSearch + Summary + Pageviews |
+| `OpenStreetMapServiceIntegrationTests` | Overpass API |
+| `ElevationServiceIntegrationTests` | Open-Elevation API |
+| `WikidataServiceIntegrationTests` | Wikidata sitelinks API + Wikipedia GeoSearch |
+
+---
+
 ## How It Works
 
 1. **Location** — `LocationManager` streams GPS fixes and compass headings via CoreLocation
