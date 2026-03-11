@@ -40,6 +40,7 @@
 		INT003 /* OpenStreetMapServiceIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = INT002 /* OpenStreetMapServiceIntegrationTests.swift */; };
 		INT005 /* ElevationServiceIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = INT004 /* ElevationServiceIntegrationTests.swift */; };
 		INT007 /* WikidataServiceIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = INT006 /* WikidataServiceIntegrationTests.swift */; };
+		LAR48T1 /* ViewportEdgeFadeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = LAR48T0 /* ViewportEdgeFadeTests.swift */; };
 		LCBF /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = LOCVG /* Localizable.strings */; };
 		PRIV02 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = PRIV01 /* PrivacyInfo.xcprivacy */; };
 		T101 /* LandmarkCategoryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T001 /* LandmarkCategoryTests.swift */; };
@@ -99,6 +100,7 @@
 		INT002 /* OpenStreetMapServiceIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenStreetMapServiceIntegrationTests.swift; sourceTree = "<group>"; };
 		INT004 /* ElevationServiceIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ElevationServiceIntegrationTests.swift; sourceTree = "<group>"; };
 		INT006 /* WikidataServiceIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WikidataServiceIntegrationTests.swift; sourceTree = "<group>"; };
+		LAR48T0 /* ViewportEdgeFadeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewportEdgeFadeTests.swift; sourceTree = "<group>"; };
 		LC_DE /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Localizable.strings; sourceTree = "<group>"; };
 		LC_EN /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		LC_ES /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -246,6 +248,7 @@
 				INT002 /* OpenStreetMapServiceIntegrationTests.swift */,
 				INT004 /* ElevationServiceIntegrationTests.swift */,
 				INT006 /* WikidataServiceIntegrationTests.swift */,
+				LAR48T0 /* ViewportEdgeFadeTests.swift */,
 			);
 			path = LandmarkARTests;
 			sourceTree = "<group>";
@@ -411,6 +414,7 @@
 				INT003 /* OpenStreetMapServiceIntegrationTests.swift in Sources */,
 				INT005 /* ElevationServiceIntegrationTests.swift in Sources */,
 				INT007 /* WikidataServiceIntegrationTests.swift in Sources */,
+				LAR48T1 /* ViewportEdgeFadeTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

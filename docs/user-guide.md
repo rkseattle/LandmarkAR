@@ -27,6 +27,8 @@ Each label shows:
 
 **If labels look misaligned**, slowly wave your phone in a figure-8 pattern to recalibrate the compass. This is a normal iPhone compass calibration step.
 
+Labels near the edge of the screen fade out gradually so they drift into view smoothly as you turn, rather than popping on and off abruptly.
+
 ### Compass Bar
 
 A compass bar is pinned to the top of the AR view. It shows:
