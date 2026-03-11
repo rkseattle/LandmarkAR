@@ -17,7 +17,6 @@
 		A108 /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = A008S /* AppSettings.swift */; };
 		A109 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A009 /* SettingsView.swift */; };
 		A110 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A010 /* Assets.xcassets */; };
-		PRIV02 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = PRIV01 /* PrivacyInfo.xcprivacy */; };
 		A116 /* ErrorLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = A016 /* ErrorLog.swift */; };
 		A117 /* ErrorLogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A017 /* ErrorLogView.swift */; };
 		A118 /* ElevationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A018 /* ElevationService.swift */; };
@@ -26,8 +25,19 @@
 		A121 /* SplashScreenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A021 /* SplashScreenView.swift */; };
 		A122 /* AppLanguage.swift in Sources */ = {isa = PBXBuildFile; fileRef = A022 /* AppLanguage.swift */; };
 		A123 /* LocaleBundleEnvironment.swift in Sources */ = {isa = PBXBuildFile; fileRef = A023 /* LocaleBundleEnvironment.swift */; };
+		BB39001100000001 /* LandmarkSignificanceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB39001000000001 /* LandmarkSignificanceTests.swift */; };
+		BB39002100000001 /* LabelColorSchemeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB39002000000001 /* LabelColorSchemeTests.swift */; };
+		BB39003100000001 /* DistanceScalingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB39003000000001 /* DistanceScalingTests.swift */; };
+		BB39003300000001 /* DistanceUnitTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB39003200000001 /* DistanceUnitTests.swift */; };
+		BB39004100000001 /* WikidataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB39004000000001 /* WikidataService.swift */; };
+		BB39004300000001 /* WikidataServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB39004200000001 /* WikidataServiceTests.swift */; };
+		BB39005100000001 /* VisibleLabelCapTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB39005000000001 /* VisibleLabelCapTests.swift */; };
 		D40573532F58FCEB00859722 /* OpenStreetMapService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D40573512F58FCEB00859722 /* OpenStreetMapService.swift */; };
+		LAR50A1 /* CompassBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = LAR50A0 /* CompassBarView.swift */; };
+		LAR50B1 /* CompassBarViewTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = LAR50B0 /* CompassBarViewTests.swift */; };
+		LAR50C1 /* LocationManagerOrientationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = LAR50C0 /* LocationManagerOrientationTests.swift */; };
 		LCBF /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = LOCVG /* Localizable.strings */; };
+		PRIV02 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = PRIV01 /* PrivacyInfo.xcprivacy */; };
 		T101 /* LandmarkCategoryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T001 /* LandmarkCategoryTests.swift */; };
 		T102 /* AppSettingsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T002 /* AppSettingsTests.swift */; };
 		T103 /* DataSourceCircuitBreakerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T003 /* DataSourceCircuitBreakerTests.swift */; };
@@ -37,16 +47,6 @@
 		T107 /* AppLanguageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T007 /* AppLanguageTests.swift */; };
 		T108 /* MapsDirectionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T008 /* MapsDirectionsTests.swift */; };
 		T109 /* AppSettingsPersistenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T009 /* AppSettingsPersistenceTests.swift */; };
-		BB39001100000001 /* LandmarkSignificanceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB39001000000001 /* LandmarkSignificanceTests.swift */; };
-		BB39002100000001 /* LabelColorSchemeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB39002000000001 /* LabelColorSchemeTests.swift */; };
-		BB39003100000001 /* DistanceScalingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB39003000000001 /* DistanceScalingTests.swift */; };
-		BB39003300000001 /* DistanceUnitTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB39003200000001 /* DistanceUnitTests.swift */; };
-		BB39005100000001 /* VisibleLabelCapTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB39005000000001 /* VisibleLabelCapTests.swift */; };
-		BB39004100000001 /* WikidataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB39004000000001 /* WikidataService.swift */; };
-		BB39004300000001 /* WikidataServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB39004200000001 /* WikidataServiceTests.swift */; };
-		LAR50A1 /* CompassBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = LAR50A0 /* CompassBarView.swift */; };
-		LAR50B1 /* CompassBarViewTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = LAR50B0 /* CompassBarViewTests.swift */; };
-		LAR50C1 /* LocationManagerOrientationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = LAR50C0 /* LocationManagerOrientationTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -68,7 +68,6 @@
 		A006 /* ARLandmarkView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARLandmarkView.swift; sourceTree = "<group>"; };
 		A007 /* LandmarkDetailSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LandmarkDetailSheet.swift; sourceTree = "<group>"; };
 		A008 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		PRIV01 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		A008S /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettings.swift; sourceTree = "<group>"; };
 		A009 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		A010 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -81,7 +80,17 @@
 		A022 /* AppLanguage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLanguage.swift; sourceTree = "<group>"; };
 		A023 /* LocaleBundleEnvironment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocaleBundleEnvironment.swift; sourceTree = "<group>"; };
 		A999 /* LandmarkAR.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LandmarkAR.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		BB39001000000001 /* LandmarkSignificanceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LandmarkSignificanceTests.swift; sourceTree = "<group>"; };
+		BB39002000000001 /* LabelColorSchemeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LabelColorSchemeTests.swift; sourceTree = "<group>"; };
+		BB39003000000001 /* DistanceScalingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DistanceScalingTests.swift; sourceTree = "<group>"; };
+		BB39003200000001 /* DistanceUnitTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DistanceUnitTests.swift; sourceTree = "<group>"; };
+		BB39004000000001 /* WikidataService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WikidataService.swift; sourceTree = "<group>"; };
+		BB39004200000001 /* WikidataServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WikidataServiceTests.swift; sourceTree = "<group>"; };
+		BB39005000000001 /* VisibleLabelCapTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisibleLabelCapTests.swift; sourceTree = "<group>"; };
 		D40573512F58FCEB00859722 /* OpenStreetMapService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenStreetMapService.swift; sourceTree = "<group>"; };
+		LAR50A0 /* CompassBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompassBarView.swift; sourceTree = "<group>"; };
+		LAR50B0 /* CompassBarViewTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompassBarViewTests.swift; sourceTree = "<group>"; };
+		LAR50C0 /* LocationManagerOrientationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManagerOrientationTests.swift; sourceTree = "<group>"; };
 		LC_DE /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Localizable.strings; sourceTree = "<group>"; };
 		LC_EN /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		LC_ES /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -90,6 +99,7 @@
 		LC_JA /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/Localizable.strings; sourceTree = "<group>"; };
 		LC_KO /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ko; path = ko.lproj/Localizable.strings; sourceTree = "<group>"; };
 		LC_PT /* pt */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pt; path = pt.lproj/Localizable.strings; sourceTree = "<group>"; };
+		PRIV01 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		T001 /* LandmarkCategoryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LandmarkCategoryTests.swift; sourceTree = "<group>"; };
 		T002 /* AppSettingsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettingsTests.swift; sourceTree = "<group>"; };
 		T003 /* DataSourceCircuitBreakerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataSourceCircuitBreakerTests.swift; sourceTree = "<group>"; };
@@ -100,16 +110,6 @@
 		T008 /* MapsDirectionsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapsDirectionsTests.swift; sourceTree = "<group>"; };
 		T009 /* AppSettingsPersistenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettingsPersistenceTests.swift; sourceTree = "<group>"; };
 		TESTPROD /* LandmarkARTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LandmarkARTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		BB39001000000001 /* LandmarkSignificanceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LandmarkSignificanceTests.swift; sourceTree = "<group>"; };
-		BB39002000000001 /* LabelColorSchemeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LabelColorSchemeTests.swift; sourceTree = "<group>"; };
-		BB39003000000001 /* DistanceScalingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DistanceScalingTests.swift; sourceTree = "<group>"; };
-		BB39003200000001 /* DistanceUnitTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DistanceUnitTests.swift; sourceTree = "<group>"; };
-		BB39005000000001 /* VisibleLabelCapTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisibleLabelCapTests.swift; sourceTree = "<group>"; };
-		BB39004000000001 /* WikidataService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WikidataService.swift; sourceTree = "<group>"; };
-		BB39004200000001 /* WikidataServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WikidataServiceTests.swift; sourceTree = "<group>"; };
-		LAR50A0 /* CompassBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompassBarView.swift; sourceTree = "<group>"; };
-		LAR50B0 /* CompassBarViewTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompassBarViewTests.swift; sourceTree = "<group>"; };
-		LAR50C0 /* LocationManagerOrientationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManagerOrientationTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -296,7 +296,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1500;
-				LastUpgradeCheck = 1500;
+				LastUpgradeCheck = 2630;
 				TargetAttributes = {
 					TARGET1 = {
 						CreatedOnToolsVersion = 15.0;
@@ -432,6 +432,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
@@ -462,6 +463,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = Y2WMH5T48B;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -484,6 +486,7 @@
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
@@ -494,6 +497,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
@@ -524,6 +528,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = Y2WMH5T48B;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -539,6 +544,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				VALIDATE_PRODUCT = YES;
 			};
@@ -551,7 +557,6 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = Y2WMH5T48B;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = LandmarkAR/Resources/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
@@ -575,7 +580,6 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = Y2WMH5T48B;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = LandmarkAR/Resources/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
@@ -597,7 +601,6 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = Y2WMH5T48B;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.edwardaspendesigns.LandmarkARTests;
@@ -613,7 +616,6 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = Y2WMH5T48B;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.edwardaspendesigns.LandmarkARTests;
