@@ -49,7 +49,9 @@ class WikipediaService {
     // MARK: - LAR-39: Significance Scoring Constants
 
     /// Minimum monthly pageview count to pass the default significance filter.
-    static let minPageviewThreshold = 1_000
+    /// LAR-47: Lowered from 1,000 to 500 — the 1,000 threshold was too aggressive
+    /// for dense urban areas where locally notable landmarks fall below the previous cutoff.
+    static let minPageviewThreshold = 500
 
     /// Monthly pageview count required when "Iconic Landmarks Only" is enabled.
     static let iconicPageviewThreshold = 10_000
@@ -165,12 +167,16 @@ class WikipediaService {
         // LAR-35: Use the language subdomain from settings (e.g. ja.wikipedia.org)
         var components = URLComponents(string: "https://\(languageCode).wikipedia.org/w/api.php")!
         components.queryItems = [
-            URLQueryItem(name: "action",   value: "query"),
-            URLQueryItem(name: "list",     value: "geosearch"),
-            URLQueryItem(name: "gscoord",  value: "\(location.coordinate.latitude)|\(location.coordinate.longitude)"),
-            URLQueryItem(name: "gsradius", value: "\(radiusMeters)"),
-            URLQueryItem(name: "gslimit",  value: "\(maxResults)"),
-            URLQueryItem(name: "format",   value: "json"),
+            URLQueryItem(name: "action",      value: "query"),
+            URLQueryItem(name: "list",        value: "geosearch"),
+            URLQueryItem(name: "gscoord",     value: "\(location.coordinate.latitude)|\(location.coordinate.longitude)"),
+            URLQueryItem(name: "gsradius",    value: "\(radiusMeters)"),
+            URLQueryItem(name: "gslimit",     value: "\(maxResults)"),
+            // LAR-47: Explicitly pin to namespace 0 (main articles) to ensure consistent
+            // result counts across API configurations and prevent deprioritisation of
+            // articles without coordinates properties.
+            URLQueryItem(name: "gsnamespace", value: "0"),
+            URLQueryItem(name: "format",      value: "json"),
         ]
 
         let (data, urlResponse) = try await session.data(from: components.url!)

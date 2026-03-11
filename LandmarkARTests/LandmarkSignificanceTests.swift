@@ -55,8 +55,10 @@ final class LandmarkSignificanceTests: XCTestCase {
 
     // MARK: - Threshold constants
 
-    func testMinPageviewThresholdIs1000() {
-        XCTAssertEqual(WikipediaService.minPageviewThreshold, 1_000)
+    func testMinPageviewThresholdIs500() {
+        // LAR-47: Lowered from 1,000 to 500 to avoid filtering locally notable landmarks
+        // in dense urban areas.
+        XCTAssertEqual(WikipediaService.minPageviewThreshold, 500)
     }
 
     func testIconicPageviewThresholdIs10000() {
