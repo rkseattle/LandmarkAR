@@ -36,6 +36,10 @@
 		LAR50A1 /* CompassBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = LAR50A0 /* CompassBarView.swift */; };
 		LAR50B1 /* CompassBarViewTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = LAR50B0 /* CompassBarViewTests.swift */; };
 		LAR50C1 /* LocationManagerOrientationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = LAR50C0 /* LocationManagerOrientationTests.swift */; };
+		INT001 /* WikipediaServiceIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = INT000 /* WikipediaServiceIntegrationTests.swift */; };
+		INT003 /* OpenStreetMapServiceIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = INT002 /* OpenStreetMapServiceIntegrationTests.swift */; };
+		INT005 /* ElevationServiceIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = INT004 /* ElevationServiceIntegrationTests.swift */; };
+		INT007 /* WikidataServiceIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = INT006 /* WikidataServiceIntegrationTests.swift */; };
 		LCBF /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = LOCVG /* Localizable.strings */; };
 		PRIV02 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = PRIV01 /* PrivacyInfo.xcprivacy */; };
 		T101 /* LandmarkCategoryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T001 /* LandmarkCategoryTests.swift */; };
@@ -91,6 +95,10 @@
 		LAR50A0 /* CompassBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompassBarView.swift; sourceTree = "<group>"; };
 		LAR50B0 /* CompassBarViewTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompassBarViewTests.swift; sourceTree = "<group>"; };
 		LAR50C0 /* LocationManagerOrientationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManagerOrientationTests.swift; sourceTree = "<group>"; };
+		INT000 /* WikipediaServiceIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WikipediaServiceIntegrationTests.swift; sourceTree = "<group>"; };
+		INT002 /* OpenStreetMapServiceIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenStreetMapServiceIntegrationTests.swift; sourceTree = "<group>"; };
+		INT004 /* ElevationServiceIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ElevationServiceIntegrationTests.swift; sourceTree = "<group>"; };
+		INT006 /* WikidataServiceIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WikidataServiceIntegrationTests.swift; sourceTree = "<group>"; };
 		LC_DE /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Localizable.strings; sourceTree = "<group>"; };
 		LC_EN /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		LC_ES /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -234,6 +242,10 @@
 				BB39004200000001 /* WikidataServiceTests.swift */,
 				LAR50B0 /* CompassBarViewTests.swift */,
 				LAR50C0 /* LocationManagerOrientationTests.swift */,
+				INT000 /* WikipediaServiceIntegrationTests.swift */,
+				INT002 /* OpenStreetMapServiceIntegrationTests.swift */,
+				INT004 /* ElevationServiceIntegrationTests.swift */,
+				INT006 /* WikidataServiceIntegrationTests.swift */,
 			);
 			path = LandmarkARTests;
 			sourceTree = "<group>";
@@ -395,6 +407,10 @@
 				BB39004300000001 /* WikidataServiceTests.swift in Sources */,
 				LAR50B1 /* CompassBarViewTests.swift in Sources */,
 				LAR50C1 /* LocationManagerOrientationTests.swift in Sources */,
+				INT001 /* WikipediaServiceIntegrationTests.swift in Sources */,
+				INT003 /* OpenStreetMapServiceIntegrationTests.swift in Sources */,
+				INT005 /* ElevationServiceIntegrationTests.swift in Sources */,
+				INT007 /* WikidataServiceIntegrationTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
