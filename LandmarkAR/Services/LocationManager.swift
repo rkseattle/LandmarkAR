@@ -1,6 +1,7 @@
 import CoreLocation
 import Combine
 import Foundation
+import UIKit
 
 // MARK: - LocationManager
 // Handles GPS location + compass heading updates from the device.
@@ -29,6 +30,36 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     // Call this to start everything (called from the main view on appear)
     func start() {
         manager.requestWhenInUseAuthorization()
+        UIDevice.current.beginGeneratingDeviceOrientationNotifications()
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(deviceOrientationDidChange),
+            name: UIDevice.orientationDidChangeNotification,
+            object: nil
+        )
+        applyHeadingOrientation()
+    }
+
+    deinit {
+        UIDevice.current.endGeneratingDeviceOrientationNotifications()
+    }
+
+    // MARK: - Heading Orientation
+
+    // Keeps CLLocationManager.headingOrientation in sync with device rotation so the
+    // compass reads correctly in both portrait and landscape (CLDeviceOrientation and
+    // UIDeviceOrientation share raw values, so the cast is safe).
+    @objc private func deviceOrientationDidChange() {
+        applyHeadingOrientation()
+    }
+
+    private func applyHeadingOrientation() {
+        let raw = Int32(UIDevice.current.orientation.rawValue)
+        guard let orientation = CLDeviceOrientation(rawValue: raw),
+              orientation != .unknown,
+              orientation != .faceUp,
+              orientation != .faceDown else { return }
+        manager.headingOrientation = orientation
     }
 
     // MARK: - CLLocationManagerDelegate

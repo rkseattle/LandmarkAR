@@ -67,6 +67,9 @@
 "errorLog.noErrors" = "Nessun errore registrato.";
 "errorLog.clear" = "Cancella";
 
+/* Compass Bar */
+"compass.calibrating" = "Calibrazione della bussola…";
+
 /* Splash Screen */
 "splash.tagline" = "Scopri i luoghi di interesse\nin realtà aumentata";
 "splash.credit" = "by Edward Aspen Studios";

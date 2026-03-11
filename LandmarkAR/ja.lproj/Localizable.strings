@@ -67,6 +67,9 @@
 "errorLog.noErrors" = "エラーはありません。";
 "errorLog.clear" = "クリア";
 
+/* Compass Bar */
+"compass.calibrating" = "コンパスを調整中…";
+
 /* Splash Screen */
 "splash.tagline" = "周囲のランドマークを\nAR で発見しよう";
 "splash.credit" = "by Edward Aspen Studios";

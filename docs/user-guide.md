@@ -27,6 +27,20 @@ Each label shows:
 
 **If labels look misaligned**, slowly wave your phone in a figure-8 pattern to recalibrate the compass. This is a normal iPhone compass calibration step.
 
+### Compass Bar
+
+A compass bar is pinned to the top of the AR view. It shows:
+
+| Element | Description |
+|---------|-------------|
+| Tick marks | A scrolling degree scale — minor ticks every 5°, major ticks every 10° |
+| Cardinal labels | **N**, **E**, **S**, **W** in bold; NE, SE, SW, NW in smaller text |
+| Heading readout | Your exact current heading in degrees (e.g. `157°`), updated in real time |
+| Center marker | A white triangle at the top-center indicating your exact heading |
+| Landmark chevrons (▲) | Small triangles that appear at the bearing of any landmark **outside your camera view**. Larger chevrons indicate more significant landmarks. Turn toward a chevron to bring that landmark into frame. |
+
+If the compass is still calibrating, the bar shows **"Calibrating compass…"** instead. Wave your phone in a figure-8 to speed up calibration.
+
 ### Tapping a Label
 
 Tap any label to open the **Landmark Detail Sheet** for that location.
