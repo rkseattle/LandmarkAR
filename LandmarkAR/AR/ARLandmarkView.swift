@@ -48,6 +48,18 @@ class ARLandmarkViewController: UIViewController, ARSessionDelegate {
     // Increase WikipediaService.geoSearchLimit proportionally if this is raised.
     static let maxVisibleLabels = 10
 
+    // LAR-48: Edge fade constants. Labels within edgeInset pts of the viewport edge are
+    // fully hidden; they fade in over the fadeZoneWidth region beyond that.
+    static let edgeInset: CGFloat = 75
+    static let fadeZoneWidth: CGFloat = 60
+
+    // LAR-48: Returns an opacity in [0, 1] that fades labels near the viewport edges.
+    // Full opacity at >= edgeInset + fadeZoneWidth pts from each edge; zero at <= edgeInset.
+    static func edgeFadeOpacity(at point: CGPoint, in viewSize: CGSize) -> CGFloat {
+        let d = min(point.x, point.y, viewSize.width - point.x, viewSize.height - point.y)
+        return max(0, min(1, (d - edgeInset) / fadeZoneWidth))
+    }
+
     // Cached farthest-first ordering for z-sort. Recomputed only when `landmarks` changes.
     private var sortedFarthestFirst: [Landmark] = []
 
@@ -167,9 +179,8 @@ class ARLandmarkViewController: UIViewController, ARSessionDelegate {
             zFar: 1000
         )
 
-        // LAR-42: Visible region with inset so labels near the edge don't clip.
-        let edgeInset: CGFloat = 75
-        let visibleRect = arView.bounds.insetBy(dx: edgeInset, dy: edgeInset)
+        // LAR-42/LAR-48: Visible region with inset so labels near the edge don't clip.
+        let visibleRect = arView.bounds.insetBy(dx: Self.edgeInset, dy: Self.edgeInset)
 
         // Pass 1: project all landmarks; separate on-screen from off-screen.
         // `landmarks` is pre-sorted by significance descending (WikipediaService), so
@@ -268,11 +279,16 @@ class ARLandmarkViewController: UIViewController, ARSessionDelegate {
     // MARK: - Label UI
 
     private func showLabel(for landmark: Landmark, at point: CGPoint) {
+        // LAR-48: Multiply distance-based opacity by edge-fade so labels ghosting in/out of
+        // the viewport edges blend smoothly rather than popping on the hard edgeInset boundary.
+        let edgeFade = Self.edgeFadeOpacity(at: point, in: arView.bounds.size)
+
         if let existingLabel = labelViews[landmark.id] {
             existingLabel.isHidden = false
             existingLabel.center = point
             // LAR-8: Update scale whenever position refreshes
             existingLabel.applyDistanceScale(landmark.distance)
+            existingLabel.alpha = existingLabel.distanceAlpha * edgeFade
         } else {
             let label = LandmarkLabelView(landmark: landmark, displaySize: labelDisplaySize, distanceUnit: distanceUnit)
             label.center = point
@@ -281,6 +297,7 @@ class ARLandmarkViewController: UIViewController, ARSessionDelegate {
             }
             arView.addSubview(label)
             labelViews[landmark.id] = label
+            label.alpha = label.distanceAlpha * edgeFade
         }
     }
 
@@ -398,6 +415,8 @@ enum LabelColorScheme {
 class LandmarkLabelView: UIView {
 
     var onTap: (() -> Void)?
+    // LAR-48: Stores the pure distance-based opacity so showLabel can multiply it by edge fade.
+    private(set) var distanceAlpha: CGFloat = 1.0
     private let landmark: Landmark
     private let displaySize: LabelDisplaySize
     private let distanceUnit: DistanceUnit
@@ -492,6 +511,7 @@ class LandmarkLabelView: UIView {
         transform = CGAffineTransform(scaleX: scale, y: scale)
 
         // LAR-27: Opacity decreases with distance so the closest landmark is visually dominant.
+        // LAR-48: Store as distanceAlpha so showLabel can multiply by edge-fade opacity.
         let opacity: CGFloat
         switch distanceMeters {
         case ..<300:      opacity = 1.00
@@ -500,6 +520,7 @@ class LandmarkLabelView: UIView {
         case 2000..<5000: opacity = 0.55
         default:          opacity = 0.40
         }
+        distanceAlpha = opacity
         alpha = opacity
     }
 
