@@ -11,6 +11,7 @@ An augmented reality iOS app that overlays floating labels on nearby natural and
 - Labels are anchored to real compass directions using ARKit's `gravityAndHeading` alignment
 - Label opacity fades with distance so close landmarks are most prominent
 - Labels smoothly fade in and out as they approach the viewport edges, preventing abrupt pop-on/pop-off at the screen boundary
+- **Cluster expansion** — when multiple labels overlap, they collapse into a single badge showing the count; tap the badge to fan the labels outward in a radial arc so you can select the one you want
 - Tap any label to open the landmark detail sheet
 - **Compass bar** at the top of the AR view shows current heading (N/NE/E/SE/S/SW/W/NW), the live heading in degrees, and chevron indicators for off-screen landmarks so you always know which way to turn
 

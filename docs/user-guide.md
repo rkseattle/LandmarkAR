@@ -47,6 +47,18 @@ If the compass is still calibrating, the bar shows **"Calibrating compass…"** 
 
 Tap any label to open the **Landmark Detail Sheet** for that location.
 
+### Overlapping Labels (Cluster Expansion)
+
+When several landmarks are close together in the same direction, their labels overlap and become hard to tap individually. LandmarkAR automatically detects this and replaces the overlapping labels with a single **cluster badge** showing a stack icon and the number of landmarks grouped inside (e.g. ⊕ 4).
+
+**To select a specific landmark from a cluster:**
+
+1. **Tap the cluster badge** — the labels fan out in a radial arc around the tap point so each one is clearly readable.
+2. **Tap the label you want** — the detail sheet opens and the fan collapses.
+3. **Tap anywhere outside the fan** (on the darkened background) to collapse the fan without selecting a landmark.
+
+If a cluster contains more than 6 landmarks, the 6 most significant are shown in the fan plus a **"+ N more"** indicator for the remainder.
+
 ---
 
 ## Landmark Detail Sheet

@@ -78,7 +78,9 @@ class WikidataService {
         let lang  = String(tag[tag.startIndex..<colonIdx])
         let title = String(tag[tag.index(after: colonIdx)...])
         guard !lang.isEmpty, !title.isEmpty else { return nil }
-        let encoded = title.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? title
+        var allowed = CharacterSet.urlPathAllowed
+        allowed.insert(":")
+        let encoded = title.addingPercentEncoding(withAllowedCharacters: allowed) ?? title
         return URL(string: "https://\(lang).wikipedia.org/wiki/\(encoded)")
     }
 

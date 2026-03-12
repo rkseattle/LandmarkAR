@@ -1,0 +1,30 @@
+{
+  "configurations" : [
+    {
+      "id" : "77454570-B154-43DE-9A49-C2F81E2968B5",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "performanceAntipatternCheckerEnabled" : true,
+    "targetForVariableExpansion" : {
+      "containerPath" : "container:LandmarkAR.xcodeproj",
+      "identifier" : "TARGET1",
+      "name" : "LandmarkAR"
+    }
+  },
+  "testTargets" : [
+    {
+      "parallelizable" : true,
+      "target" : {
+        "containerPath" : "container:LandmarkAR.xcodeproj",
+        "identifier" : "TESTTARGET",
+        "name" : "LandmarkARTests"
+      }
+    }
+  ],
+  "version" : 1
+}

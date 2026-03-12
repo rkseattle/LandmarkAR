@@ -53,6 +53,16 @@ class ARLandmarkViewController: UIViewController, ARSessionDelegate {
     static let edgeInset: CGFloat = 75
     static let fadeZoneWidth: CGFloat = 60
 
+    // LAR-51: Labels whose bounding rects intersect are grouped into a cluster badge.
+    // detectClusters(from:labelSize:) uses the rendered label dimensions passed by the
+    // caller; the unit-test default (20 × 20) exercises boundary behaviour in isolation.
+    // fanRadius — radius (pt) of the radial fan arc when a cluster is expanded.
+    // fanAnimationDuration — open/close animation time (250 ms, ease-in-out).
+    // maxFanLabels — labels shown in the fan before an overflow badge appears.
+    static let fanRadius: CGFloat = 80
+    static let fanAnimationDuration: TimeInterval = 0.25
+    static let maxFanLabels = 6
+
     // LAR-48: Returns an opacity in [0, 1] that fades labels near the viewport edges.
     // Full opacity at >= edgeInset + fadeZoneWidth pts from each edge; zero at <= edgeInset.
     static func edgeFadeOpacity(at point: CGPoint, in viewSize: CGSize) -> CGFloat {
@@ -62,6 +72,21 @@ class ARLandmarkViewController: UIViewController, ARSessionDelegate {
 
     // Cached farthest-first ordering for z-sort. Recomputed only when `landmarks` changes.
     private var sortedFarthestFirst: [Landmark] = []
+
+    // LAR-51: Cluster state and supporting views.
+    private var clusterState: ClusterState = .none
+    private var clusterBadgeViews: [String: ClusterBadgeView] = [:]
+    private var overflowBadgeView: UIView?
+
+    private lazy var scrimView: UIView = {
+        let v = UIView()
+        v.backgroundColor = UIColor.black.withAlphaComponent(0.35)
+        v.alpha = 0
+        v.isUserInteractionEnabled = true
+        let tap = UITapGestureRecognizer(target: self, action: #selector(scrimTapped))
+        v.addGestureRecognizer(tap)
+        return v
+    }()
 
     private var frameCount = 0
     private let updateInterval = 30
@@ -125,20 +150,28 @@ class ARLandmarkViewController: UIViewController, ARSessionDelegate {
         // not on every heading/location tick that calls update().
         if landmarksChanged {
             sortedFarthestFirst = landmarks.sorted { $0.distance > $1.distance }
+            // LAR-51: Dismiss any open cluster list and clear stale badges when the
+            // landmark set changes — the old cluster IDs are no longer meaningful.
+            collapseCluster(animated: false)
+            clearClusterBadges()
         }
 
         // LAR-29: If size changed, remove all labels so they rebuild with the new size
         if labelDisplaySize != self.labelDisplaySize {
             self.labelDisplaySize = labelDisplaySize
+            collapseCluster(animated: false)
             labelViews.values.forEach { $0.removeFromSuperview() }
             labelViews.removeAll()
+            clearClusterBadges()
         }
 
         // Rebuild labels when the distance unit changes so the distance text is reformatted.
         if distanceUnit != self.distanceUnit {
             self.distanceUnit = distanceUnit
+            collapseCluster(animated: false)
             labelViews.values.forEach { $0.removeFromSuperview() }
             labelViews.removeAll()
+            clearClusterBadges()
         }
 
         // Remove labels for landmarks that are no longer in the list
@@ -156,12 +189,17 @@ class ARLandmarkViewController: UIViewController, ARSessionDelegate {
     func session(_ session: ARSession, didUpdate frame: ARFrame) {
         frameCount += 1
         guard frameCount % updateInterval == 0 else { return }
-        refreshLabels()
+        // ARSession delegate fires on a background queue; all UIKit work must be on main.
+        DispatchQueue.main.async { [weak self] in self?.refreshLabels() }
     }
 
     // MARK: - Label Placement
 
     private func refreshLabels() {
+        // LAR-51: While a fan is expanded, freeze label positions to avoid fighting
+        // with the in-flight animations.
+        if case .expanded = clusterState { return }
+
         guard let userLocation = userLocation,
               let arFrame = arView.session.currentFrame else { return }
 
@@ -202,19 +240,48 @@ class ARLandmarkViewController: UIViewController, ARSessionDelegate {
         // LAR-46: Cap visible labels at maxVisibleLabels. Labels beyond the cap are
         // hidden but not removed, so they reappear instantly when a higher-ranked
         // label pans out of view.
-        let allowedIDs = Set(onScreen.prefix(ARLandmarkViewController.maxVisibleLabels).map { $0.landmark.id })
+        let allowedEntries = Array(onScreen.prefix(ARLandmarkViewController.maxVisibleLabels))
+        let allowedIDs = Set(allowedEntries.map { $0.landmark.id })
 
-        for entry in onScreen {
-            if allowedIDs.contains(entry.landmark.id) {
-                showLabel(for: entry.landmark, at: entry.point)
-            } else {
-                labelViews[entry.landmark.id]?.isHidden = true
-            }
+        for entry in onScreen where !allowedIDs.contains(entry.landmark.id) {
+            labelViews[entry.landmark.id]?.isHidden = true
         }
 
-        // LAR-40: Sample luma beneath each visible label and apply a WCAG-compliant color scheme.
-        // Falls back to .dark (the previous default) if the pixel buffer is inaccessible.
-        for entry in onScreen where allowedIDs.contains(entry.landmark.id) {
+        // LAR-51: Detect clusters using actual label bounding-rect intersection.
+        // Labels whose rendered frames overlap (any amount) belong to the same cluster.
+        let approxHeight = labelDisplaySize.iconSize + labelDisplaySize.maxTitleFontSize
+            + labelDisplaySize.maxDistanceFontSize + 20
+        let labelSize = CGSize(width: labelDisplaySize.maxLabelWidth, height: approxHeight)
+        let clusterEntries = allowedEntries.map { (id: $0.landmark.id, point: $0.point) }
+        let clusters = ARLandmarkViewController.detectClusters(from: clusterEntries,
+                                                               labelSize: labelSize)
+        let clusteredIDs = Set(clusters.flatMap { $0.landmarkIDs })
+
+        // Non-clustered allowed labels: show normally.
+        for entry in allowedEntries where !clusteredIDs.contains(entry.landmark.id) {
+            showLabel(for: entry.landmark, at: entry.point)
+        }
+
+        // Clustered labels: ensure the view exists (needed for fan expansion) but keep hidden.
+        for entry in allowedEntries where clusteredIDs.contains(entry.landmark.id) {
+            ensureLabelView(for: entry.landmark, at: entry.point)
+        }
+
+        // Show/update cluster badges.
+        for cluster in clusters {
+            showClusterBadge(cluster)
+        }
+
+        // Remove badges for clusters that no longer exist (members moved apart).
+        let activeBadgeIDs = Set(clusters.map { $0.id })
+        for id in Array(clusterBadgeViews.keys) where !activeBadgeIDs.contains(id) {
+            clusterBadgeViews[id]?.removeFromSuperview()
+            clusterBadgeViews.removeValue(forKey: id)
+        }
+
+        // LAR-40: Sample luma beneath each visible (non-clustered) label and apply
+        // a WCAG-compliant color scheme. Falls back to .dark if buffer is inaccessible.
+        for entry in allowedEntries where !clusteredIDs.contains(entry.landmark.id) {
             guard let label = labelViews[entry.landmark.id], !label.isHidden else { continue }
             let luma = sampleLuma(at: entry.point,
                                   in: arFrame.capturedImage,
@@ -226,11 +293,14 @@ class ARLandmarkViewController: UIViewController, ARSessionDelegate {
 
         // LAR-14: Z-order labels so the closest landmark renders on top when pins overlap.
         // Iterate farthest-first so each bringSubviewToFront call leaves the closest on top.
-        // Uses the cached sort (updated in update() when landmarks change) to avoid re-sorting every 30 frames.
         for landmark in sortedFarthestFirst {
             if let label = labelViews[landmark.id], !label.isHidden {
                 arView.bringSubviewToFront(label)
             }
+        }
+        // Bring cluster badges above individual labels.
+        for badge in clusterBadgeViews.values where !badge.isHidden {
+            arView.bringSubviewToFront(badge)
         }
     }
 
@@ -299,6 +369,256 @@ class ARLandmarkViewController: UIViewController, ARSessionDelegate {
             labelViews[landmark.id] = label
             label.alpha = label.distanceAlpha * edgeFade
         }
+    }
+
+    /// Creates the label view for `landmark` if it does not yet exist, positioned at `point`
+    /// but hidden. Called for clustered landmarks so the view is ready for fan expansion.
+    private func ensureLabelView(for landmark: Landmark, at point: CGPoint) {
+        if labelViews[landmark.id] == nil {
+            let label = LandmarkLabelView(landmark: landmark, displaySize: labelDisplaySize, distanceUnit: distanceUnit)
+            label.center = point
+            label.onTap = { [weak self] in
+                self?.onSelect?(landmark)
+                self?.collapseCluster()
+            }
+            arView.addSubview(label)
+            labelViews[landmark.id] = label
+            label.applyDistanceScale(landmark.distance)
+        }
+        labelViews[landmark.id]?.isHidden = true
+    }
+
+    // MARK: - LAR-51: Cluster Detection
+
+    /// Groups entries whose label bounding rects intersect using union-find.
+    /// - `labelSize`: the rendered label dimensions used to build each entry's bounding rect.
+    ///   Defaults to 20 × 20 so that existing unit tests (which pass explicit point deltas)
+    ///   exercise the same threshold behaviour as before without needing changes.
+    /// Entries must be pre-sorted by significance (highest first) so that `landmarkIDs`
+    /// in each returned ClusterGroup preserves that ordering.
+    static func detectClusters(from entries: [(id: String, point: CGPoint)],
+                                labelSize: CGSize = CGSize(width: 20, height: 20)) -> [ClusterGroup] {
+        let n = entries.count
+        guard n >= 2 else { return [] }
+
+        var parent = Array(0..<n)
+        func find(_ x: Int) -> Int {
+            var x = x
+            while parent[x] != x { parent[x] = parent[parent[x]]; x = parent[x] }
+            return x
+        }
+
+        // Build bounding rects centred on each entry's screen point.
+        let hw = labelSize.width / 2
+        let hh = labelSize.height / 2
+        let rects = entries.map { e in
+            CGRect(x: e.point.x - hw, y: e.point.y - hh, width: labelSize.width, height: labelSize.height)
+        }
+
+        for i in 0..<n {
+            for j in (i + 1)..<n {
+                if rects[i].intersects(rects[j]) {
+                    let pi = find(i), pj = find(j)
+                    if pi != pj { parent[pi] = pj }
+                }
+            }
+        }
+
+        var groups = [Int: [Int]]()
+        for i in 0..<n { groups[find(i), default: []].append(i) }
+
+        return groups.compactMap { (_, indices) -> ClusterGroup? in
+            guard indices.count >= 2 else { return nil }
+            let sorted = indices.sorted()   // lower index = higher significance
+            let ids = sorted.map { entries[$0].id }
+            let xs = indices.map { entries[$0].point.x }
+            let ys = indices.map { entries[$0].point.y }
+            let count = CGFloat(indices.count)
+            let centre = CGPoint(x: xs.reduce(0, +) / count, y: ys.reduce(0, +) / count)
+            return ClusterGroup(
+                id: ids.sorted().joined(separator: "|"),
+                landmarkIDs: ids,
+                screenCentre: centre
+            )
+        }
+    }
+
+    // MARK: - LAR-51: Cluster Badge
+
+    private func showClusterBadge(_ cluster: ClusterGroup) {
+        if let existing = clusterBadgeViews[cluster.id] {
+            existing.isHidden = false
+            existing.center = cluster.screenCentre
+            existing.update(count: cluster.landmarkIDs.count)
+        } else {
+            let badge = ClusterBadgeView(count: cluster.landmarkIDs.count)
+            badge.center = cluster.screenCentre
+            badge.onTap = { [weak self] in self?.expandCluster(cluster) }
+            arView.addSubview(badge)
+            clusterBadgeViews[cluster.id] = badge
+        }
+    }
+
+    // MARK: - LAR-51: Fan Expansion / Collapse
+
+    private func expandCluster(_ cluster: ClusterGroup) {
+        guard case .none = clusterState else { return }
+
+        let displayIDs = Array(cluster.landmarkIDs.prefix(ARLandmarkViewController.maxFanLabels))
+        let overflowCount = cluster.landmarkIDs.count - displayIDs.count
+        let fanItemCount = displayIDs.count + (overflowCount > 0 ? 1 : 0)
+        let positions = ARLandmarkViewController.fanPositions(
+            count: fanItemCount, centre: cluster.screenCentre, in: arView.bounds.size)
+
+        if scrimView.superview == nil {
+            scrimView.frame = arView.bounds
+            arView.insertSubview(scrimView, at: 0)
+        }
+        scrimView.frame = arView.bounds
+
+        clusterState = .expanded(clusterID: cluster.id, centrePoint: cluster.screenCentre)
+
+        for id in displayIDs {
+            guard let label = labelViews[id],
+                  let landmark = landmarks.first(where: { $0.id == id }) else { continue }
+            label.center = cluster.screenCentre
+            label.isHidden = false
+            label.alpha = 0
+            label.onTap = { [weak self] in
+                self?.onSelect?(landmark)
+                self?.collapseCluster()
+            }
+            arView.bringSubviewToFront(label)
+        }
+
+        if overflowCount > 0, positions.indices.contains(displayIDs.count) {
+            let badge = makeOverflowBadge(count: overflowCount)
+            badge.center = cluster.screenCentre
+            badge.alpha = 0
+            arView.addSubview(badge)
+            overflowBadgeView = badge
+            arView.bringSubviewToFront(badge)
+        }
+
+        clusterBadgeViews[cluster.id]?.isHidden = true
+
+        UIView.animate(withDuration: ARLandmarkViewController.fanAnimationDuration,
+                       delay: 0, options: .curveEaseInOut) {
+            self.scrimView.alpha = 1
+            for (i, id) in displayIDs.enumerated() {
+                guard let label = self.labelViews[id] else { continue }
+                label.center = positions[i]
+                // LAR-48: Fanned labels bypass edge fade — fan layout keeps them on-screen.
+                label.alpha = label.distanceAlpha
+            }
+            if let overflow = self.overflowBadgeView, overflowCount > 0 {
+                overflow.center = positions[displayIDs.count]
+                overflow.alpha = 1
+            }
+        }
+    }
+
+    private func collapseCluster(animated: Bool = true) {
+        guard case .expanded = clusterState else { return }
+        clusterState = .none
+
+        let duration = animated ? ARLandmarkViewController.fanAnimationDuration : 0
+        UIView.animate(withDuration: duration, delay: 0, options: .curveEaseInOut) {
+            self.scrimView.alpha = 0
+        } completion: { _ in
+            self.overflowBadgeView?.removeFromSuperview()
+            self.overflowBadgeView = nil
+        }
+
+        if !animated {
+            scrimView.alpha = 0
+            overflowBadgeView?.removeFromSuperview()
+            overflowBadgeView = nil
+        }
+
+        refreshLabels()
+    }
+
+    @objc private func scrimTapped() { collapseCluster() }
+
+    // MARK: - LAR-51: Fan Position Calculation
+
+    /// Returns screen positions for `count` items in a radial fan centred at `centre`.
+    /// 2–3 items: semicircle above the tap point. 4+ items: full circle from the top.
+    /// Positions are clamped inward if they would extend off-screen.
+    static func fanPositions(count: Int, centre: CGPoint, in viewSize: CGSize) -> [CGPoint] {
+        guard count > 0 else { return [] }
+        let r = fanRadius
+
+        let angles: [CGFloat]
+        if count <= 3 {
+            if count == 1 {
+                angles = [-.pi / 2]
+            } else {
+                let step: CGFloat = .pi / CGFloat(count - 1)
+                angles = (0..<count).map { i in -.pi + CGFloat(i) * step }
+            }
+        } else {
+            let step: CGFloat = 2 * .pi / CGFloat(count)
+            angles = (0..<count).map { i in -.pi / 2 + CGFloat(i) * step }
+        }
+
+        var positions = angles.map { a in CGPoint(x: centre.x + r * cos(a), y: centre.y + r * sin(a)) }
+
+        let adjusted = adjustedCentre(centre, fanPositions: positions, in: viewSize)
+        if adjusted != centre {
+            let dx = adjusted.x - centre.x
+            let dy = adjusted.y - centre.y
+            positions = positions.map { CGPoint(x: $0.x + dx, y: $0.y + dy) }
+        }
+        return positions
+    }
+
+    static func adjustedCentre(_ centre: CGPoint,
+                                fanPositions positions: [CGPoint],
+                                in viewSize: CGSize) -> CGPoint {
+        let halfW: CGFloat = 90
+        let halfH: CGFloat = 35
+        let margin: CGFloat = 8
+
+        guard let minX = positions.map({ $0.x - halfW }).min(),
+              let maxX = positions.map({ $0.x + halfW }).max(),
+              let minY = positions.map({ $0.y - halfH }).min(),
+              let maxY = positions.map({ $0.y + halfH }).max() else { return centre }
+
+        var dx: CGFloat = 0
+        var dy: CGFloat = 0
+        if minX < margin { dx = margin - minX }
+        else if maxX > viewSize.width - margin { dx = viewSize.width - margin - maxX }
+        if minY < margin { dy = margin - minY }
+        else if maxY > viewSize.height - margin { dy = viewSize.height - margin - maxY }
+
+        return CGPoint(x: centre.x + dx, y: centre.y + dy)
+    }
+
+    // MARK: - LAR-51: Overflow Badge
+
+    private func makeOverflowBadge(count: Int) -> UIView {
+        let text = String(format: NSLocalizedString("ar.cluster.overflow", comment: ""), count)
+        let label = UILabel()
+        label.text = text
+        label.font = .systemFont(ofSize: 13, weight: .semibold)
+        label.textColor = .white
+        label.backgroundColor = UIColor.black.withAlphaComponent(0.55)
+        label.textAlignment = .center
+        label.layer.cornerRadius = 13
+        label.layer.masksToBounds = true
+        label.sizeToFit()
+        label.frame = CGRect(x: 0, y: 0, width: label.frame.width + 20, height: 26)
+        label.isUserInteractionEnabled = false
+        return label
+    }
+
+    // MARK: - LAR-51: Helpers
+
+    private func clearClusterBadges() {
+        clusterBadgeViews.values.forEach { $0.removeFromSuperview() }
+        clusterBadgeViews.removeAll()
     }
 
     // MARK: - LAR-40: Luma Sampling
@@ -544,4 +864,112 @@ private extension UILabel {
         layer.shadowRadius = 3
         layer.masksToBounds = false
     }
+}
+
+// MARK: - ClusterGroup
+// LAR-51: Represents a set of landmark labels whose screen-space centres are close enough
+// to be replaced by a single cluster badge. `landmarkIDs` is ordered by significance
+// (highest first) so that fan expansion and overflow truncation prioritise important landmarks.
+
+struct ClusterGroup {
+    /// Stable identifier: landmark IDs sorted lexicographically and joined by "|".
+    let id: String
+    /// Landmark IDs in the cluster, highest significance first.
+    let landmarkIDs: [String]
+    /// Centroid of all member screen positions (badge placement point).
+    let screenCentre: CGPoint
+}
+
+// MARK: - ClusterState
+// LAR-51: Tracks whether a cluster fan is currently open.
+
+enum ClusterState {
+    case none
+    case expanded(clusterID: String, centrePoint: CGPoint)
+}
+
+// MARK: - ClusterBadgeView
+// LAR-51: The visual badge that replaces a group of overlapping landmark labels.
+// Shows a stack icon (SF Symbol) and the member count, styled as a dark pill.
+// Tapping the badge triggers fan expansion via `onTap`.
+
+class ClusterBadgeView: UIView {
+
+    var onTap: (() -> Void)?
+
+    private let iconView = UIImageView()
+    private let countLabel = UILabel()
+
+    // Layout constants — fixed pill geometry.
+    private static let iconSize: CGFloat = 20
+    private static let spacing: CGFloat  = 6
+    private static let hPad: CGFloat     = 12
+    private static let badgeHeight: CGFloat = 36
+
+    init(count: Int) {
+        super.init(frame: .zero)
+        setup(count: count)
+    }
+
+    required init?(coder: NSCoder) { fatalError() }
+
+    /// Updates the displayed count and re-layouts the pill width to fit.
+    func update(count: Int) {
+        countLabel.text = "\(count)"
+        countLabel.sizeToFit()
+        let savedCenter = center   // layoutBadge changes frame.size which shifts center
+        layoutBadge()
+        center = savedCenter
+    }
+
+    private func setup(count: Int) {
+        backgroundColor = UIColor.black.withAlphaComponent(0.72)
+        layer.cornerRadius = 18
+        layer.masksToBounds = true
+
+        let config = UIImage.SymbolConfiguration(pointSize: 15, weight: .semibold)
+        iconView.image = UIImage(systemName: "square.stack.3d.up.fill", withConfiguration: config)
+        iconView.tintColor = .white
+        iconView.contentMode = .scaleAspectFit
+
+        countLabel.text = "\(count)"
+        countLabel.font = .systemFont(ofSize: 16, weight: .bold)
+        countLabel.textColor = .white
+        countLabel.sizeToFit()
+
+        // Pure frame-based layout — no Auto Layout, no UIStackView, no constraints.
+        // Mixing TAMIC=true (the default for a frame-managed view) with explicit
+        // constraints on self corrupts the hit area; frame math avoids that entirely.
+        addSubview(iconView)
+        addSubview(countLabel)
+        layoutBadge()
+
+        let tap = UITapGestureRecognizer(target: self, action: #selector(tapped))
+        addGestureRecognizer(tap)
+        isUserInteractionEnabled = true
+    }
+
+    /// Computes and applies frame sizes for the badge and its child views.
+    private func layoutBadge() {
+        let iconSz   = Self.iconSize
+        let sp       = Self.spacing
+        let hPad     = Self.hPad
+        let h        = Self.badgeHeight
+        let contentW = iconSz + sp + countLabel.frame.width
+        let w        = max(contentW + 2 * hPad, 64)
+
+        // Only update size, not origin — center is managed by the caller via .center.
+        frame.size = CGSize(width: w, height: h)
+
+        let startX = (w - contentW) / 2
+        iconView.frame    = CGRect(x: startX,
+                                   y: (h - iconSz) / 2,
+                                   width: iconSz, height: iconSz)
+        countLabel.frame  = CGRect(x: startX + iconSz + sp,
+                                   y: (h - countLabel.frame.height) / 2,
+                                   width: countLabel.frame.width,
+                                   height: countLabel.frame.height)
+    }
+
+    @objc private func tapped() { onTap?() }
 }

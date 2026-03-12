@@ -67,6 +67,9 @@
 "errorLog.noErrors" = "No errors logged.";
 "errorLog.clear" = "Clear";
 
+/* AR Cluster Expansion */
+"ar.cluster.overflow" = "+ %d more";
+
 /* Compass Bar */
 "compass.calibrating" = "Calibrating compass…";
 

@@ -33,14 +33,14 @@
 		BB39004300000001 /* WikidataServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB39004200000001 /* WikidataServiceTests.swift */; };
 		BB39005100000001 /* VisibleLabelCapTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB39005000000001 /* VisibleLabelCapTests.swift */; };
 		D40573532F58FCEB00859722 /* OpenStreetMapService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D40573512F58FCEB00859722 /* OpenStreetMapService.swift */; };
-		LAR50A1 /* CompassBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = LAR50A0 /* CompassBarView.swift */; };
-		LAR50B1 /* CompassBarViewTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = LAR50B0 /* CompassBarViewTests.swift */; };
-		LAR50C1 /* LocationManagerOrientationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = LAR50C0 /* LocationManagerOrientationTests.swift */; };
 		INT001 /* WikipediaServiceIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = INT000 /* WikipediaServiceIntegrationTests.swift */; };
 		INT003 /* OpenStreetMapServiceIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = INT002 /* OpenStreetMapServiceIntegrationTests.swift */; };
 		INT005 /* ElevationServiceIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = INT004 /* ElevationServiceIntegrationTests.swift */; };
 		INT007 /* WikidataServiceIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = INT006 /* WikidataServiceIntegrationTests.swift */; };
 		LAR48T1 /* ViewportEdgeFadeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = LAR48T0 /* ViewportEdgeFadeTests.swift */; };
+		LAR50A1 /* CompassBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = LAR50A0 /* CompassBarView.swift */; };
+		LAR50B1 /* CompassBarViewTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = LAR50B0 /* CompassBarViewTests.swift */; };
+		LAR50C1 /* LocationManagerOrientationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = LAR50C0 /* LocationManagerOrientationTests.swift */; };
 		LCBF /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = LOCVG /* Localizable.strings */; };
 		PRIV02 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = PRIV01 /* PrivacyInfo.xcprivacy */; };
 		T101 /* LandmarkCategoryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T001 /* LandmarkCategoryTests.swift */; };
@@ -93,14 +93,15 @@
 		BB39004200000001 /* WikidataServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WikidataServiceTests.swift; sourceTree = "<group>"; };
 		BB39005000000001 /* VisibleLabelCapTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisibleLabelCapTests.swift; sourceTree = "<group>"; };
 		D40573512F58FCEB00859722 /* OpenStreetMapService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenStreetMapService.swift; sourceTree = "<group>"; };
-		LAR50A0 /* CompassBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompassBarView.swift; sourceTree = "<group>"; };
-		LAR50B0 /* CompassBarViewTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompassBarViewTests.swift; sourceTree = "<group>"; };
-		LAR50C0 /* LocationManagerOrientationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManagerOrientationTests.swift; sourceTree = "<group>"; };
+		D4C6EACF2F61FE280034E9C2 /* LandmarkAR.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = LandmarkAR.xctestplan; sourceTree = "<group>"; };
 		INT000 /* WikipediaServiceIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WikipediaServiceIntegrationTests.swift; sourceTree = "<group>"; };
 		INT002 /* OpenStreetMapServiceIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenStreetMapServiceIntegrationTests.swift; sourceTree = "<group>"; };
 		INT004 /* ElevationServiceIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ElevationServiceIntegrationTests.swift; sourceTree = "<group>"; };
 		INT006 /* WikidataServiceIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WikidataServiceIntegrationTests.swift; sourceTree = "<group>"; };
 		LAR48T0 /* ViewportEdgeFadeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewportEdgeFadeTests.swift; sourceTree = "<group>"; };
+		LAR50A0 /* CompassBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompassBarView.swift; sourceTree = "<group>"; };
+		LAR50B0 /* CompassBarViewTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompassBarViewTests.swift; sourceTree = "<group>"; };
+		LAR50C0 /* LocationManagerOrientationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManagerOrientationTests.swift; sourceTree = "<group>"; };
 		LC_DE /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Localizable.strings; sourceTree = "<group>"; };
 		LC_EN /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		LC_ES /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -159,6 +160,7 @@
 		MAINGROUP = {
 			isa = PBXGroup;
 			children = (
+				D4C6EACF2F61FE280034E9C2 /* LandmarkAR.xctestplan */,
 				SRCGROUP /* LandmarkAR */,
 				TESTGROUP /* LandmarkARTests */,
 				PRODGROUP /* Products */,
