@@ -67,6 +67,9 @@
 "errorLog.noErrors" = "오류가 없습니다.";
 "errorLog.clear" = "지우기";
 
+/* AR Cluster Expansion */
+"ar.cluster.overflow" = "+ %d개 더";
+
 /* Compass Bar */
 "compass.calibrating" = "나침반 보정 중…";
 
